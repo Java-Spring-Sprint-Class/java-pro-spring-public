@@ -38,7 +38,7 @@ class RoleControllerTest {
     @Test
     @DisplayName("Should create role and return 201 Created with new ID")
     void createRole_ShouldReturnCreated_WhenSuccess() throws Exception {
-        var request = new RoleController.CreateRoleRequest("ADMIN");
+        var request = new CreateRoleRequest("ADMIN");
 
         given(roleService.createRole("ADMIN")).willReturn(100);
 

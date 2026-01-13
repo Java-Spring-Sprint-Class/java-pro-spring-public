@@ -36,7 +36,7 @@ class CommentControllerTest {
     @DisplayName("Add Comment: Should return 201 Created")
     void addComment_Success() throws Exception {
         int issueId = 1;
-        var request = new CommentController.AddCommentRequest("This is a comment");
+        var request = new AddCommentRequest("This is a comment");
 
         given(detailsService.addComment(issueId, "This is a comment")).willReturn(true);
 
@@ -66,7 +66,7 @@ class CommentControllerTest {
     @DisplayName("Update Comment: Should return 200 OK")
     void updateComment_Success() throws Exception {
         int commentId = 5;
-        var request = new CommentController.UpdateCommentRequest("Updated text");
+        var request = new UpdateCommentRequest("Updated text");
 
         mockMvc.perform(put("/api/comments/{commentId}", commentId)
                         .contentType(MediaType.APPLICATION_JSON)

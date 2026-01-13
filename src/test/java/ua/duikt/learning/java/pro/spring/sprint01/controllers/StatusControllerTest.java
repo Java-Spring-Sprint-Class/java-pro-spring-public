@@ -36,7 +36,7 @@ class StatusControllerTest {
     @Test
     @DisplayName("Create Status: should return 201")
     void createStatus_Success() throws Exception {
-        var request = new StatusController.CreateStatusRequest(
+        var request = new CreateStatusRequest(
                 1, "To Do", StatusCategory.TO_DO
         );
 

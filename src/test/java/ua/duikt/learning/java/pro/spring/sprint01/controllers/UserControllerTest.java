@@ -39,7 +39,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 201 Created when registration is successful")
     void register_ShouldReturnCreated_WhenSuccess() throws Exception {
-        var request = new UserController.RegisterRequest("john", "john@mail.com", "pass123");
+        var request = new RegisterRequest("john", "john@mail.com", "pass123");
 
         given(userService.register(anyString(), anyString(), anyString())).willReturn(true);
 
@@ -53,7 +53,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 409 Conflict when user already exists")
     void register_ShouldReturnConflict_WhenUserExists() throws Exception {
-        var request = new UserController.RegisterRequest("exist", "exist@mail.com", "pass");
+        var request = new RegisterRequest("exist", "exist@mail.com", "pass");
         given(userService.register(anyString(), anyString(), anyString())).willReturn(false);
 
         mockMvc.perform(post("/api/users/register")
@@ -107,7 +107,7 @@ class UserControllerTest {
     @DisplayName("Should update user and return 200 OK")
     void updateProfile_ShouldUpdate_WhenUserExists() throws Exception {
         int userId = 1;
-        var request = new UserController.UpdateProfileRequest("newNick", "new@mail.com");
+        var request = new UpdateProfileRequest("newNick", "new@mail.com");
 
         given(userService.getUser(userId)).willReturn(new User());
 
@@ -125,7 +125,7 @@ class UserControllerTest {
     void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
         given(userService.getUser(999)).willReturn(null);
 
-        var request = new UserController.UpdateProfileRequest("new", "new");
+        var request = new UpdateProfileRequest("new", "new");
 
         mockMvc.perform(put("/api/users/{id}", 999)
                         .contentType(MediaType.APPLICATION_JSON)
