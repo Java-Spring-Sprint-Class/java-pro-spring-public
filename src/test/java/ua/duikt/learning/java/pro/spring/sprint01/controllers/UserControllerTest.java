@@ -1,0 +1,153 @@
+package ua.duikt.learning.java.pro.spring.sprint01.controllers;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import ua.duikt.learning.java.pro.spring.controllers.UserController;
+import ua.duikt.learning.java.pro.spring.entity.User;
+import ua.duikt.learning.java.pro.spring.service.UserService;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/**
+ * Created by Mykyta Sirobaba on 13.01.2026.
+ * email mykyta.sirobaba@gmail.com
+ */
+@WebMvcTest(UserController.class)
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    @DisplayName("Should return 201 Created when registration is successful")
+    void register_ShouldReturnCreated_WhenSuccess() throws Exception {
+        var request = new UserController.RegisterRequest("john", "john@mail.com", "pass123");
+
+        given(userService.register(anyString(), anyString(), anyString())).willReturn(true);
+
+        mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("User registered successfully"));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when user already exists")
+    void register_ShouldReturnConflict_WhenUserExists() throws Exception {
+        var request = new UserController.RegisterRequest("exist", "exist@mail.com", "pass");
+        given(userService.register(anyString(), anyString(), anyString())).willReturn(false);
+
+        mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("User with this username or email already exists"));
+    }
+
+    @Test
+    @DisplayName("Should return User JSON when user exists")
+    void getUser_ShouldReturnUser_WhenFound() throws Exception {
+        User mockUser = new User();
+        mockUser.setId(1);
+        mockUser.setUsername("testUser");
+
+        given(userService.getUser(1)).willReturn(mockUser);
+
+        mockMvc.perform(get("/api/users/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("testUser"))
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when user does not exist")
+    void getUser_ShouldReturnNotFound_WhenMissing() throws Exception {
+        given(userService.getUser(999)).willReturn(null);
+
+        mockMvc.perform(get("/api/users/{id}", 999))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return list of users")
+    void listUsers_ShouldReturnList() throws Exception {
+        User u1 = new User();
+        u1.setUsername("A");
+        User u2 = new User();
+        u2.setUsername("B");
+
+        given(userService.listUsers(null)).willReturn(List.of(u1, u2));
+
+        mockMvc.perform(get("/api/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].username").value("A"));
+    }
+
+    @Test
+    @DisplayName("Should update user and return 200 OK")
+    void updateProfile_ShouldUpdate_WhenUserExists() throws Exception {
+        int userId = 1;
+        var request = new UserController.UpdateProfileRequest("newNick", "new@mail.com");
+
+        given(userService.getUser(userId)).willReturn(new User());
+
+        mockMvc.perform(put("/api/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Profile updated"));
+
+        verify(userService).updateProfile(userId, "newNick", "new@mail.com");
+    }
+
+    @Test
+    @DisplayName("Should return 404 when updating non-existent user")
+    void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
+        given(userService.getUser(999)).willReturn(null);
+
+        var request = new UserController.UpdateProfileRequest("new", "new");
+
+        mockMvc.perform(put("/api/users/{id}", 999)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 204 No Content on successful deactivation")
+    void deactivateUser_ShouldReturnNoContent() throws Exception {
+        given(userService.deactivateUser(1)).willReturn(true);
+
+        mockMvc.perform(delete("/api/users/{id}", 1))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Should return 404 if deactivation fails")
+    void deactivateUser_ShouldReturnNotFound() throws Exception {
+        given(userService.deactivateUser(999)).willReturn(false);
+
+        mockMvc.perform(delete("/api/users/{id}", 999))
+                .andExpect(status().isNotFound());
+    }
+}
