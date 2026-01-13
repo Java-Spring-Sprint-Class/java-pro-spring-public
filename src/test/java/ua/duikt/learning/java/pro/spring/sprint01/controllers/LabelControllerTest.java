@@ -35,7 +35,7 @@ class LabelControllerTest {
     @Test
     @DisplayName("Create Label: Should return 201 and ID")
     void createLabel_Success() throws Exception {
-        var request = new LabelController.CreateLabelRequest("BUG", "#FF0000");
+        var request = new CreateLabelRequest("BUG", "#FF0000");
         given(detailsService.createLabel("BUG", "#FF0000")).willReturn(55);
 
         mockMvc.perform(post("/api/labels")

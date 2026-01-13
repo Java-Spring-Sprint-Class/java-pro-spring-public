@@ -29,13 +29,14 @@ class AttachmentControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private DetailsService detailsService;
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     @DisplayName("Add Attachment: Should return 201")
     void addAttachment_Success() throws Exception {
         int issueId = 1;
-        var request = new AttachmentController.AddAttachmentRequest("file.png", "http://url.com", 1024);
+        var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
         given(detailsService.addAttachment(issueId, "file.png", "http://url.com", 1024))
                 .willReturn(true);

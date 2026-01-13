@@ -38,7 +38,7 @@ class IssueControllerTest {
     @Test
     @DisplayName("Create Issue: returns 201 and ID")
     void createIssue_Success() throws Exception {
-        var request = new IssueController.CreateIssueRequest(
+        var request = new CreateIssueRequest(
                 1, "Fix Bug", "Desc", IssueType.BUG, Priority.HIGH
         );
 
@@ -81,7 +81,7 @@ class IssueControllerTest {
     @DisplayName("Update Issue: checks existence then updates")
     void updateIssue_Success() throws Exception {
         int id = 1;
-        var request = new IssueController.UpdateIssueRequest("New Title", "New Desc");
+        var request = new UpdateIssueRequest("New Title", "New Desc");
 
         given(issueService.getIssue(id)).willReturn(new Issue());
 
@@ -96,7 +96,7 @@ class IssueControllerTest {
     @DisplayName("Update Issue: returns 404 if missing")
     void updateIssue_NotFound() throws Exception {
         given(issueService.getIssue(99)).willReturn(null);
-        var request = new IssueController.UpdateIssueRequest("T", "D");
+        var request = new UpdateIssueRequest("T", "D");
 
         mockMvc.perform(put("/api/issues/{id}", 99)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +109,7 @@ class IssueControllerTest {
     void updateStatus_Success() throws Exception {
         int issueId = 1;
         int newStatusId = 5;
-        var request = new IssueController.PatchStatusRequest(newStatusId);
+        var request = new PatchStatusRequest(newStatusId);
 
         given(issueService.getIssue(issueId)).willReturn(new Issue());
 

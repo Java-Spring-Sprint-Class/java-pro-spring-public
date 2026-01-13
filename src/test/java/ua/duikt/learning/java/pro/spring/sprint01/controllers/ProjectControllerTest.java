@@ -40,7 +40,7 @@ class ProjectControllerTest {
     @Test
     @DisplayName("1. Create Project: Should return 201 and new ID")
     void createProject_Success() throws Exception {
-        var request = new ProjectController.CreateProjectRequest("New Project", "NP", "Desc");
+        var request = new CreateProjectRequest("New Project", "NP", "Desc");
 
         given(projectService.createProject("New Project", "NP", "Desc")).willReturn(55);
 
@@ -79,7 +79,7 @@ class ProjectControllerTest {
     @DisplayName("4. Update Project: Should check existence, update and return 200")
     void updateProject_Success() throws Exception {
         int projectId = 1;
-        var request = new ProjectController.UpdateProjectRequest("Updated Name", "Updated Desc");
+        var request = new UpdateProjectRequest("Updated Name", "Updated Desc");
 
         given(projectService.getProject(projectId)).willReturn(new Project());
 
@@ -96,7 +96,7 @@ class ProjectControllerTest {
     @DisplayName("4. Update Project: Should return 404 if project missing")
     void updateProject_NotFound() throws Exception {
         given(projectService.getProject(99)).willReturn(null);
-        var request = new ProjectController.UpdateProjectRequest("Val", "Desc");
+        var request = new UpdateProjectRequest("Val", "Desc");
 
         mockMvc.perform(put("/api/projects/{id}", 99)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +118,7 @@ class ProjectControllerTest {
     void addMember_Success() throws Exception {
         int projectId = 1;
         int userId = 10;
-        var request = new ProjectController.AddMemberRequest(userId, ProjectRoleType.DEVELOPER);
+        var request = new AddMemberRequest(userId, ProjectRoleType.DEVELOPER);
 
         given(projectService.getProject(projectId)).willReturn(new Project());
 
@@ -135,7 +135,7 @@ class ProjectControllerTest {
     @DisplayName("6. Add Member: Should return 404 if project missing")
     void addMember_ProjectNotFound() throws Exception {
         given(projectService.getProject(99)).willReturn(null);
-        var request = new ProjectController.AddMemberRequest(10, ProjectRoleType.ADMIN);
+        var request = new AddMemberRequest(10, ProjectRoleType.ADMIN);
 
         mockMvc.perform(post("/api/projects/{projectId}/members", 99)
                         .contentType(MediaType.APPLICATION_JSON)
