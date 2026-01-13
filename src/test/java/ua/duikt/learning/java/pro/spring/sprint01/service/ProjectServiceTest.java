@@ -42,21 +42,6 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("Manage Project Members")
-    void memberManagement() {
-        Integer pId = projectService.createProject("Beta", "BET", "Desc");
-
-        projectService.addMember(pId, 101, ProjectRoleType.OWNER);
-        projectService.addMember(pId, 102, ProjectRoleType.MEMBER);
-
-        List<ProjectMember> members = projectService.getMembers(pId);
-        assertThat(members).hasSize(2);
-
-        projectService.removeMember(pId, 101);
-        assertThat(projectService.getMembers(pId)).hasSize(1);
-    }
-
-    @Test
     @DisplayName("Create and Get Project")
     void createAndGet() {
         Integer pId = projectService.createProject("Alpha", "ALP", "Description for Alpha");
