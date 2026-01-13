@@ -1,9 +1,52 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ua.duikt.learning.java.pro.spring.dtos.AddCommentRequest;
+import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
+import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.service.DetailsService;
+
+import java.util.List;
+
 /**
  * Created by Mykyta Sirobaba on 14.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
-//TODO: Implements all necessary endpoints
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class CommentController {
+
+    private final DetailsService detailsService;
+
+    @PostMapping("/issues/{issueId}/comments")
+    public ResponseEntity<String> addComment(@PathVariable Integer issueId,
+                                             @RequestBody AddCommentRequest request) {
+        boolean added = detailsService.addComment(issueId, request.getContent());
+        if (added) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
+        }
+        return ResponseEntity.badRequest().body("Failed to add comment");
+    }
+
+    @GetMapping("/issues/{issueId}/comments")
+    public ResponseEntity<List<IssueComment>> getComments(@PathVariable Integer issueId) {
+        return ResponseEntity.ok(detailsService.getComments(issueId));
+    }
+
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<String> updateComment(@PathVariable Integer commentId,
+                                                @RequestBody UpdateCommentRequest request) {
+        detailsService.updateComment(commentId, request.getContent());
+        return ResponseEntity.ok("Comment updated");
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId) {
+        boolean deleted = detailsService.deleteComment(commentId);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
 }

@@ -1,9 +1,62 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
+import ua.duikt.learning.java.pro.spring.entity.Label;
+import ua.duikt.learning.java.pro.spring.service.DetailsService;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Mykyta Sirobaba on 14.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
-//TODO: Implements all necessary endpoints
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class LabelController {
+
+    private final DetailsService detailsService;
+
+    @PostMapping("/labels")
+    public ResponseEntity<Map<String, Object>> createLabel(@RequestBody CreateLabelRequest request) {
+        Integer labelId = detailsService.createLabel(request.getName(), request.getColor());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("id", labelId, "message", "Label created"));
+    }
+
+    @GetMapping("/labels")
+    public ResponseEntity<List<Label>> getAllLabels() {
+        return ResponseEntity.ok(detailsService.getLabels());
+    }
+
+    @PostMapping("/issues/{issueId}/labels/{labelId}")
+    public ResponseEntity<String> addLabelToIssue(@PathVariable Integer issueId,
+                                                  @PathVariable Integer labelId) {
+        boolean added = detailsService.addLabelToIssue(issueId, labelId);
+        if (added) {
+            return ResponseEntity.ok("Label added to issue");
+        }
+        return ResponseEntity.badRequest().body("Failed to add label");
+    }
+
+    @GetMapping("/issues/{issueId}/labels")
+    public ResponseEntity<List<Label>> getLabelsForIssue(@PathVariable Integer issueId) {
+        return ResponseEntity.ok(detailsService.getLabelsForIssue(issueId));
+    }
+
+    @DeleteMapping("/issues/{issueId}/labels/{labelId}")
+    public ResponseEntity<String> removeLabelFromIssue(@PathVariable Integer issueId,
+                                                       @PathVariable Integer labelId) {
+        boolean removed = detailsService.removeLabelFromIssue(issueId, labelId);
+        if (removed) {
+            return ResponseEntity.ok("Label removed from issue");
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
