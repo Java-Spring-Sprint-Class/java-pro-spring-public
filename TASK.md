@@ -1,224 +1,170 @@
-# AgileNext Junior Java Developer Mission
+# Task: Define API Endpoints Contract
 
-Welcome to **AgileNext Junior Java Developer Mission**.
+## Goal
 
-You are the new **Junior Java Developer** at the startup AgileNext. Our Tech Lead left a prototype of the core system of our future project management tool (a Jira-like application).
 
-Your mission: transform this prototype into a full-fledged, working **REST API application**. Ensure the system is reliable, the code is clean, and tests are green.
+### User DTOs
+**RegisterRequest**
+- String username
+- String email
+- String password
 
----
-
-## Entities
-
-### 1. User
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| username | String | `username` |
-| email | String | `email` |
-| passwordHash | String | `passwordHash` |
-| avatarUrl | String | `avatarUrl` |
-| isActive | Boolean | `isActive` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
-
-### 2. Role
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| name | String | `name` |
-
-### 3. UserRole (Many-to-Many)
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| userId | Integer | `userId` |
-| roleId | Integer | `roleId` |
-
-### 4. Project
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| name | String | `name` |
-| key | String | `key` |
-| ownerId | Integer | `ownerId` |
-| description | String | `description` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
-
-### 5. ProjectMember
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| projectId | Integer | `projectId` |
-| userId | Integer | `userId` |
-| role | ProjectRoleType | `role` |
-
-### 6. Issue
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| projectId | Integer | `projectId` |
-| key | String | `key` |
-| title | String | `title` |
-| description | String | `description` |
-| type | IssueType | `type` |
-| priority | Priority | `priority` |
-| statusId | Integer | `statusId` |
-| assigneeId | Integer | `assigneeId` |
-| reporterId | Integer | `reporterId` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
-
-### 7. Status
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| name | String | `name` |
-| category | StatusCategory | `category` |
-| position | Integer | `position` |
-| projectId | Integer | `projectId` |
-
-### 8. IssueComment
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
-| content | String | `content` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
-
-### 9. Attachment
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
-| fileName | String | `fileName` |
-| fileUrl | String | `fileUrl` |
-| fileSize | Integer | `fileSize` |
-| createdAt | LocalDateTime | `createdAt` |
-
-### 10. IssueHistory
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
-| fieldChanged | String | `fieldChanged` |
-| oldValue | String | `oldValue` |
-| newValue | String | `newValue` |
-| createdAt | LocalDateTime | `createdAt` |
-
-### 11. Label
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| id | Integer | `id` |
-| name | String | `name` |
-| color | String | `color` |
-
-### 12. IssueLabel (Many-to-Many)
-
-| Field | Type | Variable Name |
-|-------|------|---------------|
-| issueId | Integer | `issueId` |
-| labelId | Integer | `labelId` |
+**UpdateProfileRequest**
+- String username
+- String email
 
 ---
 
-## Enums
+### Role DTOs
+**CreateRoleRequest**
+- String name
 
-```java
-public enum IssueType { BUG, TASK, STORY, EPIC }
-public enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
-public enum StatusCategory { TO_DO, IN_PROGRESS, DONE }
-public enum ProjectRoleType { OWNER, ADMIN, MEMBER, VIEWER }
-```
+---
 
-## Services (Methods)
+### Project DTOs
+**CreateProjectRequest**
+- String name
+- String key
+- String description
 
-### UserService
+**UpdateProjectRequest**
+- String name
+- String description
 
-| Method         | Parameters                                     | Description                                            |
-| -------------- | ---------------------------------------------- | ------------------------------------------------------ |
-| register       | String username, String email, String password | Creates a new user. Password should be hashed.         |
-| getUser        | Integer id                                     | Retrieves a user by ID.                                |
-| listUsers      | String search                                  | Returns a list of users. Filters by username or email. |
-| updateProfile  | Integer id, String username, String email      | Updates username and email. Updates `updatedAt`.       |
-| deactivateUser | Integer id                                     | Deactivates user (`isActive=false`).                   |
-| assignRole     | Integer userId, Integer roleId                 | Assigns role to user.                                  |
-| removeRole     | Integer userId, Integer roleId                 | Removes role from user.                                |
+**AddMemberRequest**
+- Integer userId
+- ProjectRoleType role
 
-### RoleService
+---
 
-| Method     | Parameters  | Description                          |
-| ---------- | ----------- | ------------------------------------ |
-| createRole | String name | Creates a new role. Returns role ID. |
-| getRoles   | —           | Returns all roles.                   |
+### Issue DTOs
+**CreateIssueRequest**
+- Integer projectId
+- String title
+- String description
+- IssueType type
+- Priority priority
 
-### ProjectService
+**UpdateIssueRequest**
+- String title
+- String description
 
-| Method        | Parameters                                              | Description                                                                |
-| ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------- |
-| createProject | String name, String key, String description             | Creates a new project. Owner ID from security context. Returns project ID. |
-| getProject    | Integer id                                              | Returns a project by ID.                                                   |
-| listProjects  | —                                                       | Returns all projects.                                                      |
-| updateProject | Integer id, String name, String description             | Updates project name and description. Updates `updatedAt`.                 |
-| deleteProject | Integer id                                              | Deletes project by ID.                                                     |
-| addMember     | Integer projectId, Integer userId, ProjectRoleType role | Adds a member with role.                                                   |
-| getMembers    | Integer projectId                                       | Returns project members.                                                   |
-| removeMember  | Integer projectId, Integer userId                       | Removes a member.                                                          |
+**PatchStatusRequest**
+- Integer statusId
 
-### IssueService
+**PatchAssigneeRequest**
+- Integer assigneeId
 
-| Method        | Parameters                                                                             | Description                                                    |
-| ------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| createIssue   | Integer projectId, String title, String description, IssueType type, Priority priority | Creates an issue. Default status ID=1. Adds to `IssueHistory`. |
-| getIssue      | Integer id                                                                             | Returns an issue by ID.                                        |
-| listIssues    | Integer projectId                                                                      | Returns all issues in a project.                               |
-| updateIssue   | Integer id, String title, String description                                           | Updates title/description. Adds to `IssueHistory`.             |
-| deleteIssue   | Integer id                                                                             | Deletes an issue.                                              |
-| patchStatus   | Integer id, Integer newStatusId                                                        | Updates status. Adds history entry.                            |
-| patchAssignee | Integer id, Integer assigneeId                                                         | Changes assignee. Adds history entry.                          |
-| createStatus  | Integer projectId, String name, StatusCategory category                                | Creates a status. Returns status ID.                           |
-| getStatuses   | Integer projectId                                                                      | Returns all statuses for a project.                            |
-| updateStatus  | Integer id, String name                                                                | Updates status name.                                           |
-| deleteStatus  | Integer id                                                                             | Deletes a status.                                              |
-| getHistory    | Integer issueId                                                                        | Returns all `IssueHistory` entries.                            |
+---
 
-### DetailsService (Comments, Attachments, Labels)
+### Status DTOs
+**CreateStatusRequest**
+- Integer projectId
+- String name
+- StatusCategory category
 
-| Method        | Parameters                      | Description                           |
-| ------------- | ------------------------------- | ------------------------------------- |
-| addComment    | Integer issueId, String content | Adds a comment.                       |
-| getComments   | Integer issueId                 | Returns all comments for an issue.    |
-| updateComment | Integer id, String content      | Updates comment and sets `updatedAt`. |
-| deleteComment | Integer id                      | Deletes a comment.                    |
+**UpdateStatusRequest**
+- String name
+
+---
+
+### Comment DTOs
+**AddCommentRequest**
+- String content
+
+**UpdateCommentRequest**
+- String content
+
+---
+
+### Attachment DTOs
+**AddAttachmentRequest**
+- String fileName
+- String fileUrl
+- Integer fileSize
+
+---
+
+### Label DTOs
+**CreateLabelRequest**
+- String name
+- String color
+
+---
+
+## 2. API Endpoints Contract
 
 
-| Method           | Parameters                                                         | Description          |
-| ---------------- | ------------------------------------------------------------------ | -------------------- |
-| addAttachment    | Integer issueId, String fileName, String fileUrl, Integer fileSize | Adds attachment.     |
-| getAttachments   | Integer issueId                                                    | Returns attachments. |
-| deleteAttachment | Integer id                                                         | Deletes attachment.  |
+---
 
+### UserController (`/api/users`)
+- register(RegisterRequest request)
+- getUser(Integer id)
+- listUsers(String search)
+- updateProfile(Integer id, UpdateProfileRequest request)
+- deactivateUser(Integer id)
+- assignRole(Integer userId, Integer roleId)
+- removeRole(Integer userId, Integer roleId)
 
-| Method               | Parameters                       | Description                       |
-| -------------------- | -------------------------------- | --------------------------------- |
-| createLabel          | String name, String color        | Creates label. Returns label ID.  |
-| getLabels            | —                                | Returns all labels.               |
-| addLabelToIssue      | Integer issueId, Integer labelId | Assigns label to issue.           |
-| removeLabelFromIssue | Integer issueId, Integer labelId | Removes label from issue.         |
-| getLabelsForIssue    | Integer issueId                  | Returns labels assigned to issue. |
+---
+
+### RoleController (`/api/roles`)
+- createRole(CreateRoleRequest request)
+- getRoles()
+
+---
+
+### ProjectController (`/api/projects`)
+- createProject(CreateProjectRequest request)
+- getProject(Integer id)
+- listProjects()
+- updateProject(Integer id, UpdateProjectRequest request)
+- deleteProject(Integer id)
+- addMember(Integer projectId, AddMemberRequest request)
+- getProjectMembers(Integer projectId)
+- removeMember(Integer projectId, Integer userId)
+
+---
+
+### IssueController (`/api/issues`)
+- createIssue(CreateIssueRequest request)
+- getIssue(Integer id)
+- listIssues(Integer projectId)
+- updateIssue(Integer id, UpdateIssueRequest request)
+- deleteIssue(Integer id)
+- updateStatus(Integer id, PatchStatusRequest request)
+- updateAssignee(Integer id, PatchAssigneeRequest request)
+- getHistory(Integer id)
+
+---
+
+### StatusController (`/api/statuses`)
+- createStatus(CreateStatusRequest request)
+- getStatuses(Integer projectId)
+- updateStatus(Integer id, UpdateStatusRequest request)
+- deleteStatus(Integer id)
+
+---
+
+### CommentController (`/api`)
+- addComment(Integer issueId, AddCommentRequest request)
+- getComments(Integer issueId)
+- updateComment(Integer commentId, UpdateCommentRequest request)
+- deleteComment(Integer commentId)
+
+---
+
+### AttachmentController (`/api`)
+- addAttachment(Integer issueId, AddAttachmentRequest request)
+- getAttachments(Integer issueId)
+- deleteAttachment(Integer attachmentId)
+
+---
+
+### LabelController (`/api`)
+- createLabel(CreateLabelRequest request)
+- getAllLabels()
+- addLabelToIssue(Integer issueId, Integer labelId)
+- getLabelsForIssue(Integer issueId)
+- removeLabelFromIssue(Integer issueId, Integer labelId)  
 
