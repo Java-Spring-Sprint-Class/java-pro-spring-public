@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.ProjectController;
+import ua.duikt.learning.java.pro.spring.dtos.AddMemberRequest;
+import ua.duikt.learning.java.pro.spring.dtos.CreateProjectRequest;
+import ua.duikt.learning.java.pro.spring.dtos.UpdateProjectRequest;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
@@ -118,11 +121,11 @@ class ProjectControllerTest {
     void addMember_Success() throws Exception {
         int projectId = 1;
         int userId = 10;
-        var request = new AddMemberRequest(userId, ProjectRoleType.DEVELOPER);
+        var request = new AddMemberRequest(userId, ProjectRoleType.ADMIN);
 
         given(projectService.getProject(projectId)).willReturn(new Project());
 
-        given(projectService.addMember(projectId, userId, ProjectRoleType.DEVELOPER)).willReturn(true);
+        given(projectService.addMember(projectId, userId, ProjectRoleType.ADMIN)).willReturn(true);
 
         mockMvc.perform(post("/api/projects/{projectId}/members", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
