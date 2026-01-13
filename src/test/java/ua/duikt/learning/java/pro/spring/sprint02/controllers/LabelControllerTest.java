@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.LabelController;
+import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
 import ua.duikt.learning.java.pro.spring.entity.Label;
 import ua.duikt.learning.java.pro.spring.service.DetailsService;
 

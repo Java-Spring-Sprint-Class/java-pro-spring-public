@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.CommentController;
+import ua.duikt.learning.java.pro.spring.dtos.AddCommentRequest;
+import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
 import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
