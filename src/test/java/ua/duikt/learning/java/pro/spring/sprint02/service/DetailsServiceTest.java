@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint01.service;
+package ua.duikt.learning.java.pro.spring.sprint02.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
