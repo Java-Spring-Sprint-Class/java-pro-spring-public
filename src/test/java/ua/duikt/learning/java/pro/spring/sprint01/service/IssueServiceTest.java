@@ -43,9 +43,9 @@ class IssueServiceTest {
     @Test
     @DisplayName("Status Lifecycle: Create, Update, Delete")
     void statusLifecycle() {
-        Long sId = issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
 
-        List<Status> statuses = issueService.getStatuses(1);
+        List<Status> statuses = issueService.getStatuses(1L);
         assertThat(statuses).hasSize(1);
         assertThat(statuses.getFirst().getName()).isEqualTo("To Do");
 
@@ -62,7 +62,7 @@ class IssueServiceTest {
     @Test
     @DisplayName("Issue CRUD: Create, Get, Update, Delete")
     void issueCrud() {
-        Long issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
+        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
 
         Issue issue = issueService.getIssue(issueId);
         assertThat(issue).isNotNull();
