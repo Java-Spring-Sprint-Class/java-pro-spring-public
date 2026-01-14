@@ -32,34 +32,35 @@
 - String description
 
 **AddMemberRequest**
-- Integer userId
+- Long userId
 - ProjectRoleType role
 
 ---
 
 ### Issue DTOs
 **CreateIssueRequest**
-- Integer projectId
+- Long projectId
 - String title
 - String description
 - IssueType type
 - Priority priority
+- Long statusId
 
 **UpdateIssueRequest**
 - String title
 - String description
 
 **PatchStatusRequest**
-- Integer statusId
+- Long statusId
 
 **PatchAssigneeRequest**
-- Integer assigneeId
+- Long assigneeId
 
 ---
 
 ### Status DTOs
 **CreateStatusRequest**
-- Integer projectId
+- Long projectId
 - String name
 - StatusCategory category
 
@@ -99,12 +100,12 @@
 
 ### UserController (`/api/users`)
 - register(RegisterRequest request)
-- getUser(Integer id)
+- getUser(Long id)
 - listUsers(String search)
-- updateProfile(Integer id, UpdateProfileRequest request)
-- deactivateUser(Integer id)
-- assignRole(Integer userId, Integer roleId)
-- removeRole(Integer userId, Integer roleId)
+- updateProfile(Long id, UpdateProfileRequest request)
+- deactivateUser(Long id)
+- assignRole(Long userId, Long roleId)
+- removeRole(Long userId, Long roleId)
 
 ---
 
@@ -116,55 +117,55 @@
 
 ### ProjectController (`/api/projects`)
 - createProject(CreateProjectRequest request)
-- getProject(Integer id)
+- getProject(Long id)
 - listProjects()
-- updateProject(Integer id, UpdateProjectRequest request)
-- deleteProject(Integer id)
-- addMember(Integer projectId, AddMemberRequest request)
-- getProjectMembers(Integer projectId)
-- removeMember(Integer projectId, Integer userId)
+- updateProject(Long id, UpdateProjectRequest request)
+- deleteProject(Long id)
+- addMember(Long projectId, AddMemberRequest request)
+- getProjectMembers(Long projectId)
+- removeMember(Long projectId, Long userId)
 
 ---
 
 ### IssueController (`/api/issues`)
 - createIssue(CreateIssueRequest request)
-- getIssue(Integer id)
-- listIssues(Integer projectId)
-- updateIssue(Integer id, UpdateIssueRequest request)
-- deleteIssue(Integer id)
-- updateStatus(Integer id, PatchStatusRequest request)
-- updateAssignee(Integer id, PatchAssigneeRequest request)
-- getHistory(Integer id)
+- getIssue(Long id)
+- listIssues(Long projectId)
+- updateIssue(Long id, UpdateIssueRequest request)
+- deleteIssue(Long id)
+- updateStatus(Long id, PatchStatusRequest request)
+- updateAssignee(Long id, PatchAssigneeRequest request)
+- getHistory(Long id)
 
 ---
 
 ### StatusController (`/api/statuses`)
 - createStatus(CreateStatusRequest request)
-- getStatuses(Integer projectId)
-- updateStatus(Integer id, UpdateStatusRequest request)
-- deleteStatus(Integer id)
+- getStatuses(Long projectId)
+- updateStatus(Long id, UpdateStatusRequest request)
+- deleteStatus(Long id)
 
 ---
 
 ### CommentController (`/api`)
-- addComment(Integer issueId, AddCommentRequest request)
-- getComments(Integer issueId)
-- updateComment(Integer commentId, UpdateCommentRequest request)
-- deleteComment(Integer commentId)
+- addComment(Long issueId, AddCommentRequest request)
+- getComments(Long issueId)
+- updateComment(Long commentId, UpdateCommentRequest request)
+- deleteComment(Long commentId)
 
 ---
 
 ### AttachmentController (`/api`)
-- addAttachment(Integer issueId, AddAttachmentRequest request)
-- getAttachments(Integer issueId)
-- deleteAttachment(Integer attachmentId)
+- addAttachment(Long issueId, AddAttachmentRequest request)
+- getAttachments(Long issueId)
+- deleteAttachment(Long attachmentId)
 
 ---
 
 ### LabelController (`/api`)
 - createLabel(CreateLabelRequest request)
 - getAllLabels()
-- addLabelToIssue(Integer issueId, Integer labelId)
-- getLabelsForIssue(Integer issueId)
-- removeLabelFromIssue(Integer issueId, Integer labelId)  
+- addLabelToIssue(Long issueId, Long labelId)
+- getLabelsForIssue(Long issueId)
+- removeLabelFromIssue(Long issueId, Long labelId)  
 

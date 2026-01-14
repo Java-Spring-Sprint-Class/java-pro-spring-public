@@ -67,23 +67,23 @@ class UserControllerTest {
     @DisplayName("Should return User JSON when user exists")
     void getUser_ShouldReturnUser_WhenFound() throws Exception {
         User mockUser = new User();
-        mockUser.setId(1);
+        mockUser.setId(1L);
         mockUser.setUsername("testUser");
 
         given(userService.getUser(1)).willReturn(mockUser);
 
-        mockMvc.perform(get("/api/users/{id}", 1))
+        mockMvc.perform(get("/api/users/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("testUser"))
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1L));
     }
 
     @Test
     @DisplayName("Should return 404 Not Found when user does not exist")
     void getUser_ShouldReturnNotFound_WhenMissing() throws Exception {
-        given(userService.getUser(999)).willReturn(null);
+        given(userService.getUser(999L)).willReturn(null);
 
-        mockMvc.perform(get("/api/users/{id}", 999))
+        mockMvc.perform(get("/api/users/{id}", 999L))
                 .andExpect(status().isNotFound());
     }
 
@@ -106,7 +106,7 @@ class UserControllerTest {
     @Test
     @DisplayName("Should update user and return 200 OK")
     void updateProfile_ShouldUpdate_WhenUserExists() throws Exception {
-        int userId = 1;
+        Long userId = 1L;
         var request = new UpdateProfileRequest("newNick", "new@mail.com");
 
         given(userService.getUser(userId)).willReturn(new User());
@@ -123,11 +123,11 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 404 when updating non-existent user")
     void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
-        given(userService.getUser(999)).willReturn(null);
+        given(userService.getUser(999L)).willReturn(null);
 
         var request = new UpdateProfileRequest("new", "new");
 
-        mockMvc.perform(put("/api/users/{id}", 999)
+        mockMvc.perform(put("/api/users/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -136,18 +136,18 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 204 No Content on successful deactivation")
     void deactivateUser_ShouldReturnNoContent() throws Exception {
-        given(userService.deactivateUser(1)).willReturn(true);
+        given(userService.deactivateUser(1L)).willReturn(true);
 
-        mockMvc.perform(delete("/api/users/{id}", 1))
+        mockMvc.perform(delete("/api/users/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("Should return 404 if deactivation fails")
     void deactivateUser_ShouldReturnNotFound() throws Exception {
-        given(userService.deactivateUser(999)).willReturn(false);
+        given(userService.deactivateUser(999L)).willReturn(false);
 
-        mockMvc.perform(delete("/api/users/{id}", 999))
+        mockMvc.perform(delete("/api/users/{id}", 999L))
                 .andExpect(status().isNotFound());
     }
 }

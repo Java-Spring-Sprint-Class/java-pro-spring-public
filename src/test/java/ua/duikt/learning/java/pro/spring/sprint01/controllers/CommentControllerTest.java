@@ -35,7 +35,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Add Comment: Should return 201 Created")
     void addComment_Success() throws Exception {
-        int issueId = 1;
+        Long issueId = 1L;
         var request = new AddCommentRequest("This is a comment");
 
         given(detailsService.addComment(issueId, "This is a comment")).willReturn(true);
@@ -50,7 +50,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Get Comments: Should return list")
     void getComments_Success() throws Exception {
-        int issueId = 1;
+        Long issueId = 1L;
         IssueComment comment = new IssueComment();
         comment.setContent("Test content");
 
@@ -65,7 +65,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Update Comment: Should return 200 OK")
     void updateComment_Success() throws Exception {
-        int commentId = 5;
+        Long commentId = 5L;
         var request = new UpdateCommentRequest("Updated text");
 
         mockMvc.perform(put("/api/comments/{commentId}", commentId)
@@ -78,18 +78,18 @@ class CommentControllerTest {
     @Test
     @DisplayName("Delete Comment: Should return 204 No Content")
     void deleteComment_Success() throws Exception {
-        given(detailsService.deleteComment(5)).willReturn(true);
+        given(detailsService.deleteComment(5L)).willReturn(true);
 
-        mockMvc.perform(delete("/api/comments/{commentId}", 5))
+        mockMvc.perform(delete("/api/comments/{commentId}", 5L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("Delete Comment: Should return 404 Not Found if missing")
     void deleteComment_NotFound() throws Exception {
-        given(detailsService.deleteComment(99)).willReturn(false);
+        given(detailsService.deleteComment(99L)).willReturn(false);
 
-        mockMvc.perform(delete("/api/comments/{commentId}", 99))
+        mockMvc.perform(delete("/api/comments/{commentId}", 99L))
                 .andExpect(status().isNotFound());
     }
 }
