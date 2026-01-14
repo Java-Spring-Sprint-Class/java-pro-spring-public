@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
-import ua.duikt.learning.java.pro.spring.service.DetailsService;
+import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.util.List;
 
@@ -19,12 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AttachmentController {
 
-    private final DetailsService detailsService;
+    private final AttachmentService attachmentService;
 
     @PostMapping("/issues/{issueId}/attachments")
     public ResponseEntity<String> addAttachment(@PathVariable Integer issueId,
                                                 @RequestBody AddAttachmentRequest request) {
-        boolean added = detailsService.addAttachment(
+        boolean added = attachmentService.addAttachment(
                 issueId,
                 request.getFileName(),
                 request.getFileUrl(),
@@ -39,12 +39,12 @@ public class AttachmentController {
 
     @GetMapping("/issues/{issueId}/attachments")
     public ResponseEntity<List<Attachment>> getAttachments(@PathVariable Integer issueId) {
-        return ResponseEntity.ok(detailsService.getAttachments(issueId));
+        return ResponseEntity.ok(attachmentService.getAttachments(issueId));
     }
 
     @DeleteMapping("/attachments/{attachmentId}")
     public ResponseEntity<Void> deleteAttachment(@PathVariable Integer attachmentId) {
-        boolean deleted = detailsService.deleteAttachment(attachmentId);
+        boolean deleted = attachmentService.deleteAttachment(attachmentId);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
 import ua.duikt.learning.java.pro.spring.entity.Label;
-import ua.duikt.learning.java.pro.spring.service.DetailsService;
+import ua.duikt.learning.java.pro.spring.service.LabelService;
 
 import java.util.List;
 import java.util.Map;
@@ -20,11 +20,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LabelController {
 
-    private final DetailsService detailsService;
+    private final LabelService labelService;
 
     @PostMapping("/labels")
     public ResponseEntity<Map<String, Object>> createLabel(@RequestBody CreateLabelRequest request) {
-        Integer labelId = detailsService.createLabel(request.getName(), request.getColor());
+        Integer labelId = labelService.createLabel(request.getName(), request.getColor());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Map.of("id", labelId, "message", "Label created"));
@@ -32,13 +32,13 @@ public class LabelController {
 
     @GetMapping("/labels")
     public ResponseEntity<List<Label>> getAllLabels() {
-        return ResponseEntity.ok(detailsService.getLabels());
+        return ResponseEntity.ok(labelService.getLabels());
     }
 
     @PostMapping("/issues/{issueId}/labels/{labelId}")
     public ResponseEntity<String> addLabelToIssue(@PathVariable Integer issueId,
                                                   @PathVariable Integer labelId) {
-        boolean added = detailsService.addLabelToIssue(issueId, labelId);
+        boolean added = labelService.addLabelToIssue(issueId, labelId);
         if (added) {
             return ResponseEntity.ok("Label added to issue");
         }
@@ -47,13 +47,13 @@ public class LabelController {
 
     @GetMapping("/issues/{issueId}/labels")
     public ResponseEntity<List<Label>> getLabelsForIssue(@PathVariable Integer issueId) {
-        return ResponseEntity.ok(detailsService.getLabelsForIssue(issueId));
+        return ResponseEntity.ok(labelService.getLabelsForIssue(issueId));
     }
 
     @DeleteMapping("/issues/{issueId}/labels/{labelId}")
     public ResponseEntity<String> removeLabelFromIssue(@PathVariable Integer issueId,
                                                        @PathVariable Integer labelId) {
-        boolean removed = detailsService.removeLabelFromIssue(issueId, labelId);
+        boolean removed = labelService.removeLabelFromIssue(issueId, labelId);
         if (removed) {
             return ResponseEntity.ok("Label removed from issue");
         }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.duikt.learning.java.pro.spring.dtos.CreateStatusRequest;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateStatusRequest;
 import ua.duikt.learning.java.pro.spring.entity.Status;
-import ua.duikt.learning.java.pro.spring.service.IssueService;
+import ua.duikt.learning.java.pro.spring.service.StatusService;
 
 import java.util.List;
 import java.util.Map;
@@ -21,11 +21,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StatusController {
 
-    private final IssueService issueService;
+    private final StatusService statusService;
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createStatus(@RequestBody CreateStatusRequest request) {
-        Integer statusId = issueService.createStatus(
+        Integer statusId = statusService.createStatus(
                 request.getProjectId(),
                 request.getName(),
                 request.getCategory()
@@ -38,19 +38,19 @@ public class StatusController {
 
     @GetMapping
     public ResponseEntity<List<Status>> getStatuses(@RequestParam Integer projectId) {
-        return ResponseEntity.ok(issueService.getStatuses(projectId));
+        return ResponseEntity.ok(statusService.getStatuses(projectId));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable Integer id,
                                                @RequestBody UpdateStatusRequest request) {
-        issueService.updateStatus(id, request.getName());
+        statusService.updateStatus(id, request.getName());
         return ResponseEntity.ok("Status updated");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStatus(@PathVariable Integer id) {
-        boolean deleted = issueService.deleteStatus(id);
+        boolean deleted = statusService.deleteStatus(id);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
