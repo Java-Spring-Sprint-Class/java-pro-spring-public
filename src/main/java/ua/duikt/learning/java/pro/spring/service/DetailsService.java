@@ -13,31 +13,31 @@ import java.util.List;
 public interface DetailsService {
     // ===== Comments =====
 
-    boolean addComment(Integer issueId, String content);
+    boolean addComment(Long issueId, String content);
 
-    List<IssueComment> getComments(Integer issueId);
+    List<IssueComment> getComments(Long issueId);
 
-    void updateComment(Integer id, String content);
+    void updateComment(Long id, String content);
 
-    boolean deleteComment(Integer id);
+    boolean deleteComment(Long id);
 
     // ===== Attachments =====
 
-    boolean addAttachment(Integer issueId, String fileName, String fileUrl, Integer fileSize);
+    boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize);
 
-    List<Attachment> getAttachments(Integer issueId);
+    List<Attachment> getAttachments(Long issueId);
 
-    boolean deleteAttachment(Integer id);
+    boolean deleteAttachment(Long id);
 
     // ===== Labels =====
 
-    Integer createLabel(String name, String color);
+    Long createLabel(String name, String color);
 
     List<Label> getLabels();
 
-    boolean addLabelToIssue(Integer issueId, Integer labelId);
+    boolean addLabelToIssue(Long issueId, Long labelId);
 
-    boolean removeLabelFromIssue(Integer issueId, Integer labelId);
+    boolean removeLabelFromIssue(Long issueId, Long labelId);
 
-    List<Label> getLabelsForIssue(Integer issueId);
+    List<Label> getLabelsForIssue(Long issueId);
 }

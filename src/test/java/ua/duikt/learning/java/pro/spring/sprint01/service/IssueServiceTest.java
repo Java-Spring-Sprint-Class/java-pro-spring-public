@@ -32,76 +32,38 @@ class IssueServiceTest {
     @Test
     @DisplayName("Status Management")
     void statusManagement() {
-        issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
-        issueService.createStatus(1, "In Progress", StatusCategory.IN_PROGRESS);
+        issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        issueService.createStatus(1L, "In Progress", StatusCategory.IN_PROGRESS);
 
-        List<Status> statuses = issueService.getStatuses(1);
+        List<Status> statuses = issueService.getStatuses(1L);
         assertThat(statuses).hasSize(2);
-        assertThat(statuses.get(0).getName()).isEqualTo("To Do");
-    }
-
-    @Test
-    @DisplayName("Issue CRUD")
-    void issueCrud() {
-        Integer issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
-
-        Issue issue = issueService.getIssue(issueId);
-        assertThat(issue.getTitle()).isEqualTo("Login Bug");
-        assertThat(issue.getType()).isEqualTo(IssueType.BUG);
-        assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
-    }
-
-    @Test
-    @DisplayName("Patch Status and History Tracking")
-    void patchStatusAndHistory() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchStatus(issueId, 2);
-
-        Issue updatedIssue = issueService.getIssue(issueId);
-        assertThat(updatedIssue.getStatusId()).isEqualTo(2);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-        assertThat(history).hasSize(2);
-
-        IssueHistory statusChange = history.get(1);
-        assertThat(statusChange.getFieldChanged()).isEqualTo("status");
-        assertThat(statusChange.getNewValue()).isEqualTo("2");
-    }
-
-    @Test
-    @DisplayName("Patch Assignee")
-    void patchAssignee() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchAssignee(issueId, 55);
-
-        assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(55);
+        assertThat(statuses.getFirst().getName()).isEqualTo("To Do");
     }
 
     @Test
     @DisplayName("Status Lifecycle: Create, Update, Delete")
     void statusLifecycle() {
-        Integer sId = issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
 
-        List<Status> statuses = issueService.getStatuses(1);
+        List<Status> statuses = issueService.getStatuses(1L);
         assertThat(statuses).hasSize(1);
-        assertThat(statuses.get(0).getName()).isEqualTo("To Do");
+        assertThat(statuses.getFirst().getName()).isEqualTo("To Do");
 
         issueService.updateStatus(sId, "To Do Updated");
 
-        Status updatedStatus = issueService.getStatuses(1).get(0);
+        Status updatedStatus = issueService.getStatuses(1L).getFirst();
         assertThat(updatedStatus.getName()).isEqualTo("To Do Updated");
 
         boolean deleted = issueService.deleteStatus(sId);
         assertThat(deleted).isTrue();
-        assertThat(issueService.getStatuses(1)).isEmpty();
+        assertThat(issueService.getStatuses(1L)).isEmpty();
     }
 
     @Test
     @DisplayName("Issue CRUD: Create, Get, Update, Delete")
     void issueCrud() {
-        Integer issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH, sId);
 
         Issue issue = issueService.getIssue(issueId);
         assertThat(issue).isNotNull();
@@ -121,23 +83,24 @@ class IssueServiceTest {
     @Test
     @DisplayName("List Issues by Project")
     void listIssues() {
-        issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.LOW);
-        issueService.createIssue(1, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW, sId);
+        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM, sId);
 
-        issueService.createIssue(2, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW);
+        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW, sId);
 
-        List<Issue> project1Issues = issueService.listIssues(1);
+        List<Issue> project1Issues = issueService.listIssues(1L);
         assertThat(project1Issues).hasSize(2);
 
-        List<Issue> project2Issues = issueService.listIssues(2);
+        List<Issue> project2Issues = issueService.listIssues(2L);
         assertThat(project2Issues).hasSize(1);
     }
 
     @Test
     @DisplayName("Patch Status and History Tracking")
     void patchStatusAndHistory() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-        Integer statusId = 100;
+        Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
 
         issueService.patchStatus(issueId, statusId);
 
@@ -148,7 +111,7 @@ class IssueServiceTest {
 
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
 
-        IssueHistory lastChange = history.get(history.size() - 1);
+        IssueHistory lastChange = history.getLast();
         assertThat(lastChange.getFieldChanged()).isEqualTo("status");
         assertThat(lastChange.getNewValue()).isEqualTo(String.valueOf(statusId));
     }
@@ -156,16 +119,12 @@ class IssueServiceTest {
     @Test
     @DisplayName("Patch Assignee and History")
     void patchAssignee() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-        Integer assigneeId = 55;
+        Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
+        Long assigneeId = 55L;
 
         issueService.patchAssignee(issueId, assigneeId);
 
         assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(assigneeId);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-        boolean hasAssigneeRecord = history.stream()
-                .anyMatch(h -> "assignee".equals(h.getFieldChanged()) && String.valueOf(assigneeId).equals(h.getNewValue()));
-
     }
 }
