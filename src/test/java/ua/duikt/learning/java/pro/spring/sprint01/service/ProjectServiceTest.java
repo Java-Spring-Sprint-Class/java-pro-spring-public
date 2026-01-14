@@ -45,7 +45,8 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Create and Get Project")
     void createAndGet() {
-        Long pId = projectService.createProject("Alpha", "ALP", "Description for Alpha");
+        Long userId1 = 101L;
+        Long pId = projectService.createProject("Alpha", "ALP", "Description for Alpha", userId1);
 
         Project p = projectService.getProject(pId);
         assertThat(p).isNotNull();
@@ -57,8 +58,9 @@ class ProjectServiceTest {
     @Test
     @DisplayName("List Projects")
     void listProjects() {
-        projectService.createProject("Project A", "PA", "Desc A");
-        projectService.createProject("Project B", "PB", "Desc B");
+        Long userId1 = 101L;
+        projectService.createProject("Project A", "PA", "Desc A", userId1);
+        projectService.createProject("Project B", "PB", "Desc B",  userId1);
 
         List<Project> allProjects = projectService.listProjects();
 
@@ -69,7 +71,8 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Update Project")
     void updateProject() {
-        Long pId = projectService.createProject("Old Name", "KEY", "Old Desc");
+        Long userId1 = 101L;
+        Long pId = projectService.createProject("Old Name", "KEY", "Old Desc", userId1);
 
         projectService.updateProject(pId, "New Name", "New Desc");
 
@@ -82,7 +85,8 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Delete Project")
     void deleteProject() {
-        Long pId = projectService.createProject("To Delete", "DEL", "Desc");
+        Long userId1 = 101L;
+        Long pId = projectService.createProject("To Delete", "DEL", "Desc", userId1);
 
         boolean isDeleted = projectService.deleteProject(pId);
         assertThat(isDeleted).isTrue();
@@ -95,9 +99,10 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Manage Project Members: Add, Get, Remove")
     void memberManagement() {
-        Long pId = projectService.createProject("Team Project", "TEAM", "Desc");
+        Long userId = 100L;
         Long userId1 = 101L;
         Long userId2 = 102L;
+        Long pId = projectService.createProject("Team Project", "TEAM", "Desc", userId);
 
         boolean added1 = projectService.addMember(pId, userId1, ProjectRoleType.OWNER);
         boolean added2 = projectService.addMember(pId, userId2, ProjectRoleType.MEMBER);

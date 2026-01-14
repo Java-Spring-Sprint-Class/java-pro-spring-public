@@ -83,10 +83,11 @@ class IssueServiceTest {
     @Test
     @DisplayName("List Issues by Project")
     void listIssues() {
-        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW);
-        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW, sId);
+        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM, sId);
 
-        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW);
+        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW, sId);
 
         List<Issue> project1Issues = issueService.listIssues(1L);
         assertThat(project1Issues).hasSize(2);
@@ -98,8 +99,8 @@ class IssueServiceTest {
     @Test
     @DisplayName("Patch Status and History Tracking")
     void patchStatusAndHistory() {
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
         Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
 
         issueService.patchStatus(issueId, statusId);
 
@@ -118,7 +119,8 @@ class IssueServiceTest {
     @Test
     @DisplayName("Patch Assignee and History")
     void patchAssignee() {
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
+        Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
         Long assigneeId = 55L;
 
         issueService.patchAssignee(issueId, assigneeId);
