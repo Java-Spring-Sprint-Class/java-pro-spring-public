@@ -9,17 +9,17 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface UserService {
-    boolean assignRole(Integer userId, Integer roleId);
+    boolean assignRole(Long userId, Long roleId);
 
-    boolean removeRole(Integer userId, Integer roleId);
+    boolean removeRole(Long userId, Long roleId);
 
-    boolean deactivateUser(Integer id);
+    boolean deactivateUser(Long id);
 
-    void updateProfile(Integer id, String username, String email);
+    void updateProfile(Long id, String username, String email);
 
     List<User> listUsers(String search);
 
-    User getUser(Integer id);
+    User getUser(Long id);
 
     boolean register(String username, String email, String password);
 }

@@ -1,37 +1,32 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.User;
 import ua.duikt.learning.java.pro.spring.entity.UserRole;
+import ua.duikt.learning.java.pro.spring.repositories.UserRepo;
+import ua.duikt.learning.java.pro.spring.repositories.UserRoleRepo;
 import ua.duikt.learning.java.pro.spring.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by Mykyta Sirobaba on 13.01.2026.
- * email mykyta.sirobaba@gmail.com
- */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final Map<Integer, User> userTable = new ConcurrentHashMap<>();
-    private final List<UserRole> userRoleTable = new ArrayList<>();
-    private final AtomicInteger idGenerator = new AtomicInteger(1);
+    private final UserRepo userRepository;
+    private final UserRoleRepo userRoleRepository;
 
+    @Override
+    @Transactional
     public boolean register(String username, String email, String password) {
-        for (User user : userTable.values()) {
-            if (user.getUsername().equals(username) || user.getEmail().equals(email)) {
-                return false;
-            }
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+            return false;
         }
 
         User user = User.builder()
-                .id(idGenerator.getAndIncrement())
                 .username(username)
                 .email(email)
                 .passwordHash(password)
@@ -39,49 +34,64 @@ public class UserServiceImpl implements UserService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        userTable.put(user.getId(), user);
+        userRepository.save(user);
         return true;
     }
 
-    public User getUser(Integer id) {
-        return userTable.get(id);
+    @Override
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
+    @Override
     public List<User> listUsers(String search) {
         if (search == null || search.isEmpty()) {
-            return new ArrayList<>(userTable.values());
+            return userRepository.findAll();
         }
-        return userTable.values().stream()
-                .filter(u -> u.getUsername().contains(search) || u.getEmail().contains(search))
-                .toList();
+        return userRepository.findByUsernameContainingOrEmailContaining(search, search);
     }
 
-    public void updateProfile(Integer id, String username, String email) {
-        User user = userTable.get(id);
-        if (user != null) {
+    @Override
+    @Transactional
+    public void updateProfile(Long id, String username, String email) {
+        userRepository.findById(id).ifPresent(user -> {
             user.setUsername(username);
             user.setEmail(email);
             user.setUpdatedAt(LocalDateTime.now());
-        }
+            userRepository.save(user);
+        });
     }
 
-    public boolean deactivateUser(Integer id) {
-        User user = userTable.get(id);
-        if (user != null) {
-            user.setIsActive(false);
+    @Override
+    @Transactional
+    public boolean deactivateUser(Long id) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setIsActive(false);
+                    userRepository.save(user);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Override
+    public boolean assignRole(Long userId, Long roleId) {
+        try {
+            UserRole ur = UserRole.builder()
+                    .userId(userId)
+                    .roleId(roleId)
+                    .build();
+            userRoleRepository.save(ur);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
-
-    public boolean assignRole(Integer userId, Integer roleId) {
-        UserRole ur = UserRole.builder().userId(userId).roleId(roleId).build();
-        return userRoleTable.add(ur);
-    }
-
-    public boolean removeRole(Integer userId, Integer roleId) {
-        return userRoleTable.removeIf(ur ->
-                ur.getUserId().equals(userId) && ur.getRoleId().equals(roleId));
+    @Override
+    @Transactional
+    public boolean removeRole(Integer userId, Long roleId) {
+        long deletedCount = userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
+        return deletedCount > 0;
     }
 }

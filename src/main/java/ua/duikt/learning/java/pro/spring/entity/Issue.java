@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,17 +18,45 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "issue")
 public class Issue {
-    private Integer id;
-    private Integer projectId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "project_id")
+    private Long projectId;
+
+    @Column(nullable = false)
     private String key;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column
     private IssueType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column
     private Priority priority;
-    private Integer statusId;
-    private Integer assigneeId;
-    private Integer reporterId;
+
+    @Column(name = "status_id")
+    private Long statusId;
+
+    @Column(name = "assignee_id")
+    private Long assigneeId;
+
+    @Column(name = "reporter_id")
+    private Long reporterId;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

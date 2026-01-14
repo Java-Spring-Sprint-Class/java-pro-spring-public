@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import org.springframework.stereotype.Service;
 import ua.duikt.learning.java.pro.spring.entity.Issue;
 import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
 import ua.duikt.learning.java.pro.spring.entity.Status;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by Mykyta Sirobaba on 13.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
-// TODO: Implements all necessary methods
+@Service
 public class IssueServiceImpl implements IssueService {
     // TODO: Implements the method
     @Override

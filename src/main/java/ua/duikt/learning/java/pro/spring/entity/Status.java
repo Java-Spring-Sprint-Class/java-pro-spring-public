@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +15,23 @@ import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "status")
 public class Status {
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusCategory category;
+
+    @Column
     private Integer position;
-    private Integer projectId;
+
+    @Column(name = "project_id")
+    private Long projectId;
 }

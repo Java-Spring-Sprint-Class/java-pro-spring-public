@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +15,20 @@ import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "project_member")
 public class ProjectMember {
-    private Integer id;
-    private Integer projectId;
-    private Integer userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "project_id")
+    private Long projectId;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ProjectRoleType role;
 }
