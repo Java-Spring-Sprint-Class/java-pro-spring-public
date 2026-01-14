@@ -14,7 +14,7 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
+| id | Long | `id` |
 | username | String | `username` |
 | email | String | `email` |
 | passwordHash | String | `passwordHash` |
@@ -27,24 +27,24 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
+| id | Long | `id` |
 | name | String | `name` |
 
 ### 3. UserRole (Many-to-Many)
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| userId | Integer | `userId` |
-| roleId | Integer | `roleId` |
+| userId | Long | `userId` |
+| roleId | Long | `roleId` |
 
 ### 4. Project
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
+| id | Long | `id` |
 | name | String | `name` |
 | key | String | `key` |
-| ownerId | Integer | `ownerId` |
+| ownerId | Long | `ownerId` |
 | description | String | `description` |
 | createdAt | LocalDateTime | `createdAt` |
 | updatedAt | LocalDateTime | `updatedAt` |
@@ -53,25 +53,25 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
-| projectId | Integer | `projectId` |
-| userId | Integer | `userId` |
+| id | Long | `id` |
+| projectId | Long | `projectId` |
+| userId | Long | `userId` |
 | role | ProjectRoleType | `role` |
 
 ### 6. Issue
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
-| projectId | Integer | `projectId` |
+| id | Long | `id` |
+| projectId | Long | `projectId` |
 | key | String | `key` |
 | title | String | `title` |
 | description | String | `description` |
 | type | IssueType | `type` |
 | priority | Priority | `priority` |
-| statusId | Integer | `statusId` |
-| assigneeId | Integer | `assigneeId` |
-| reporterId | Integer | `reporterId` |
+| statusId | Long | `statusId` |
+| assigneeId | Long | `assigneeId` |
+| reporterId | Long | `reporterId` |
 | createdAt | LocalDateTime | `createdAt` |
 | updatedAt | LocalDateTime | `updatedAt` |
 
@@ -79,19 +79,19 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
+| id | Long | `id` |
 | name | String | `name` |
 | category | StatusCategory | `category` |
 | position | Integer | `position` |
-| projectId | Integer | `projectId` |
+| projectId | Long | `projectId` |
 
 ### 8. IssueComment
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
+| id | Long | `id` |
+| issueId | Long | `issueId` |
+| userId | Long | `userId` |
 | content | String | `content` |
 | createdAt | LocalDateTime | `createdAt` |
 | updatedAt | LocalDateTime | `updatedAt` |
@@ -100,9 +100,9 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
+| id | Long | `id` |
+| issueId | Long | `issueId` |
+| userId | Long | `userId` |
 | fileName | String | `fileName` |
 | fileUrl | String | `fileUrl` |
 | fileSize | Integer | `fileSize` |
@@ -112,9 +112,9 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
-| issueId | Integer | `issueId` |
-| userId | Integer | `userId` |
+| id | Long | `id` |
+| issueId | Long | `issueId` |
+| userId | Long | `userId` |
 | fieldChanged | String | `fieldChanged` |
 | oldValue | String | `oldValue` |
 | newValue | String | `newValue` |
@@ -124,7 +124,7 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Integer | `id` |
+| id | Long | `id` |
 | name | String | `name` |
 | color | String | `color` |
 
@@ -132,8 +132,8 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| issueId | Integer | `issueId` |
-| labelId | Integer | `labelId` |
+| issueId | Long | `issueId` |
+| labelId | Long | `labelId` |
 
 ---
 
@@ -153,12 +153,12 @@ public enum ProjectRoleType { OWNER, ADMIN, MEMBER, VIEWER }
 | Method         | Parameters                                     | Description                                            |
 | -------------- | ---------------------------------------------- | ------------------------------------------------------ |
 | register       | String username, String email, String password | Creates a new user. Password should be hashed.         |
-| getUser        | Integer id                                     | Retrieves a user by ID.                                |
+| getUser        | Long id                                     | Retrieves a user by ID.                                |
 | listUsers      | String search                                  | Returns a list of users. Filters by username or email. |
-| updateProfile  | Integer id, String username, String email      | Updates username and email. Updates `updatedAt`.       |
-| deactivateUser | Integer id                                     | Deactivates user (`isActive=false`).                   |
-| assignRole     | Integer userId, Integer roleId                 | Assigns role to user.                                  |
-| removeRole     | Integer userId, Integer roleId                 | Removes role from user.                                |
+| updateProfile  | Long id, String username, String email      | Updates username and email. Updates `updatedAt`.       |
+| deactivateUser | Long id                                     | Deactivates user (`isActive=false`).                   |
+| assignRole     | Long userId, Long roleId                 | Assigns role to user.                                  |
+| removeRole     | Long userId, Long roleId                 | Removes role from user.                                |
 
 ### RoleService
 
@@ -172,53 +172,53 @@ public enum ProjectRoleType { OWNER, ADMIN, MEMBER, VIEWER }
 | Method        | Parameters                                              | Description                                                                |
 | ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------- |
 | createProject | String name, String key, String description             | Creates a new project. Owner ID from security context. Returns project ID. |
-| getProject    | Integer id                                              | Returns a project by ID.                                                   |
+| getProject    | Long id                                              | Returns a project by ID.                                                   |
 | listProjects  | —                                                       | Returns all projects.                                                      |
-| updateProject | Integer id, String name, String description             | Updates project name and description. Updates `updatedAt`.                 |
-| deleteProject | Integer id                                              | Deletes project by ID.                                                     |
-| addMember     | Integer projectId, Integer userId, ProjectRoleType role | Adds a member with role.                                                   |
-| getMembers    | Integer projectId                                       | Returns project members.                                                   |
-| removeMember  | Integer projectId, Integer userId                       | Removes a member.                                                          |
+| updateProject | Long id, String name, String description             | Updates project name and description. Updates `updatedAt`.                 |
+| deleteProject | Long id                                              | Deletes project by ID.                                                     |
+| addMember     | Long projectId, Long userId, ProjectRoleType role | Adds a member with role.                                                   |
+| getMembers    | Long projectId                                       | Returns project members.                                                   |
+| removeMember  | Long projectId, Long userId                       | Removes a member.                                                          |
 
 ### IssueService
 
 | Method        | Parameters                                                                             | Description                                                    |
 | ------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| createIssue   | Integer projectId, String title, String description, IssueType type, Priority priority | Creates an issue. Default status ID=1. Adds to `IssueHistory`. |
-| getIssue      | Integer id                                                                             | Returns an issue by ID.                                        |
-| listIssues    | Integer projectId                                                                      | Returns all issues in a project.                               |
-| updateIssue   | Integer id, String title, String description                                           | Updates title/description. Adds to `IssueHistory`.             |
-| deleteIssue   | Integer id                                                                             | Deletes an issue.                                              |
-| patchStatus   | Integer id, Integer newStatusId                                                        | Updates status. Adds history entry.                            |
-| patchAssignee | Integer id, Integer assigneeId                                                         | Changes assignee. Adds history entry.                          |
-| createStatus  | Integer projectId, String name, StatusCategory category                                | Creates a status. Returns status ID.                           |
-| getStatuses   | Integer projectId                                                                      | Returns all statuses for a project.                            |
-| updateStatus  | Integer id, String name                                                                | Updates status name.                                           |
-| deleteStatus  | Integer id                                                                             | Deletes a status.                                              |
-| getHistory    | Integer issueId                                                                        | Returns all `IssueHistory` entries.                            |
+| createIssue   | Long projectId, String title, String description, IssueType type, Priority priority | Creates an issue. Default status ID=1. Adds to `IssueHistory`. |
+| getIssue      | Long id                                                                             | Returns an issue by ID.                                        |
+| listIssues    | Long projectId                                                                      | Returns all issues in a project.                               |
+| updateIssue   | Long id, String title, String description                                           | Updates title/description. Adds to `IssueHistory`.             |
+| deleteIssue   | Long id                                                                             | Deletes an issue.                                              |
+| patchStatus   | Long id, Long newStatusId                                                        | Updates status. Adds history entry.                            |
+| patchAssignee | Long id, Long assigneeId                                                         | Changes assignee. Adds history entry.                          |
+| createStatus  | Long projectId, String name, StatusCategory category                                | Creates a status. Returns status ID.                           |
+| getStatuses   | Long projectId                                                                      | Returns all statuses for a project.                            |
+| updateStatus  | Long id, String name                                                                | Updates status name.                                           |
+| deleteStatus  | Long id                                                                             | Deletes a status.                                              |
+| getHistory    | Long issueId                                                                        | Returns all `IssueHistory` entries.                            |
 
 ### DetailsService (Comments, Attachments, Labels)
 
 | Method        | Parameters                      | Description                           |
 | ------------- | ------------------------------- | ------------------------------------- |
-| addComment    | Integer issueId, String content | Adds a comment.                       |
-| getComments   | Integer issueId                 | Returns all comments for an issue.    |
-| updateComment | Integer id, String content      | Updates comment and sets `updatedAt`. |
-| deleteComment | Integer id                      | Deletes a comment.                    |
+| addComment    | Long issueId, String content | Adds a comment.                       |
+| getComments   | Long issueId                 | Returns all comments for an issue.    |
+| updateComment | Long id, String content      | Updates comment and sets `updatedAt`. |
+| deleteComment | Long id                      | Deletes a comment.                    |
 
 
 | Method           | Parameters                                                         | Description          |
 | ---------------- | ------------------------------------------------------------------ | -------------------- |
-| addAttachment    | Integer issueId, String fileName, String fileUrl, Integer fileSize | Adds attachment.     |
-| getAttachments   | Integer issueId                                                    | Returns attachments. |
-| deleteAttachment | Integer id                                                         | Deletes attachment.  |
+| addAttachment    | Long issueId, String fileName, String fileUrl, Integer fileSize | Adds attachment.     |
+| getAttachments   | Long issueId                                                    | Returns attachments. |
+| deleteAttachment | Long id                                                         | Deletes attachment.  |
 
 
 | Method               | Parameters                       | Description                       |
 | -------------------- | -------------------------------- | --------------------------------- |
 | createLabel          | String name, String color        | Creates label. Returns label ID.  |
 | getLabels            | —                                | Returns all labels.               |
-| addLabelToIssue      | Integer issueId, Integer labelId | Assigns label to issue.           |
-| removeLabelFromIssue | Integer issueId, Integer labelId | Removes label from issue.         |
-| getLabelsForIssue    | Integer issueId                  | Returns labels assigned to issue. |
+| addLabelToIssue      | Long issueId, Long labelId | Assigns label to issue.           |
+| removeLabelFromIssue | Long issueId, Long labelId | Removes label from issue.         |
+| getLabelsForIssue    | Long issueId                  | Returns labels assigned to issue. |
 
