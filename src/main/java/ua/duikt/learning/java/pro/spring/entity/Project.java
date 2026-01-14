@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project {
-    private Integer id;
+    private Long id;
     private String name;
     private String key;
-    private Integer ownerId;
+    private Long ownerId;
     private String description;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

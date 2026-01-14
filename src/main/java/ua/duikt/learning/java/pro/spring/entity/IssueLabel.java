@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IssueLabel {
-    private Integer issueId;
-    private Integer labelId;
+    private Long issueId;
+    private Long labelId;
 }

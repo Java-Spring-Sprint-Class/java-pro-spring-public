@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
@@ -20,17 +20,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 public class DetailsServiceImpl implements DetailsService {
-    private final Map<Integer, IssueComment> commentTable = new ConcurrentHashMap<>();
-    private final Map<Integer, Attachment> attachmentTable = new ConcurrentHashMap<>();
-    private final Map<Integer, Label> labelTable = new ConcurrentHashMap<>();
+    private final Map<Long, IssueComment> commentTable = new ConcurrentHashMap<>();
+    private final Map<Long, Attachment> attachmentTable = new ConcurrentHashMap<>();
+    private final Map<Long, Label> labelTable = new ConcurrentHashMap<>();
     private final List<IssueLabel> issueLabelTable = new ArrayList<>();
 
-    private final AtomicInteger commentIdGen = new AtomicInteger(1);
-    private final AtomicInteger attachmentIdGen = new AtomicInteger(1);
-    private final AtomicInteger labelIdGen = new AtomicInteger(1);
+    private final AtomicLong commentIdGen = new AtomicLong(1);
+    private final AtomicLong attachmentIdGen = new AtomicLong(1);
+    private final AtomicLong labelIdGen = new AtomicLong(1);
 
-    public boolean addComment(Integer issueId, String content) {
-        Integer id = commentIdGen.getAndIncrement();
+    public boolean addComment(Long issueId, String content) {
+        Long id = commentIdGen.getAndIncrement();
         IssueComment comment = IssueComment.builder()
                 .id(id)
                 .issueId(issueId)
@@ -41,13 +41,13 @@ public class DetailsServiceImpl implements DetailsService {
         return true;
     }
 
-    public List<IssueComment> getComments(Integer issueId) {
+    public List<IssueComment> getComments(Long issueId) {
         return commentTable.values().stream()
                 .filter(c -> c.getIssueId().equals(issueId))
                 .toList();
     }
 
-    public void updateComment(Integer id, String content) {
+    public void updateComment(Long id, String content) {
         IssueComment c = commentTable.get(id);
         if (c != null) {
             c.setContent(content);
@@ -55,12 +55,12 @@ public class DetailsServiceImpl implements DetailsService {
         }
     }
 
-    public boolean deleteComment(Integer id) {
+    public boolean deleteComment(Long id) {
         return commentTable.remove(id) != null;
     }
 
-    public boolean addAttachment(Integer issueId, String fileName, String fileUrl, Integer fileSize) {
-        Integer id = attachmentIdGen.getAndIncrement();
+    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize) {
+        Long id = attachmentIdGen.getAndIncrement();
         Attachment attachment = Attachment.builder()
                 .id(id)
                 .issueId(issueId)
@@ -73,18 +73,18 @@ public class DetailsServiceImpl implements DetailsService {
         return true;
     }
 
-    public List<Attachment> getAttachments(Integer issueId) {
+    public List<Attachment> getAttachments(Long issueId) {
         return attachmentTable.values().stream()
                 .filter(a -> a.getIssueId().equals(issueId))
                 .toList();
     }
 
-    public boolean deleteAttachment(Integer id) {
+    public boolean deleteAttachment(Long id) {
         return attachmentTable.remove(id) != null;
     }
 
-    public Integer createLabel(String name, String color) {
-        Integer id = labelIdGen.getAndIncrement();
+    public Long createLabel(String name, String color) {
+        Long id = labelIdGen.getAndIncrement();
         Label label = Label.builder().id(id).name(name).color(color).build();
         labelTable.put(id, label);
         return id;
@@ -94,18 +94,18 @@ public class DetailsServiceImpl implements DetailsService {
         return new ArrayList<>(labelTable.values());
     }
 
-    public boolean addLabelToIssue(Integer issueId, Integer labelId) {
+    public boolean addLabelToIssue(Long issueId, Long labelId) {
         IssueLabel il = IssueLabel.builder().issueId(issueId).labelId(labelId).build();
         return issueLabelTable.add(il);
     }
 
-    public boolean removeLabelFromIssue(Integer issueId, Integer labelId) {
+    public boolean removeLabelFromIssue(Long issueId, Long labelId) {
         return issueLabelTable.removeIf(il ->
                 il.getIssueId().equals(issueId) && il.getLabelId().equals(labelId));
     }
 
-    public List<Label> getLabelsForIssue(Integer issueId) {
-        List<Integer> labelIds = issueLabelTable.stream()
+    public List<Label> getLabelsForIssue(Long issueId) {
+        List<Long> labelIds = issueLabelTable.stream()
                 .filter(il -> il.getIssueId().equals(issueId))
                 .map(IssueLabel::getLabelId)
                 .toList();

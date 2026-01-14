@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IssueComment {
-    private Integer id;
-    private Integer issueId;
-    private Integer userId;
+    private Long id;
+    private Long issueId;
+    private Long userId;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

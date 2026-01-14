@@ -18,16 +18,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Issue {
-    private Integer id;
-    private Integer projectId;
+    private Long id;
+    private Long projectId;
     private String key;
     private String title;
     private String description;
     private IssueType type;
     private Priority priority;
-    private Integer statusId;
-    private Integer assigneeId;
-    private Integer reporterId;
+    private Long statusId;
+    private Long assigneeId;
+    private Long reporterId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

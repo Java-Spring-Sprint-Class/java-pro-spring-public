@@ -11,19 +11,19 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface ProjectService {
-    Integer createProject(String name, String key, String description);
+    Long createProject(String name, String key, String description);
 
-    Project getProject(Integer id);
+    Project getProject(Long id);
 
     List<Project> listProjects();
 
-    void updateProject(Integer id, String name, String description);
+    void updateProject(Long id, String name, String description);
 
-    boolean deleteProject(Integer id);
+    boolean deleteProject(Long id);
 
-    boolean addMember(Integer projectId, Integer userId, ProjectRoleType role);
+    boolean addMember(Long projectId, Long userId, ProjectRoleType role);
 
-    List<ProjectMember> getMembers(Integer projectId);
+    List<ProjectMember> getMembers(Long projectId);
 
-    boolean removeMember(Integer projectId, Integer userId);
+    boolean removeMember(Long projectId, Long userId);
 }

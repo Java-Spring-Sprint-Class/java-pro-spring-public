@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Attachment {
-    private Integer id;
-    private Integer issueId;
-    private Integer userId;
+    private Long id;
+    private Long issueId;
+    private Long userId;
     private String fileName;
     private String fileUrl;
     private Integer fileSize;

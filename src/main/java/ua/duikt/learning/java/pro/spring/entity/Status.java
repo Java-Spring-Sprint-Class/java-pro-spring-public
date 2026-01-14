@@ -15,9 +15,9 @@ import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Status {
-    private Integer id;
+    private Long id;
     private String name;
     private StatusCategory category;
     private Integer position;
-    private Integer projectId;
+    private Long projectId;
 }
