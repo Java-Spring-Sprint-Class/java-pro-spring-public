@@ -41,17 +41,6 @@ class IssueServiceTest {
     }
 
     @Test
-    @DisplayName("Issue CRUD")
-    void issueCrud() {
-        Long issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
-
-        Issue issue = issueService.getIssue(issueId);
-        assertThat(issue.getTitle()).isEqualTo("Login Bug");
-        assertThat(issue.getType()).isEqualTo(IssueType.BUG);
-        assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
-    }
-
-    @Test
     @DisplayName("Patch Status and History Tracking")
     void patchStatusAndHistory() {
         Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
@@ -121,10 +110,10 @@ class IssueServiceTest {
     @Test
     @DisplayName("List Issues by Project")
     void listIssues() {
-        issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.LOW);
-        issueService.createIssue(1, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM);
+        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW);
+        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM);
 
-        issueService.createIssue(2, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW);
+        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW);
 
         List<Issue> project1Issues = issueService.listIssues(1L);
         assertThat(project1Issues).hasSize(2);

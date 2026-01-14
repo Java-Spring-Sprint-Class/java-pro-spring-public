@@ -27,42 +27,6 @@ class DetailsServiceTest {
     }
 
     @Test
-    @DisplayName("Comments Logic")
-    void commentsLogic() {
-        detailsService.addComment(10L, "Great job!");
-        detailsService.addComment(10L, "Needs fixes.");
-
-        List<IssueComment> comments = detailsService.getComments(10L);
-        assertThat(comments).hasSize(2);
-        assertThat(comments.getFirst().getContent()).isEqualTo("Great job!");
-    }
-
-    @Test
-    @DisplayName("Attachments Logic")
-    void attachmentsLogic() {
-        detailsService.addAttachment(10L, "log.txt", "http://s3...", 1024);
-
-        List<Attachment> attachments = detailsService.getAttachments(10L);
-        assertThat(attachments).hasSize(1);
-        assertThat(attachments.getFirst().getFileName()).isEqualTo("log.txt");
-    }
-
-    @Test
-    @DisplayName("Labels and Issue Linking")
-    void labelsLogic() {
-        Long l1 = detailsService.createLabel("Backend", "Blue");
-        detailsService.createLabel("Frontend", "Red");
-
-        detailsService.addLabelToIssue(100L, l1);
-
-        List<Label> issueLabels = detailsService.getLabelsForIssue(100);
-        assertThat(issueLabels).hasSize(1);
-        assertThat(issueLabels.getFirst().getName()).isEqualTo("Backend");
-
-        assertThat(detailsService.getLabelsForIssue(999)).isEmpty();
-    }
-
-    @Test
     @DisplayName("Comments Logic: Add, Get, Update, Delete")
     void commentsLogic() {
         detailsService.addComment(10L, "First comment");

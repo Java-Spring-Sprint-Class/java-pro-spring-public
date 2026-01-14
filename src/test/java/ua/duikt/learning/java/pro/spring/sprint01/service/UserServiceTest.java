@@ -25,57 +25,9 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Register and Get User")
-    void registerAndGetUser() {
-        userService.register("john_doe", "john@example.com", "secret123");
-
-        List<User> users = userService.listUsers(null);
-        assertThat(users).hasSize(1);
-
-        User user = users.getFirst();
-        assertThat(user.getUsername()).isEqualTo("john_doe");
-        assertThat(user.getIsActive()).isTrue();
-        assertThat(userService.getUser(user.getId())).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Search Users")
-    void listUsersSearch() {
-        userService.register("alice", "alice@mail.com", "pass");
-        userService.register("bob", "bob@mail.com", "pass");
-
-        List<User> result = userService.listUsers("alice");
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getUsername()).isEqualTo("alice");
-    }
-
-    @Test
-    @DisplayName("Update Profile")
-    void updateProfile() {
-        userService.register("temp", "temp@mail.com", "pass");
-        Long userId = userService.listUsers(null).getFirst().getId();
-
-        userService.updateProfile(userId, "new_name", "new@mail.com");
-
-        User updated = userService.getUser(userId);
-        assertThat(updated.getUsername()).isEqualTo("new_name");
-        assertThat(updated.getEmail()).isEqualTo("new@mail.com");
-    }
-
-    @Test
-    @DisplayName("Deactivate User")
-    void deactivateUser() {
-        userService.register("active_user", "email", "pass");
-        Long userId = userService.listUsers(null).getFirst().getId();
-
-        userService.deactivateUser(userId);
-        assertThat(userService.getUser(userId).getIsActive()).isFalse();
-    }
-
-    @Test
     @DisplayName("Assign Role")
     void assignRole() {
-        boolean result = userService.assignRole(1, 100);
+        boolean result = userService.assignRole(1L, 100L);
         assertThat(result).isTrue();
     }
 
@@ -151,7 +103,7 @@ class UserServiceTest {
     void rolesLogic() {
         userService.register("role_user", "role@test.com", "pass");
         Long userId = userService.listUsers(null).getFirst().getId();
-        Long roleId = 100;
+        Long roleId = 100L;
 
         boolean assigned = userService.assignRole(userId, roleId);
         assertThat(assigned).isTrue();
