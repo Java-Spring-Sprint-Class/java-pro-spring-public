@@ -1,63 +1,87 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import org.springframework.stereotype.Service;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 import ua.duikt.learning.java.pro.spring.service.ProjectService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
-// TODO: Implements all necessary methods
+@Service
 public class ProjectServiceImpl implements ProjectService {
-    // TODO: Implements the method
+    private final Map<Long, Project> projectTable = new ConcurrentHashMap<>();
+    private final List<ProjectMember> memberTable = new ArrayList<>();
+    private final AtomicLong projectIdGen = new AtomicLong(1L);
+    private final AtomicLong memberIdGen = new AtomicLong(1L);
+
     @Override
     public Long createProject(String name, String key, String description) {
-        return 0L;
+        Long id = projectIdGen.getAndIncrement();
+        Project project = Project.builder()
+                .id(id)
+                .name(name)
+                .key(key)
+                .ownerId(1L)
+                .description(description)
+                .createdAt(LocalDateTime.now())
+                .build();
+        projectTable.put(id, project);
+        return id;
     }
 
-    // TODO: Implements the method
     @Override
     public Project getProject(Long id) {
-        return null;
+        return projectTable.get(id);
     }
 
-    // TODO: Implements the method
     @Override
     public List<Project> listProjects() {
-        return List.of();
+        return new ArrayList<>(projectTable.values());
     }
 
-    // TODO: Implements the method
-    @Override
     public void updateProject(Long id, String name, String description) {
-
+        Project p = projectTable.get(id);
+        if (p != null) {
+            p.setName(name);
+            p.setDescription(description);
+            p.setUpdatedAt(LocalDateTime.now());
+        }
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean deleteProject(Long id) {
-        return false;
+        return projectTable.remove(id) != null;
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean addMember(Long projectId, Long userId, ProjectRoleType role) {
-        return false;
+        ProjectMember member = ProjectMember.builder()
+                .id(memberIdGen.getAndIncrement())
+                .projectId(projectId)
+                .userId(userId)
+                .role(role)
+                .build();
+        return memberTable.add(member);
     }
 
-    // TODO: Implements the method
     @Override
     public List<ProjectMember> getMembers(Long projectId) {
-        return List.of();
+        return memberTable.stream()
+                .filter(m -> m.getProjectId().equals(projectId))
+                .toList();
     }
 
-    // TODO: Implements the method
     @Override
     public boolean removeMember(Long projectId, Long userId) {
-        return false;
+        return memberTable.removeIf(m ->
+                m.getProjectId().equals(projectId) && m.getUserId().equals(userId));
     }
 }

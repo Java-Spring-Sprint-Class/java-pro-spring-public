@@ -1,87 +1,117 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import org.springframework.stereotype.Service;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.entity.IssueLabel;
 import ua.duikt.learning.java.pro.spring.entity.Label;
 import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
-// TODO: Implements all necessary methods
+@Service
 public class DetailsServiceImpl implements DetailsService {
-    // TODO: Implements the method
-    @Override
+    private final Map<Long, IssueComment> commentTable = new ConcurrentHashMap<>();
+    private final Map<Long, Attachment> attachmentTable = new ConcurrentHashMap<>();
+    private final Map<Long, Label> labelTable = new ConcurrentHashMap<>();
+    private final List<IssueLabel> issueLabelTable = new ArrayList<>();
+
+    private final AtomicLong commentIdGen = new AtomicLong(1);
+    private final AtomicLong attachmentIdGen = new AtomicLong(1);
+    private final AtomicLong labelIdGen = new AtomicLong(1);
+
     public boolean addComment(Long issueId, String content) {
-        return false;
+        Long id = commentIdGen.getAndIncrement();
+        IssueComment comment = IssueComment.builder()
+                .id(id)
+                .issueId(issueId)
+                .content(content)
+                .createdAt(LocalDateTime.now())
+                .build();
+        commentTable.put(id, comment);
+        return true;
     }
 
-    // TODO: Implements the method
-    @Override
     public List<IssueComment> getComments(Long issueId) {
-        return List.of();
+        return commentTable.values().stream()
+                .filter(c -> c.getIssueId().equals(issueId))
+                .toList();
     }
 
-    // TODO: Implements the method
-    @Override
     public void updateComment(Long id, String content) {
-
+        IssueComment c = commentTable.get(id);
+        if (c != null) {
+            c.setContent(content);
+            c.setUpdatedAt(LocalDateTime.now());
+        }
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean deleteComment(Long id) {
-        return false;
+        return commentTable.remove(id) != null;
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize) {
-        return false;
+        Long id = attachmentIdGen.getAndIncrement();
+        Attachment attachment = Attachment.builder()
+                .id(id)
+                .issueId(issueId)
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .fileSize(fileSize)
+                .createdAt(LocalDateTime.now())
+                .build();
+        attachmentTable.put(id, attachment);
+        return true;
     }
 
-    // TODO: Implements the method
-    @Override
     public List<Attachment> getAttachments(Long issueId) {
-        return List.of();
+        return attachmentTable.values().stream()
+                .filter(a -> a.getIssueId().equals(issueId))
+                .toList();
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean deleteAttachment(Long id) {
-        return false;
+        return attachmentTable.remove(id) != null;
     }
 
-    // TODO: Implements the method
-    @Override
     public Long createLabel(String name, String color) {
-        return 0L;
+        Long id = labelIdGen.getAndIncrement();
+        Label label = Label.builder().id(id).name(name).color(color).build();
+        labelTable.put(id, label);
+        return id;
     }
 
-    // TODO: Implements the method
-    @Override
     public List<Label> getLabels() {
-        return List.of();
+        return new ArrayList<>(labelTable.values());
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean addLabelToIssue(Long issueId, Long labelId) {
-        return false;
+        IssueLabel il = IssueLabel.builder().issueId(issueId).labelId(labelId).build();
+        return issueLabelTable.add(il);
     }
 
-    // TODO: Implements the method
-    @Override
     public boolean removeLabelFromIssue(Long issueId, Long labelId) {
-        return false;
+        return issueLabelTable.removeIf(il ->
+                il.getIssueId().equals(issueId) && il.getLabelId().equals(labelId));
     }
 
-    // TODO: Implements the method
-    @Override
     public List<Label> getLabelsForIssue(Long issueId) {
-        return List.of();
+        List<Long> labelIds = issueLabelTable.stream()
+                .filter(il -> il.getIssueId().equals(issueId))
+                .map(IssueLabel::getLabelId)
+                .toList();
+
+        return labelTable.values().stream()
+                .filter(l -> labelIds.contains(l.getId()))
+                .toList();
     }
 }
