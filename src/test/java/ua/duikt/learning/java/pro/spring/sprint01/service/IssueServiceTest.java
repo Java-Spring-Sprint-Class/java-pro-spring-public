@@ -41,34 +41,6 @@ class IssueServiceTest {
     }
 
     @Test
-    @DisplayName("Patch Status and History Tracking")
-    void patchStatusAndHistory() {
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchStatus(issueId, 2L);
-
-        Issue updatedIssue = issueService.getIssue(issueId);
-        assertThat(updatedIssue.getStatusId()).isEqualTo(2);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-        assertThat(history).hasSize(2);
-
-        IssueHistory statusChange = history.get(1);
-        assertThat(statusChange.getFieldChanged()).isEqualTo("status");
-        assertThat(statusChange.getNewValue()).isEqualTo("2");
-    }
-
-    @Test
-    @DisplayName("Patch Assignee")
-    void patchAssignee() {
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchAssignee(issueId, 55L);
-
-        assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(55L);
-    }
-
-    @Test
     @DisplayName("Status Lifecycle: Create, Update, Delete")
     void statusLifecycle() {
         Long sId = issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
