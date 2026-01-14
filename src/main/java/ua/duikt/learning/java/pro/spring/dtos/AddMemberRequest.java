@@ -13,6 +13,6 @@ import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 @Builder
 @AllArgsConstructor
 public class AddMemberRequest {
-    private Integer userId;
+    private Long userId;
     private ProjectRoleType role;
 }

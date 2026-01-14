@@ -25,7 +25,7 @@ public class StatusController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createStatus(@RequestBody CreateStatusRequest request) {
-        Integer statusId = issueService.createStatus(
+        Long statusId = issueService.createStatus(
                 request.getProjectId(),
                 request.getName(),
                 request.getCategory()
@@ -37,19 +37,19 @@ public class StatusController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Status>> getStatuses(@RequestParam Integer projectId) {
+    public ResponseEntity<List<Status>> getStatuses(@RequestParam Long projectId) {
         return ResponseEntity.ok(issueService.getStatuses(projectId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateStatus(@PathVariable Integer id,
+    public ResponseEntity<String> updateStatus(@PathVariable Long id,
                                                @RequestBody UpdateStatusRequest request) {
         issueService.updateStatus(id, request.getName());
         return ResponseEntity.ok("Status updated");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStatus(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteStatus(@PathVariable Long id) {
         boolean deleted = issueService.deleteStatus(id);
         if (deleted) {
             return ResponseEntity.noContent().build();

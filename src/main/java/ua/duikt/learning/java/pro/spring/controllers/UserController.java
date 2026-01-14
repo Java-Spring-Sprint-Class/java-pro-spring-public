@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Integer id) {
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
         User user = userService.getUser(id);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateProfile(@PathVariable Integer id,
+    public ResponseEntity<String> updateProfile(@PathVariable Long id,
                                                 @RequestBody UpdateProfileRequest request) {
         if (userService.getUser(id) == null) {
             return ResponseEntity.notFound().build();
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deactivateUser(@PathVariable Integer id) {
+    public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
         boolean isDeactivated = userService.deactivateUser(id);
         if (isDeactivated) {
             return ResponseEntity.noContent().build();
@@ -75,8 +75,8 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/roles/{roleId}")
-    public ResponseEntity<String> assignRole(@PathVariable Integer userId,
-                                             @PathVariable Integer roleId) {
+    public ResponseEntity<String> assignRole(@PathVariable Long userId,
+                                             @PathVariable Long roleId) {
         boolean assigned = userService.assignRole(userId, roleId);
         if (assigned) {
             return ResponseEntity.ok("Role assigned");
@@ -85,8 +85,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/roles/{roleId}")
-    public ResponseEntity<String> removeRole(@PathVariable Integer userId,
-                                             @PathVariable Integer roleId) {
+    public ResponseEntity<String> removeRole(@PathVariable Long userId,
+                                             @PathVariable Long roleId) {
         boolean removed = userService.removeRole(userId, roleId);
         if (removed) {
             return ResponseEntity.ok("Role removed");

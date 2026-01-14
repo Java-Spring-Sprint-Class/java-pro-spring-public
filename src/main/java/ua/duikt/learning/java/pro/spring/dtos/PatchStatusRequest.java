@@ -12,5 +12,5 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class PatchStatusRequest {
-    private Integer statusId;
+    private Long statusId;
 }

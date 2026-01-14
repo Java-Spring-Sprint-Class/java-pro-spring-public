@@ -23,7 +23,7 @@ public class CommentController {
     private final DetailsService detailsService;
 
     @PostMapping("/issues/{issueId}/comments")
-    public ResponseEntity<String> addComment(@PathVariable Integer issueId,
+    public ResponseEntity<String> addComment(@PathVariable Long issueId,
                                              @RequestBody AddCommentRequest request) {
         boolean added = detailsService.addComment(issueId, request.getContent());
         if (added) {
@@ -33,19 +33,19 @@ public class CommentController {
     }
 
     @GetMapping("/issues/{issueId}/comments")
-    public ResponseEntity<List<IssueComment>> getComments(@PathVariable Integer issueId) {
+    public ResponseEntity<List<IssueComment>> getComments(@PathVariable Long issueId) {
         return ResponseEntity.ok(detailsService.getComments(issueId));
     }
 
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<String> updateComment(@PathVariable Integer commentId,
+    public ResponseEntity<String> updateComment(@PathVariable Long commentId,
                                                 @RequestBody UpdateCommentRequest request) {
         detailsService.updateComment(commentId, request.getContent());
         return ResponseEntity.ok("Comment updated");
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Integer commentId) {
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         boolean deleted = detailsService.deleteComment(commentId);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

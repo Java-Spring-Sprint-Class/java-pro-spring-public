@@ -22,7 +22,7 @@ public class AttachmentController {
     private final DetailsService detailsService;
 
     @PostMapping("/issues/{issueId}/attachments")
-    public ResponseEntity<String> addAttachment(@PathVariable Integer issueId,
+    public ResponseEntity<String> addAttachment(@PathVariable Long issueId,
                                                 @RequestBody AddAttachmentRequest request) {
         boolean added = detailsService.addAttachment(
                 issueId,
@@ -38,12 +38,12 @@ public class AttachmentController {
     }
 
     @GetMapping("/issues/{issueId}/attachments")
-    public ResponseEntity<List<Attachment>> getAttachments(@PathVariable Integer issueId) {
+    public ResponseEntity<List<Attachment>> getAttachments(@PathVariable Long issueId) {
         return ResponseEntity.ok(detailsService.getAttachments(issueId));
     }
 
     @DeleteMapping("/attachments/{attachmentId}")
-    public ResponseEntity<Void> deleteAttachment(@PathVariable Integer attachmentId) {
+    public ResponseEntity<Void> deleteAttachment(@PathVariable Long attachmentId) {
         boolean deleted = detailsService.deleteAttachment(attachmentId);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

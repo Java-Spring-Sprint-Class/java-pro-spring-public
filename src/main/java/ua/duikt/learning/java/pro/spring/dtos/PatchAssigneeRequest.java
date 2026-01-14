@@ -12,5 +12,5 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class PatchAssigneeRequest {
-    private Integer assigneeId;
+    private Long assigneeId;
 }
