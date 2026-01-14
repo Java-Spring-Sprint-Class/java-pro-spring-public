@@ -41,12 +41,13 @@ class IssueControllerTest {
     @Test
     @DisplayName("Create Issue: returns 201 and ID")
     void createIssue_Success() throws Exception {
+        Long statusId = 1L;
         var request = new CreateIssueRequest(
-                1, "Fix Bug", "Desc", IssueType.BUG, Priority.HIGH
+                1L, "Fix Bug", "Desc", IssueType.BUG, Priority.HIGH, statusId
         );
 
-        given(issueService.createIssue(1, "Fix Bug", "Desc", IssueType.BUG, Priority.HIGH))
-                .willReturn(101);
+        given(issueService.createIssue(1L, "Fix Bug", "Desc", IssueType.BUG, Priority.HIGH, statusId))
+                .willReturn(101L);
 
         mockMvc.perform(post("/api/issues")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,12 +60,12 @@ class IssueControllerTest {
     @DisplayName("Get Issue: returns Issue if found")
     void getIssue_Success() throws Exception {
         Issue issue = new Issue();
-        issue.setId(10);
+        issue.setId(10L);
         issue.setTitle("Task 1");
 
-        given(issueService.getIssue(10)).willReturn(issue);
+        given(issueService.getIssue(10L)).willReturn(issue);
 
-        mockMvc.perform(get("/api/issues/{id}", 10))
+        mockMvc.perform(get("/api/issues/{id}", 10L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Task 1"));
     }
@@ -73,7 +74,7 @@ class IssueControllerTest {
     @DisplayName("List Issues: filters by projectId")
     void listIssues_Success() throws Exception {
         Issue issue = new Issue();
-        given(issueService.listIssues(5)).willReturn(List.of(issue));
+        given(issueService.listIssues(5L)).willReturn(List.of(issue));
 
         mockMvc.perform(get("/api/issues").param("projectId", "5"))
                 .andExpect(status().isOk())
@@ -83,7 +84,7 @@ class IssueControllerTest {
     @Test
     @DisplayName("Update Issue: checks existence then updates")
     void updateIssue_Success() throws Exception {
-        int id = 1;
+        Long id = 1L;
         var request = new UpdateIssueRequest("New Title", "New Desc");
 
         given(issueService.getIssue(id)).willReturn(new Issue());
@@ -98,10 +99,10 @@ class IssueControllerTest {
     @Test
     @DisplayName("Update Issue: returns 404 if missing")
     void updateIssue_NotFound() throws Exception {
-        given(issueService.getIssue(99)).willReturn(null);
+        given(issueService.getIssue(99L)).willReturn(null);
         var request = new UpdateIssueRequest("T", "D");
 
-        mockMvc.perform(put("/api/issues/{id}", 99)
+        mockMvc.perform(put("/api/issues/{id}", 99L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
@@ -110,8 +111,8 @@ class IssueControllerTest {
     @Test
     @DisplayName("Patch Status: should update status")
     void updateStatus_Success() throws Exception {
-        int issueId = 1;
-        int newStatusId = 5;
+        Long issueId = 1L;
+        Long newStatusId = 5L;
         var request = new PatchStatusRequest(newStatusId);
 
         given(issueService.getIssue(issueId)).willReturn(new Issue());
@@ -126,7 +127,7 @@ class IssueControllerTest {
     @Test
     @DisplayName("Get History: returns list of changes")
     void getHistory_Success() throws Exception {
-        int issueId = 1;
+        Long issueId = 1L;
         given(issueService.getIssue(issueId)).willReturn(new Issue());
         given(issueService.getHistory(issueId)).willReturn(List.of(new IssueHistory()));
 
