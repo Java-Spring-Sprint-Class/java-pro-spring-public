@@ -39,7 +39,7 @@ class AllEntitiesTest {
     void roleEntityTest() {
         assertFieldExists(Role.class, "name", String.class);
 
-        Role role = Role.builder().id(1).name("ADMIN").build();
+        Role role = Role.builder().id(1L).name("ADMIN").build();
         assertThat(role.getName()).isEqualTo("ADMIN");
     }
 
@@ -49,8 +49,8 @@ class AllEntitiesTest {
         assertFieldExists(UserRole.class, "userId", Long.class);
         assertFieldExists(UserRole.class, "roleId", Long.class);
 
-        UserRole ur = UserRole.builder().userId(1).roleId(2).build();
-        assertThat(ur.getUserId()).isEqualTo(1);
+        UserRole ur = UserRole.builder().userId(1L).roleId(2L).build();
+        assertThat(ur.getUserId()).isEqualTo(1L);
     }
 
     @Test
@@ -60,7 +60,7 @@ class AllEntitiesTest {
         assertFieldExists(Project.class, "key", String.class);
         assertFieldExists(Project.class, "ownerId", Long.class);
 
-        Project project = Project.builder().key("PRJ").ownerId(10).build();
+        Project project = Project.builder().key("PRJ").ownerId(10L).build();
         assertThat(project.getKey()).isEqualTo("PRJ");
     }
 
