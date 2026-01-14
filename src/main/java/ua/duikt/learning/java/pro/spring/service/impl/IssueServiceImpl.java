@@ -12,7 +12,7 @@ import ua.duikt.learning.java.pro.spring.service.IssueService;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
@@ -20,17 +20,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 public class IssueServiceImpl implements IssueService {
-    private final Map<Integer, Issue> issueTable = new ConcurrentHashMap<>();
-    private final Map<Integer, Status> statusTable = new ConcurrentHashMap<>();
+    private final Map<Long, Issue> issueTable = new ConcurrentHashMap<>();
+    private final Map<Long, Status> statusTable = new ConcurrentHashMap<>();
     private final List<IssueHistory> historyTable = new ArrayList<>();
 
-    private final AtomicInteger issueIdGen = new AtomicInteger(1);
-    private final AtomicInteger statusIdGen = new AtomicInteger(1);
-    private final AtomicInteger historyIdGen = new AtomicInteger(1);
+    private final AtomicLong issueIdGen = new AtomicLong(1);
+    private final AtomicLong statusIdGen = new AtomicLong(1);
+    private final AtomicLong historyIdGen = new AtomicLong(1);
 
     @Override
-    public Integer createIssue(Integer projectId, String title, String description, IssueType type, Priority priority) {
-        Integer id = issueIdGen.getAndIncrement();
+    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority, Long statusId) {
+        Long id = issueIdGen.getAndIncrement();
         Issue issue = Issue.builder()
                 .id(id)
                 .projectId(projectId)
@@ -38,7 +38,7 @@ public class IssueServiceImpl implements IssueService {
                 .description(description)
                 .type(type)
                 .priority(priority)
-                .statusId(1)
+                .statusId(statusId)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -50,19 +50,19 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Issue getIssue(Integer id) {
+    public Issue getIssue(Long id) {
         return issueTable.get(id);
     }
 
     @Override
-    public List<Issue> listIssues(Integer projectId) {
+    public List<Issue> listIssues(Long projectId) {
         return issueTable.values().stream()
                 .filter(i -> i.getProjectId().equals(projectId))
                 .toList();
     }
 
     @Override
-    public void updateIssue(Integer id, String title, String description) {
+    public void updateIssue(Long id, String title, String description) {
         Issue issue = issueTable.get(id);
         if (issue != null) {
             issue.setTitle(title);
@@ -72,12 +72,12 @@ public class IssueServiceImpl implements IssueService {
         }
     }
 
-    public boolean deleteIssue(Integer id) {
+    public boolean deleteIssue(Long id) {
         return issueTable.remove(id) != null;
     }
 
     @Override
-    public void patchStatus(Integer id, Integer newStatusId) {
+    public void patchStatus(Long id, Long newStatusId) {
         Issue issue = issueTable.get(id);
         if (issue != null) {
             String oldStatus = String.valueOf(issue.getStatusId());
@@ -87,7 +87,7 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public void patchAssignee(Integer id, Integer assigneeId) {
+    public void patchAssignee(Long id, Long assigneeId) {
         Issue issue = issueTable.get(id);
         if (issue != null) {
             String oldAssignee = String.valueOf(issue.getAssigneeId());
@@ -97,8 +97,8 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public Integer createStatus(Integer projectId, String name, StatusCategory category) {
-        Integer id = statusIdGen.getAndIncrement();
+    public Long createStatus(Long projectId, String name, StatusCategory category) {
+        Long id = statusIdGen.getAndIncrement();
 
         int nextPosition = statusTable.values().stream()
                                    .filter(s -> s.getProjectId().equals(projectId))
@@ -121,7 +121,7 @@ public class IssueServiceImpl implements IssueService {
 
 
     @Override
-    public List<Status> getStatuses(Integer projectId) {
+    public List<Status> getStatuses(Long projectId) {
         return statusTable.values().stream()
                 .filter(s -> s.getProjectId().equals(projectId))
                 .sorted(Comparator.comparingInt(Status::getPosition))
@@ -129,25 +129,25 @@ public class IssueServiceImpl implements IssueService {
     }
 
     @Override
-    public void updateStatus(Integer id, String name) {
+    public void updateStatus(Long id, String name) {
         Status s = statusTable.get(id);
         if (s != null) s.setName(name);
     }
 
     @Override
-    public boolean deleteStatus(Integer id) {
+    public boolean deleteStatus(Long id) {
         return statusTable.remove(id) != null;
     }
 
     @Override
-    public List<IssueHistory> getHistory(Integer issueId) {
+    public List<IssueHistory> getHistory(Long issueId) {
         return historyTable.stream()
                 .filter(h -> h.getIssueId().equals(issueId))
                 .toList();
     }
 
 
-    private void recordHistory(Integer issueId, String field, String oldVal, String newVal) {
+    private void recordHistory(Long issueId, String field, String oldVal, String newVal) {
         IssueHistory history = IssueHistory.builder()
                 .id(historyIdGen.getAndIncrement())
                 .issueId(issueId)
@@ -158,5 +158,4 @@ public class IssueServiceImpl implements IssueService {
                 .build();
         historyTable.add(history);
     }
-
 }

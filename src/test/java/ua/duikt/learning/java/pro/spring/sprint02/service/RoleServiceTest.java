@@ -25,8 +25,8 @@ class RoleServiceTest {
 
     @Test
     void createAndListRoles() {
-        Integer id1 = roleService.createRole("ADMIN");
-        Integer id2 = roleService.createRole("USER");
+        Long id1 = roleService.createRole("ADMIN");
+        Long id2 = roleService.createRole("USER");
 
         List<Role> roles = roleService.getRoles();
         assertThat(roles).hasSize(2);

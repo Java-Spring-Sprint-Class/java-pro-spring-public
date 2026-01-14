@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
@@ -19,9 +19,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final Map<Integer, User> userTable = new ConcurrentHashMap<>();
+    private final Map<Long, User> userTable = new ConcurrentHashMap<>();
     private final List<UserRole> userRoleTable = new ArrayList<>();
-    private final AtomicInteger idGenerator = new AtomicInteger(1);
+    private final AtomicLong idGenerator = new AtomicLong(1L);
 
     public boolean register(String username, String email, String password) {
         for (User user : userTable.values()) {
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
-    public User getUser(Integer id) {
+    public User getUser(Long id) {
         return userTable.get(id);
     }
 
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    public void updateProfile(Integer id, String username, String email) {
+    public void updateProfile(Long id, String username, String email) {
         User user = userTable.get(id);
         if (user != null) {
             user.setUsername(username);
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public boolean deactivateUser(Integer id) {
+    public boolean deactivateUser(Long id) {
         User user = userTable.get(id);
         if (user != null) {
             user.setIsActive(false);
@@ -75,12 +75,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public boolean assignRole(Integer userId, Integer roleId) {
+    public boolean assignRole(Long userId, Long roleId) {
         UserRole ur = UserRole.builder().userId(userId).roleId(roleId).build();
         return userRoleTable.add(ur);
     }
 
-    public boolean removeRole(Integer userId, Integer roleId) {
+    public boolean removeRole(Long userId, Long roleId) {
         return userRoleTable.removeIf(ur ->
                 ur.getUserId().equals(userId) && ur.getRoleId().equals(roleId));
     }

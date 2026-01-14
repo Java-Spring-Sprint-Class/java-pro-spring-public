@@ -39,18 +39,18 @@ class AllEntitiesTest {
     void roleEntityTest() {
         assertFieldExists(Role.class, "name", String.class);
 
-        Role role = Role.builder().id(1).name("ADMIN").build();
+        Role role = Role.builder().id(1L).name("ADMIN").build();
         assertThat(role.getName()).isEqualTo("ADMIN");
     }
 
     @Test
     @DisplayName("UserRole Entity: Check Many-to-Many fields")
     void userRoleEntityTest() {
-        assertFieldExists(UserRole.class, "userId", Integer.class);
-        assertFieldExists(UserRole.class, "roleId", Integer.class);
+        assertFieldExists(UserRole.class, "userId", Long.class);
+        assertFieldExists(UserRole.class, "roleId", Long.class);
 
-        UserRole ur = UserRole.builder().userId(1).roleId(2).build();
-        assertThat(ur.getUserId()).isEqualTo(1);
+        UserRole ur = UserRole.builder().userId(1L).roleId(2L).build();
+        assertThat(ur.getUserId()).isEqualTo(1L);
     }
 
     @Test
@@ -58,18 +58,18 @@ class AllEntitiesTest {
     void projectEntityTest() {
         assertFieldExists(Project.class, "name", String.class);
         assertFieldExists(Project.class, "key", String.class);
-        assertFieldExists(Project.class, "ownerId", Integer.class);
+        assertFieldExists(Project.class, "ownerId", Long.class);
 
-        Project project = Project.builder().key("PRJ").ownerId(10).build();
+        Project project = Project.builder().key("PRJ").ownerId(10L).build();
         assertThat(project.getKey()).isEqualTo("PRJ");
     }
 
     @Test
     @DisplayName("ProjectMember Entity: Check Enum usage")
     void projectMemberEntityTest() {
-        assertFieldExists(ProjectMember.class, "projectId", Integer.class);
-        assertFieldExists(ProjectMember.class, "userId", Integer.class);
-        assertFieldExists(ProjectMember.class, "role", ProjectRoleType.class); // Enum check
+        assertFieldExists(ProjectMember.class, "projectId", Long.class);
+        assertFieldExists(ProjectMember.class, "userId", Long.class);
+        assertFieldExists(ProjectMember.class, "role", ProjectRoleType.class);
 
         ProjectMember pm = ProjectMember.builder().role(ProjectRoleType.OWNER).build();
         assertThat(pm.getRole()).isEqualTo(ProjectRoleType.OWNER);
@@ -79,9 +79,9 @@ class AllEntitiesTest {
     @DisplayName("Status Entity: Check Enum usage")
     void statusEntityTest() {
         assertFieldExists(Status.class, "name", String.class);
-        assertFieldExists(Status.class, "category", StatusCategory.class); // Enum check
+        assertFieldExists(Status.class, "category", StatusCategory.class);
         assertFieldExists(Status.class, "position", Integer.class);
-        assertFieldExists(Status.class, "projectId", Integer.class);
+        assertFieldExists(Status.class, "projectId", Long.class);
 
         Status status = Status.builder().category(StatusCategory.DONE).build();
         assertThat(status.getCategory()).isEqualTo(StatusCategory.DONE);
@@ -92,9 +92,9 @@ class AllEntitiesTest {
     void issueEntityTest() {
         assertFieldExists(Issue.class, "type", IssueType.class);
         assertFieldExists(Issue.class, "priority", Priority.class);
-        assertFieldExists(Issue.class, "projectId", Integer.class);
-        assertFieldExists(Issue.class, "assigneeId", Integer.class);
-        assertFieldExists(Issue.class, "reporterId", Integer.class);
+        assertFieldExists(Issue.class, "projectId", Long.class);
+        assertFieldExists(Issue.class, "assigneeId", Long.class);
+        assertFieldExists(Issue.class, "reporterId", Long.class);
         assertFieldExists(Issue.class, "key", String.class);
 
         Issue issue = Issue.builder()
@@ -109,7 +109,7 @@ class AllEntitiesTest {
     @Test
     @DisplayName("IssueComment Entity: Check fields")
     void issueCommentTest() {
-        assertFieldExists(IssueComment.class, "issueId", Integer.class);
+        assertFieldExists(IssueComment.class, "issueId", Long.class);
         assertFieldExists(IssueComment.class, "content", String.class);
         assertFieldExists(IssueComment.class, "createdAt", LocalDateTime.class);
 
@@ -148,8 +148,8 @@ class AllEntitiesTest {
         Label label = Label.builder().color("#FFF").build();
         assertThat(label.getColor()).isEqualTo("#FFF");
 
-        assertFieldExists(IssueLabel.class, "issueId", Integer.class);
-        assertFieldExists(IssueLabel.class, "labelId", Integer.class);
+        assertFieldExists(IssueLabel.class, "issueId", Long.class);
+        assertFieldExists(IssueLabel.class, "labelId", Long.class);
     }
 
     /**

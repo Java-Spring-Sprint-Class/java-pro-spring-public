@@ -15,8 +15,8 @@ import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectMember {
-    private Integer id;
-    private Integer projectId;
-    private Integer userId;
+    private Long id;
+    private Long projectId;
+    private Long userId;
     private ProjectRoleType role;
 }
