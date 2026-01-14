@@ -18,7 +18,7 @@ import java.util.List;
 public class IssueServiceImpl implements IssueService {
     // TODO: Implements the method
     @Override
-    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority) {
+    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority, Long statusId) {
         return 0L;
     }
 

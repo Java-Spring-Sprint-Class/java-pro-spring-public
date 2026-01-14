@@ -62,7 +62,8 @@ class IssueServiceTest {
     @Test
     @DisplayName("Issue CRUD: Create, Get, Update, Delete")
     void issueCrud() {
-        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH, sId);
 
         Issue issue = issueService.getIssue(issueId);
         assertThat(issue).isNotNull();
