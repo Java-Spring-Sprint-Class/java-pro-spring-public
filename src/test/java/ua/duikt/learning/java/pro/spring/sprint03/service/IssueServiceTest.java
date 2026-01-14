@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/test/java/ua/duikt/learning/java/pro/spring/sprint02/service/IssueServiceTest.java
 package ua.duikt.learning.java.pro.spring.sprint02.service;
+========
+package ua.duikt.learning.java.pro.spring.sprint03.service;
+>>>>>>>> refs/heads/task-sprint-3:src/test/java/ua/duikt/learning/java/pro/spring/sprint03/service/IssueServiceTest.java
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +14,7 @@ import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 import ua.duikt.learning.java.pro.spring.service.IssueService;
+import ua.duikt.learning.java.pro.spring.service.StatusService;
 import ua.duikt.learning.java.pro.spring.service.impl.IssueServiceImpl;
 
 import java.util.List;
@@ -30,6 +35,7 @@ class IssueServiceTest {
     }
 
     @Test
+<<<<<<<< HEAD:src/test/java/ua/duikt/learning/java/pro/spring/sprint02/service/IssueServiceTest.java
     @DisplayName("Status Management")
     void statusManagement() {
         issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
@@ -60,6 +66,8 @@ class IssueServiceTest {
     }
 
     @Test
+========
+>>>>>>>> refs/heads/task-sprint-3:src/test/java/ua/duikt/learning/java/pro/spring/sprint03/service/IssueServiceTest.java
     @DisplayName("Issue CRUD: Create, Get, Update, Delete")
     void issueCrud() {
         Integer issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);

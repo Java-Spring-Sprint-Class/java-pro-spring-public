@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/test/java/ua/duikt/learning/java/pro/spring/sprint02/service/RoleServiceTest.java
 package ua.duikt.learning.java.pro.spring.sprint02.service;
+========
+package ua.duikt.learning.java.pro.spring.sprint03.service;
+>>>>>>>> refs/heads/task-sprint-3:src/test/java/ua/duikt/learning/java/pro/spring/sprint03/service/RoleServiceTest.java
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

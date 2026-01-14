@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/test/java/ua/duikt/learning/java/pro/spring/sprint02/controllers/RoleControllerTest.java
 package ua.duikt.learning.java.pro.spring.sprint02.controllers;
+========
+package ua.duikt.learning.java.pro.spring.sprint03.controllers;
+>>>>>>>> refs/heads/task-sprint-3:src/test/java/ua/duikt/learning/java/pro/spring/sprint03/controllers/RoleControllerTest.java
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;

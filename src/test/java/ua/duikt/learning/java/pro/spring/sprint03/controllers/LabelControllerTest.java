@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/test/java/ua/duikt/learning/java/pro/spring/sprint02/controllers/LabelControllerTest.java
 package ua.duikt.learning.java.pro.spring.sprint02.controllers;
+========
+package ua.duikt.learning.java.pro.spring.sprint03.controllers;
+>>>>>>>> refs/heads/task-sprint-3:src/test/java/ua/duikt/learning/java/pro/spring/sprint03/controllers/LabelControllerTest.java
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.LabelController;
 import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
 import ua.duikt.learning.java.pro.spring.entity.Label;
-import ua.duikt.learning.java.pro.spring.service.DetailsService;
+import ua.duikt.learning.java.pro.spring.service.LabelService;
 
 import java.util.List;
 
@@ -29,7 +33,7 @@ class LabelControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private DetailsService detailsService;
+    private LabelService labelService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -37,7 +41,7 @@ class LabelControllerTest {
     @DisplayName("Create Label: Should return 201 and ID")
     void createLabel_Success() throws Exception {
         var request = new CreateLabelRequest("BUG", "#FF0000");
-        given(detailsService.createLabel("BUG", "#FF0000")).willReturn(55);
+        given(labelService.createLabel("BUG", "#FF0000")).willReturn(55);
 
         mockMvc.perform(post("/api/labels")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +55,7 @@ class LabelControllerTest {
     void getAllLabels_Success() throws Exception {
         Label label = new Label();
         label.setName("Feature");
-        given(detailsService.getLabels()).willReturn(List.of(label));
+        given(labelService.getLabels()).willReturn(List.of(label));
 
         mockMvc.perform(get("/api/labels"))
                 .andExpect(status().isOk())
@@ -63,7 +67,7 @@ class LabelControllerTest {
     void addLabelToIssue_Success() throws Exception {
         int issueId = 1;
         int labelId = 5;
-        given(detailsService.addLabelToIssue(issueId, labelId)).willReturn(true);
+        given(labelService.addLabelToIssue(issueId, labelId)).willReturn(true);
 
         mockMvc.perform(post("/api/issues/{issueId}/labels/{labelId}", issueId, labelId))
                 .andExpect(status().isOk())
@@ -74,7 +78,7 @@ class LabelControllerTest {
     @DisplayName("Get Labels for Issue: Should return list")
     void getLabelsForIssue_Success() throws Exception {
         Label l = new Label(); l.setColor("blue");
-        given(detailsService.getLabelsForIssue(1)).willReturn(List.of(l));
+        given(labelService.getLabelsForIssue(1)).willReturn(List.of(l));
 
         mockMvc.perform(get("/api/issues/{issueId}/labels", 1))
                 .andExpect(status().isOk())
@@ -84,7 +88,7 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 200 if removed")
     void removeLabelFromIssue_Success() throws Exception {
-        given(detailsService.removeLabelFromIssue(1, 5)).willReturn(true);
+        given(labelService.removeLabelFromIssue(1, 5)).willReturn(true);
 
         mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1, 5))
                 .andExpect(status().isOk())
@@ -94,7 +98,7 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 404 if not found")
     void removeLabelFromIssue_NotFound() throws Exception {
-        given(detailsService.removeLabelFromIssue(1, 99)).willReturn(false);
+        given(labelService.removeLabelFromIssue(1, 99)).willReturn(false);
 
         mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1, 99))
                 .andExpect(status().isNotFound());
