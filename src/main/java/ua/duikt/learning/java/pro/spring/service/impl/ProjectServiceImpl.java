@@ -31,7 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .id(id)
                 .name(name)
                 .key(key)
-                .ownerId(1L)
+                .ownerId(ownerId)
                 .description(description)
                 .createdAt(LocalDateTime.now())
                 .build();

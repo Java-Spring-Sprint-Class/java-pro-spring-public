@@ -38,7 +38,7 @@ public class IssueServiceImpl implements IssueService {
                 .description(description)
                 .type(type)
                 .priority(priority)
-                .statusId(1L)
+                .statusId(statusId)
                 .createdAt(LocalDateTime.now())
                 .build();
 
