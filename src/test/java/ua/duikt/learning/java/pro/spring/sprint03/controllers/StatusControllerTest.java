@@ -12,7 +12,7 @@ import ua.duikt.learning.java.pro.spring.controllers.StatusController;
 import ua.duikt.learning.java.pro.spring.dtos.CreateStatusRequest;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
-import ua.duikt.learning.java.pro.spring.service.IssueService;
+import ua.duikt.learning.java.pro.spring.service.StatusService;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ class StatusControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private IssueService issueService;
+    private StatusService statusService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -41,7 +41,7 @@ class StatusControllerTest {
                 1, "To Do", StatusCategory.TO_DO
         );
 
-        given(issueService.createStatus(1, "To Do", StatusCategory.TO_DO))
+        given(statusService.createStatus(1, "To Do", StatusCategory.TO_DO))
                 .willReturn(55);
 
         mockMvc.perform(post("/api/statuses")
@@ -55,7 +55,7 @@ class StatusControllerTest {
     @DisplayName("Get Statuses: filters by projectId")
     void getStatuses_Success() throws Exception {
         Status s1 = new Status(); s1.setName("Done");
-        given(issueService.getStatuses(10)).willReturn(List.of(s1));
+        given(statusService.getStatuses(10)).willReturn(List.of(s1));
 
         mockMvc.perform(get("/api/statuses")
                         .param("projectId", "10"))
@@ -66,7 +66,7 @@ class StatusControllerTest {
     @Test
     @DisplayName("Delete Status: returns 204 if success")
     void deleteStatus_Success() throws Exception {
-        given(issueService.deleteStatus(1)).willReturn(true);
+        given(statusService.deleteStatus(1)).willReturn(true);
 
         mockMvc.perform(delete("/api/statuses/{id}", 1))
                 .andExpect(status().isNoContent());
@@ -75,7 +75,7 @@ class StatusControllerTest {
     @Test
     @DisplayName("Delete Status: returns 404 if failed")
     void deleteStatus_NotFound() throws Exception {
-        given(issueService.deleteStatus(99)).willReturn(false);
+        given(statusService.deleteStatus(99)).willReturn(false);
 
         mockMvc.perform(delete("/api/statuses/{id}", 99))
                 .andExpect(status().isNotFound());

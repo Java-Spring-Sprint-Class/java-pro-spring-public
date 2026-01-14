@@ -53,26 +53,6 @@ public class IssueServiceImpl implements IssueService {
     }
     // TODO: Implements the method
     @Override
-    public Integer createStatus(Integer projectId, String name, StatusCategory category) {
-        return null;
-    }
-    // TODO: Implements the method
-    @Override
-    public List<Status> getStatuses(Integer projectId) {
-        return null;
-    }
-    // TODO: Implements the method
-    @Override
-    public void updateStatus(Integer id, String name) {
-
-    }
-    // TODO: Implements the method
-    @Override
-    public boolean deleteStatus(Integer id) {
-        return false;
-    }
-    // TODO: Implements the method
-    @Override
     public List<IssueHistory> getHistory(Integer issueId) {
         return null;
     }

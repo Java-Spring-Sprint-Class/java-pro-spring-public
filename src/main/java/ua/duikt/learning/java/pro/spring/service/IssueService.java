@@ -35,17 +35,6 @@ public interface IssueService {
 
     void patchAssignee(Integer id, Integer assigneeId);
 
-    // ===== Statuses =====
-
-    Integer createStatus(Integer projectId, String name, StatusCategory category);
-
-    List<Status> getStatuses(Integer projectId);
-
-    void updateStatus(Integer id, String name);
-
-    boolean deleteStatus(Integer id);
-
     // ===== History =====
-
     List<IssueHistory> getHistory(Integer issueId);
 }

@@ -10,6 +10,7 @@ import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 import ua.duikt.learning.java.pro.spring.service.IssueService;
+import ua.duikt.learning.java.pro.spring.service.StatusService;
 import ua.duikt.learning.java.pro.spring.service.impl.IssueServiceImpl;
 
 import java.util.List;
@@ -27,36 +28,6 @@ class IssueServiceTest {
     @BeforeEach
     void setUp() {
         issueService = new IssueServiceImpl();
-    }
-
-    @Test
-    @DisplayName("Status Management")
-    void statusManagement() {
-        issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
-        issueService.createStatus(1, "In Progress", StatusCategory.IN_PROGRESS);
-
-        List<Status> statuses = issueService.getStatuses(1);
-        assertThat(statuses).hasSize(2);
-        assertThat(statuses.get(0).getName()).isEqualTo("To Do");
-    }
-
-    @Test
-    @DisplayName("Status Lifecycle: Create, Update, Delete")
-    void statusLifecycle() {
-        Integer sId = issueService.createStatus(1, "To Do", StatusCategory.TO_DO);
-
-        List<Status> statuses = issueService.getStatuses(1);
-        assertThat(statuses).hasSize(1);
-        assertThat(statuses.get(0).getName()).isEqualTo("To Do");
-
-        issueService.updateStatus(sId, "To Do Updated");
-
-        Status updatedStatus = issueService.getStatuses(1).get(0);
-        assertThat(updatedStatus.getName()).isEqualTo("To Do Updated");
-
-        boolean deleted = issueService.deleteStatus(sId);
-        assertThat(deleted).isTrue();
-        assertThat(issueService.getStatuses(1)).isEmpty();
     }
 
     @Test
