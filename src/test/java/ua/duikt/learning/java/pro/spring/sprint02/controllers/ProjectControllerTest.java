@@ -44,7 +44,7 @@ class ProjectControllerTest {
     @DisplayName("1. Create Project: Should return 201 and new ID")
     void createProject_Success() throws Exception {
         Long userId = 1L;
-        var request = new CreateProjectRequest("New Project", "NP", "Desc");
+        var request = new CreateProjectRequest("New Project", "NP", "Desc", userId);
 
         given(projectService.createProject("New Project", "NP", "Desc", userId)).willReturn(55L);
 
@@ -111,7 +111,7 @@ class ProjectControllerTest {
     @Test
     @DisplayName("5. Delete Project: Should return 204 No Content")
     void deleteProject_Success() throws Exception {
-        given(projectService.deleteProject(1)).willReturn(true);
+        given(projectService.deleteProject(1L)).willReturn(true);
 
         mockMvc.perform(delete("/api/projects/{id}", 1))
                 .andExpect(status().isNoContent());
