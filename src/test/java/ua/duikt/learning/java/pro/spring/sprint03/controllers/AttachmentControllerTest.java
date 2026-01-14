@@ -36,7 +36,7 @@ class AttachmentControllerTest {
     @Test
     @DisplayName("Add Attachment: Should return 201")
     void addAttachment_Success() throws Exception {
-        int issueId = 1;
+        Long issueId = 1L;
         var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
         given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024))
@@ -55,9 +55,9 @@ class AttachmentControllerTest {
         Attachment att = new Attachment();
         att.setFileName("doc.pdf");
 
-        given(attachmentService.getAttachments(1)).willReturn(List.of(att));
+        given(attachmentService.getAttachments(1L)).willReturn(List.of(att));
 
-        mockMvc.perform(get("/api/issues/{issueId}/attachments", 1))
+        mockMvc.perform(get("/api/issues/{issueId}/attachments", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].fileName").value("doc.pdf"));
     }
@@ -65,9 +65,9 @@ class AttachmentControllerTest {
     @Test
     @DisplayName("Delete Attachment: Should return 204")
     void deleteAttachment_Success() throws Exception {
-        given(attachmentService.deleteAttachment(10)).willReturn(true);
+        given(attachmentService.deleteAttachment(10L)).willReturn(true);
 
-        mockMvc.perform(delete("/api/attachments/{id}", 10))
+        mockMvc.perform(delete("/api/attachments/{id}", 10L))
                 .andExpect(status().isNoContent());
     }
 }

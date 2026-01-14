@@ -15,42 +15,49 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
     // TODO: Implements the method
     @Override
-    public Integer createProject(String name, String key, String description) {
-        return null;
+    public Long createProject(String name, String key, String description, Long ownerId) {
+        return 0L;
     }
+
     // TODO: Implements the method
     @Override
-    public Project getProject(Integer id) {
+    public Project getProject(Long id) {
         return null;
     }
+
     // TODO: Implements the method
     @Override
     public List<Project> listProjects() {
-        return null;
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public void updateProject(Integer id, String name, String description) {
+    public void updateProject(Long id, String name, String description) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deleteProject(Integer id) {
+    public boolean deleteProject(Long id) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public boolean addMember(Integer projectId, Integer userId, ProjectRoleType role) {
+    public boolean addMember(Long projectId, Long userId, ProjectRoleType role) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public List<ProjectMember> getMembers(Integer projectId) {
-        return null;
+    public List<ProjectMember> getMembers(Long projectId) {
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public boolean removeMember(Integer projectId, Integer userId) {
+    public boolean removeMember(Long projectId, Long userId) {
         return false;
     }
 }

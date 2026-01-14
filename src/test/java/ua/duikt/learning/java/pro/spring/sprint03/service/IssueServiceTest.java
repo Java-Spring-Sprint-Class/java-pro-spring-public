@@ -33,7 +33,8 @@ class IssueServiceTest {
     @Test
     @DisplayName("Issue CRUD: Create, Get, Update, Delete")
     void issueCrud() {
-        Integer issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH, sId);
 
         Issue issue = issueService.getIssue(issueId);
         assertThat(issue).isNotNull();
@@ -53,23 +54,24 @@ class IssueServiceTest {
     @Test
     @DisplayName("List Issues by Project")
     void listIssues() {
-        issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.LOW);
-        issueService.createIssue(1, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM);
+        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW, sId);
+        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM, sId);
 
-        issueService.createIssue(2, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW);
+        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW, sId);
 
-        List<Issue> project1Issues = issueService.listIssues(1);
+        List<Issue> project1Issues = issueService.listIssues(1L);
         assertThat(project1Issues).hasSize(2);
 
-        List<Issue> project2Issues = issueService.listIssues(2);
+        List<Issue> project2Issues = issueService.listIssues(2L);
         assertThat(project2Issues).hasSize(1);
     }
 
     @Test
     @DisplayName("Patch Status and History Tracking")
     void patchStatusAndHistory() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-        Integer statusId = 100;
+        Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
 
         issueService.patchStatus(issueId, statusId);
 
@@ -80,7 +82,7 @@ class IssueServiceTest {
 
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
 
-        IssueHistory lastChange = history.get(history.size() - 1);
+        IssueHistory lastChange = history.getLast();
         assertThat(lastChange.getFieldChanged()).isEqualTo("status");
         assertThat(lastChange.getNewValue()).isEqualTo(String.valueOf(statusId));
     }
@@ -88,16 +90,12 @@ class IssueServiceTest {
     @Test
     @DisplayName("Patch Assignee and History")
     void patchAssignee() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-        Integer assigneeId = 55;
+        Long statusId = 100L;
+        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
+        Long assigneeId = 55L;
 
         issueService.patchAssignee(issueId, assigneeId);
 
         assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(assigneeId);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-        boolean hasAssigneeRecord = history.stream()
-                .anyMatch(h -> "assignee".equals(h.getFieldChanged()) && String.valueOf(assigneeId).equals(h.getNewValue()));
-
     }
 }

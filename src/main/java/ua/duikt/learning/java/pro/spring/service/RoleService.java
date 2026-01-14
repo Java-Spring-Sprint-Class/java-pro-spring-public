@@ -9,7 +9,7 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface RoleService {
-    Integer createRole(String name);
+    Long createRole(String name);
 
     List<Role> getRoles();
 }

@@ -13,34 +13,40 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     // TODO: Implements the method
     @Override
-    public boolean removeRole(Integer userId, Integer roleId) {
+    public boolean assignRole(Long userId, Long roleId) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public boolean assignRole(Integer userId, Integer roleId) {
+    public boolean removeRole(Long userId, Long roleId) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deactivateUser(Integer id) {
+    public boolean deactivateUser(Long id) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public void updateProfile(Integer id, String username, String email) {
+    public void updateProfile(Long id, String username, String email) {
 
     }
+
     // TODO: Implements the method
     @Override
     public List<User> listUsers(String search) {
-        return null;
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public User getUser(Integer id) {
+    public User getUser(Long id) {
         return null;
     }
+
     // TODO: Implements the method
     @Override
     public boolean register(String username, String email, String password) {

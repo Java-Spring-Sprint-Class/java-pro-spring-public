@@ -13,7 +13,7 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
     // TODO: Implements the method
     @Override
-    public Integer createRole(String name) {
+    public Long createRole(String name) {
         return null;
     }
     // TODO: Implements the method

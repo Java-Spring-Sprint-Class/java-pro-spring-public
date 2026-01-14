@@ -38,24 +38,24 @@ class StatusControllerTest {
     @DisplayName("Create Status: should return 201")
     void createStatus_Success() throws Exception {
         var request = new CreateStatusRequest(
-                1, "To Do", StatusCategory.TO_DO
+                1L, "To Do", StatusCategory.TO_DO
         );
 
-        given(statusService.createStatus(1, "To Do", StatusCategory.TO_DO))
-                .willReturn(55);
+        given(statusService.createStatus(1L, "To Do", StatusCategory.TO_DO))
+                .willReturn(55L);
 
         mockMvc.perform(post("/api/statuses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(55));
+                .andExpect(jsonPath("$.id").value(55L));
     }
 
     @Test
     @DisplayName("Get Statuses: filters by projectId")
     void getStatuses_Success() throws Exception {
         Status s1 = new Status(); s1.setName("Done");
-        given(statusService.getStatuses(10)).willReturn(List.of(s1));
+        given(statusService.getStatuses(10L)).willReturn(List.of(s1));
 
         mockMvc.perform(get("/api/statuses")
                         .param("projectId", "10"))
@@ -66,18 +66,18 @@ class StatusControllerTest {
     @Test
     @DisplayName("Delete Status: returns 204 if success")
     void deleteStatus_Success() throws Exception {
-        given(statusService.deleteStatus(1)).willReturn(true);
+        given(statusService.deleteStatus(1L)).willReturn(true);
 
-        mockMvc.perform(delete("/api/statuses/{id}", 1))
+        mockMvc.perform(delete("/api/statuses/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     @DisplayName("Delete Status: returns 404 if failed")
     void deleteStatus_NotFound() throws Exception {
-        given(statusService.deleteStatus(99)).willReturn(false);
+        given(statusService.deleteStatus(99L)).willReturn(false);
 
-        mockMvc.perform(delete("/api/statuses/{id}", 99))
+        mockMvc.perform(delete("/api/statuses/{id}", 99L))
                 .andExpect(status().isNotFound());
     }
 }
