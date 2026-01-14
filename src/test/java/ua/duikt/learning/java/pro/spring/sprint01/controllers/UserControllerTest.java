@@ -70,7 +70,7 @@ class UserControllerTest {
         mockUser.setId(1L);
         mockUser.setUsername("testUser");
 
-        given(userService.getUser(1)).willReturn(mockUser);
+        given(userService.getUser(1L)).willReturn(mockUser);
 
         mockMvc.perform(get("/api/users/{id}", 1L))
                 .andExpect(status().isOk())
