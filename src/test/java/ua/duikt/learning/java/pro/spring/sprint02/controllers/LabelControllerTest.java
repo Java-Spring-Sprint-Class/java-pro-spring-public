@@ -74,7 +74,7 @@ class LabelControllerTest {
     @DisplayName("Get Labels for Issue: Should return list")
     void getLabelsForIssue_Success() throws Exception {
         Label l = new Label(); l.setColor("blue");
-        given(detailsService.getLabelsForIssue(1)).willReturn(List.of(l));
+        given(detailsService.getLabelsForIssue(1L)).willReturn(List.of(l));
 
         mockMvc.perform(get("/api/issues/{issueId}/labels", 1L))
                 .andExpect(status().isOk())
