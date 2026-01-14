@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint01.controllers;
+package ua.duikt.learning.java.pro.spring.sprint03.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.StatusController;
+import ua.duikt.learning.java.pro.spring.dtos.CreateStatusRequest;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 import ua.duikt.learning.java.pro.spring.service.IssueService;

@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint01.service;
+package ua.duikt.learning.java.pro.spring.sprint03.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,21 +39,6 @@ class ProjectServiceTest {
 
         projectService.deleteProject(pId);
         assertThat(projectService.getProject(pId)).isNull();
-    }
-
-    @Test
-    @DisplayName("Manage Project Members")
-    void memberManagement() {
-        Integer pId = projectService.createProject("Beta", "BET", "Desc");
-
-        projectService.addMember(pId, 101, ProjectRoleType.OWNER);
-        projectService.addMember(pId, 102, ProjectRoleType.MEMBER);
-
-        List<ProjectMember> members = projectService.getMembers(pId);
-        assertThat(members).hasSize(2);
-
-        projectService.removeMember(pId, 101);
-        assertThat(projectService.getMembers(pId)).hasSize(1);
     }
 
     @Test

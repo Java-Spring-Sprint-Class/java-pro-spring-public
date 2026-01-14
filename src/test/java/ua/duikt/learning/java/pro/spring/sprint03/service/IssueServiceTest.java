@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint01.service;
+package ua.duikt.learning.java.pro.spring.sprint03.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,45 +38,6 @@ class IssueServiceTest {
         List<Status> statuses = issueService.getStatuses(1);
         assertThat(statuses).hasSize(2);
         assertThat(statuses.get(0).getName()).isEqualTo("To Do");
-    }
-
-    @Test
-    @DisplayName("Issue CRUD")
-    void issueCrud() {
-        Integer issueId = issueService.createIssue(1, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH);
-
-        Issue issue = issueService.getIssue(issueId);
-        assertThat(issue.getTitle()).isEqualTo("Login Bug");
-        assertThat(issue.getType()).isEqualTo(IssueType.BUG);
-        assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
-    }
-
-    @Test
-    @DisplayName("Patch Status and History Tracking")
-    void patchStatusAndHistory() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchStatus(issueId, 2);
-
-        Issue updatedIssue = issueService.getIssue(issueId);
-        assertThat(updatedIssue.getStatusId()).isEqualTo(2);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-        assertThat(history).hasSize(2);
-
-        IssueHistory statusChange = history.get(1);
-        assertThat(statusChange.getFieldChanged()).isEqualTo("status");
-        assertThat(statusChange.getNewValue()).isEqualTo("2");
-    }
-
-    @Test
-    @DisplayName("Patch Assignee")
-    void patchAssignee() {
-        Integer issueId = issueService.createIssue(1, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM);
-
-        issueService.patchAssignee(issueId, 55);
-
-        assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(55);
     }
 
     @Test

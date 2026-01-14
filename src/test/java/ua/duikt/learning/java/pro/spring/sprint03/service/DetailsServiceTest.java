@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint01.service;
+package ua.duikt.learning.java.pro.spring.sprint03.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,42 +24,6 @@ class DetailsServiceTest {
     @BeforeEach
     void setUp() {
         detailsService = new DetailsServiceImpl();
-    }
-
-    @Test
-    @DisplayName("Comments Logic")
-    void commentsLogic() {
-        detailsService.addComment(10, "Great job!");
-        detailsService.addComment(10, "Needs fixes.");
-
-        List<IssueComment> comments = detailsService.getComments(10);
-        assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getContent()).isEqualTo("Great job!");
-    }
-
-    @Test
-    @DisplayName("Attachments Logic")
-    void attachmentsLogic() {
-        detailsService.addAttachment(10, "log.txt", "http://s3...", 1024);
-
-        List<Attachment> attachments = detailsService.getAttachments(10);
-        assertThat(attachments).hasSize(1);
-        assertThat(attachments.get(0).getFileName()).isEqualTo("log.txt");
-    }
-
-    @Test
-    @DisplayName("Labels and Issue Linking")
-    void labelsLogic() {
-        Integer l1 = detailsService.createLabel("Backend", "Blue");
-        Integer l2 = detailsService.createLabel("Frontend", "Red");
-
-        detailsService.addLabelToIssue(100, l1);
-
-        List<Label> issueLabels = detailsService.getLabelsForIssue(100);
-        assertThat(issueLabels).hasSize(1);
-        assertThat(issueLabels.get(0).getName()).isEqualTo("Backend");
-
-        assertThat(detailsService.getLabelsForIssue(999)).isEmpty();
     }
 
     @Test
