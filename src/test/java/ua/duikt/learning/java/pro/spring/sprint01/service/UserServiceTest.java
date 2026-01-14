@@ -27,7 +27,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Assign Role")
     void assignRole() {
-        boolean result = userService.assignRole(1, 100);
+        boolean result = userService.assignRole(1L, 100L);
         assertThat(result).isTrue();
     }
 
@@ -103,7 +103,7 @@ class UserServiceTest {
     void rolesLogic() {
         userService.register("role_user", "role@test.com", "pass");
         Long userId = userService.listUsers(null).getFirst().getId();
-        Long roleId = 100;
+        Long roleId = 100L;
 
         boolean assigned = userService.assignRole(userId, roleId);
         assertThat(assigned).isTrue();
