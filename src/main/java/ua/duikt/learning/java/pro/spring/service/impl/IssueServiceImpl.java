@@ -18,66 +18,78 @@ import java.util.List;
 public class IssueServiceImpl implements IssueService {
     // TODO: Implements the method
     @Override
-    public Integer createIssue(Integer projectId, String title, String description, IssueType type, Priority priority) {
-        return null;
+    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority) {
+        return 0L;
     }
+
     // TODO: Implements the method
     @Override
-    public Issue getIssue(Integer id) {
+    public Issue getIssue(Long id) {
         return null;
     }
+
     // TODO: Implements the method
     @Override
-    public List<Issue> listIssues(Integer projectId) {
-        return null;
+    public List<Issue> listIssues(Long projectId) {
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public void updateIssue(Integer id, String title, String description) {
+    public void updateIssue(Long id, String title, String description) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deleteIssue(Integer id) {
+    public boolean deleteIssue(Long id) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public void patchStatus(Integer id, Integer newStatusId) {
+    public void patchStatus(Long id, Long newStatusId) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public void patchAssignee(Integer id, Integer assigneeId) {
+    public void patchAssignee(Long id, Long assigneeId) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public Integer createStatus(Integer projectId, String name, StatusCategory category) {
-        return null;
+    public Long createStatus(Long projectId, String name, StatusCategory category) {
+        return 0L;
     }
+
     // TODO: Implements the method
     @Override
-    public List<Status> getStatuses(Integer projectId) {
-        return null;
+    public List<Status> getStatuses(Long projectId) {
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public void updateStatus(Integer id, String name) {
+    public void updateStatus(Long id, String name) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deleteStatus(Integer id) {
+    public boolean deleteStatus(Long id) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public List<IssueHistory> getHistory(Integer issueId) {
-        return null;
+    public List<IssueHistory> getHistory(Long issueId) {
+        return List.of();
     }
+
     // TODO: Implements the method
-    private void recordHistory(Integer issueId, String field, String oldVal, String newVal) {
+    private void recordHistory(Long issueId, String field, String oldVal, String newVal) {
 
     }
 }

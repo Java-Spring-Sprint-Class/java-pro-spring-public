@@ -29,35 +29,35 @@ class DetailsServiceTest {
     @Test
     @DisplayName("Comments Logic")
     void commentsLogic() {
-        detailsService.addComment(10, "Great job!");
-        detailsService.addComment(10, "Needs fixes.");
+        detailsService.addComment(10L, "Great job!");
+        detailsService.addComment(10L, "Needs fixes.");
 
-        List<IssueComment> comments = detailsService.getComments(10);
+        List<IssueComment> comments = detailsService.getComments(10L);
         assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getContent()).isEqualTo("Great job!");
+        assertThat(comments.getFirst().getContent()).isEqualTo("Great job!");
     }
 
     @Test
     @DisplayName("Attachments Logic")
     void attachmentsLogic() {
-        detailsService.addAttachment(10, "log.txt", "http://s3...", 1024);
+        detailsService.addAttachment(10L, "log.txt", "http://s3...", 1024);
 
-        List<Attachment> attachments = detailsService.getAttachments(10);
+        List<Attachment> attachments = detailsService.getAttachments(10L);
         assertThat(attachments).hasSize(1);
-        assertThat(attachments.get(0).getFileName()).isEqualTo("log.txt");
+        assertThat(attachments.getFirst().getFileName()).isEqualTo("log.txt");
     }
 
     @Test
     @DisplayName("Labels and Issue Linking")
     void labelsLogic() {
-        Integer l1 = detailsService.createLabel("Backend", "Blue");
-        Integer l2 = detailsService.createLabel("Frontend", "Red");
+        Long l1 = detailsService.createLabel("Backend", "Blue");
+        detailsService.createLabel("Frontend", "Red");
 
-        detailsService.addLabelToIssue(100, l1);
+        detailsService.addLabelToIssue(100L, l1);
 
         List<Label> issueLabels = detailsService.getLabelsForIssue(100);
         assertThat(issueLabels).hasSize(1);
-        assertThat(issueLabels.get(0).getName()).isEqualTo("Backend");
+        assertThat(issueLabels.getFirst().getName()).isEqualTo("Backend");
 
         assertThat(detailsService.getLabelsForIssue(999)).isEmpty();
     }
@@ -65,17 +65,17 @@ class DetailsServiceTest {
     @Test
     @DisplayName("Comments Logic: Add, Get, Update, Delete")
     void commentsLogic() {
-        detailsService.addComment(10, "First comment");
-        detailsService.addComment(10, "Second comment");
+        detailsService.addComment(10L, "First comment");
+        detailsService.addComment(10L, "Second comment");
 
-        List<IssueComment> comments = detailsService.getComments(10);
+        List<IssueComment> comments = detailsService.getComments(10L);
         assertThat(comments).hasSize(2);
 
-        Integer firstCommentId = comments.get(0).getId();
+        Long firstCommentId = comments.getFirst().getId();
 
         detailsService.updateComment(firstCommentId, "Updated content");
 
-        List<IssueComment> updatedComments = detailsService.getComments(10);
+        List<IssueComment> updatedComments = detailsService.getComments(10L);
         IssueComment updatedComment = updatedComments.stream()
                 .filter(c -> c.getId().equals(firstCommentId))
                 .findFirst()
@@ -86,50 +86,50 @@ class DetailsServiceTest {
         boolean isDeleted = detailsService.deleteComment(firstCommentId);
         assertThat(isDeleted).isTrue();
 
-        assertThat(detailsService.getComments(10)).hasSize(1);
+        assertThat(detailsService.getComments(10L)).hasSize(1);
     }
 
     @Test
     @DisplayName("Attachments Logic: Add, Get, Delete")
     void attachmentsLogic() {
-        detailsService.addAttachment(10, "log.txt", "http://s3...", 1024);
-        detailsService.addAttachment(10, "image.png", "http://s3...", 2048);
+        detailsService.addAttachment(10L, "log.txt", "http://s3...", 1024);
+        detailsService.addAttachment(10L, "image.png", "http://s3...", 2048);
 
-        List<Attachment> attachments = detailsService.getAttachments(10);
+        List<Attachment> attachments = detailsService.getAttachments(10L);
         assertThat(attachments).hasSize(2);
-        assertThat(attachments.get(0).getFileName()).isEqualTo("log.txt");
+        assertThat(attachments.getFirst().getFileName()).isEqualTo("log.txt");
 
-        Integer attachmentId = attachments.get(0).getId();
+        Long attachmentId = attachments.getFirst().getId();
 
         boolean isDeleted = detailsService.deleteAttachment(attachmentId);
         assertThat(isDeleted).isTrue();
 
-        assertThat(detailsService.getAttachments(10)).hasSize(1);
+        assertThat(detailsService.getAttachments(10L)).hasSize(1);
     }
 
     @Test
     @DisplayName("Labels Logic: Create, Get All, Link, Unlink")
     void labelsLogic() {
-        Integer l1 = detailsService.createLabel("Backend", "Blue");
-        Integer l2 = detailsService.createLabel("Frontend", "Red");
+        Long l1 = detailsService.createLabel("Backend", "Blue");
+        Long l2 = detailsService.createLabel("Frontend", "Red");
 
         List<Label> allLabels = detailsService.getLabels();
         assertThat(allLabels).hasSize(2);
 
-        detailsService.addLabelToIssue(100, l1);
-        detailsService.addLabelToIssue(100, l2);
+        detailsService.addLabelToIssue(100L, l1);
+        detailsService.addLabelToIssue(100L, l2);
 
-        List<Label> issueLabels = detailsService.getLabelsForIssue(100);
+        List<Label> issueLabels = detailsService.getLabelsForIssue(100L);
         assertThat(issueLabels).hasSize(2);
         assertThat(issueLabels).extracting(Label::getName).contains("Backend", "Frontend");
 
-        assertThat(detailsService.getLabelsForIssue(999)).isEmpty();
+        assertThat(detailsService.getLabelsForIssue(999L)).isEmpty();
 
-        boolean isRemoved = detailsService.removeLabelFromIssue(100, l1);
+        boolean isRemoved = detailsService.removeLabelFromIssue(100L, l1);
         assertThat(isRemoved).isTrue();
 
-        List<Label> labelsAfterRemoval = detailsService.getLabelsForIssue(100);
+        List<Label> labelsAfterRemoval = detailsService.getLabelsForIssue(100L);
         assertThat(labelsAfterRemoval).hasSize(1);
-        assertThat(labelsAfterRemoval.get(0).getId()).isEqualTo(l2);
+        assertThat(labelsAfterRemoval.getFirst().getId()).isEqualTo(l2);
     }
 }

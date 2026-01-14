@@ -29,7 +29,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Project CRUD Operations")
     void projectCrud() {
-        Integer pId = projectService.createProject("Alpha", "ALP", "Desc");
+        Long pId = projectService.createProject("Alpha", "ALP", "Desc");
 
         Project p = projectService.getProject(pId);
         assertThat(p.getName()).isEqualTo("Alpha");
@@ -44,22 +44,22 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Manage Project Members")
     void memberManagement() {
-        Integer pId = projectService.createProject("Beta", "BET", "Desc");
+        Long pId = projectService.createProject("Beta", "BET", "Desc");
 
-        projectService.addMember(pId, 101, ProjectRoleType.OWNER);
-        projectService.addMember(pId, 102, ProjectRoleType.MEMBER);
+        projectService.addMember(pId, 101L, ProjectRoleType.OWNER);
+        projectService.addMember(pId, 102L, ProjectRoleType.MEMBER);
 
         List<ProjectMember> members = projectService.getMembers(pId);
         assertThat(members).hasSize(2);
 
-        projectService.removeMember(pId, 101);
+        projectService.removeMember(pId, 101L);
         assertThat(projectService.getMembers(pId)).hasSize(1);
     }
 
     @Test
     @DisplayName("Create and Get Project")
     void createAndGet() {
-        Integer pId = projectService.createProject("Alpha", "ALP", "Description for Alpha");
+        Long pId = projectService.createProject("Alpha", "ALP", "Description for Alpha");
 
         Project p = projectService.getProject(pId);
         assertThat(p).isNotNull();
@@ -83,7 +83,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Update Project")
     void updateProject() {
-        Integer pId = projectService.createProject("Old Name", "KEY", "Old Desc");
+        Long pId = projectService.createProject("Old Name", "KEY", "Old Desc");
 
         projectService.updateProject(pId, "New Name", "New Desc");
 
@@ -96,7 +96,7 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Delete Project")
     void deleteProject() {
-        Integer pId = projectService.createProject("To Delete", "DEL", "Desc");
+        Long pId = projectService.createProject("To Delete", "DEL", "Desc");
 
         boolean isDeleted = projectService.deleteProject(pId);
         assertThat(isDeleted).isTrue();
@@ -109,9 +109,9 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Manage Project Members: Add, Get, Remove")
     void memberManagement() {
-        Integer pId = projectService.createProject("Team Project", "TEAM", "Desc");
-        Integer userId1 = 101;
-        Integer userId2 = 102;
+        Long pId = projectService.createProject("Team Project", "TEAM", "Desc");
+        Long userId1 = 101L;
+        Long userId2 = 102L;
 
         boolean added1 = projectService.addMember(pId, userId1, ProjectRoleType.OWNER);
         boolean added2 = projectService.addMember(pId, userId2, ProjectRoleType.MEMBER);
@@ -130,7 +130,7 @@ class ProjectServiceTest {
 
         assertThat(projectService.getMembers(pId)).hasSize(1);
 
-        boolean removeFail = projectService.removeMember(pId, 999);
+        boolean removeFail = projectService.removeMember(pId, 999L);
         assertThat(removeFail).isFalse();
     }
 }

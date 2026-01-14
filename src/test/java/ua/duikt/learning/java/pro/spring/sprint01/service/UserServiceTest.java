@@ -32,7 +32,7 @@ class UserServiceTest {
         List<User> users = userService.listUsers(null);
         assertThat(users).hasSize(1);
 
-        User user = users.get(0);
+        User user = users.getFirst();
         assertThat(user.getUsername()).isEqualTo("john_doe");
         assertThat(user.getIsActive()).isTrue();
         assertThat(userService.getUser(user.getId())).isNotNull();
@@ -46,14 +46,14 @@ class UserServiceTest {
 
         List<User> result = userService.listUsers("alice");
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUsername()).isEqualTo("alice");
+        assertThat(result.getFirst().getUsername()).isEqualTo("alice");
     }
 
     @Test
     @DisplayName("Update Profile")
     void updateProfile() {
         userService.register("temp", "temp@mail.com", "pass");
-        Integer userId = userService.listUsers(null).get(0).getId();
+        Long userId = userService.listUsers(null).getFirst().getId();
 
         userService.updateProfile(userId, "new_name", "new@mail.com");
 
@@ -66,7 +66,7 @@ class UserServiceTest {
     @DisplayName("Deactivate User")
     void deactivateUser() {
         userService.register("active_user", "email", "pass");
-        Integer userId = userService.listUsers(null).get(0).getId();
+        Long userId = userService.listUsers(null).getFirst().getId();
 
         userService.deactivateUser(userId);
         assertThat(userService.getUser(userId).getIsActive()).isFalse();
@@ -88,7 +88,7 @@ class UserServiceTest {
         List<User> users = userService.listUsers(null);
         assertThat(users).hasSize(1);
 
-        User user = users.get(0);
+        User user = users.getFirst();
         assertThat(user.getUsername()).isEqualTo("john_doe");
         assertThat(user.getIsActive()).isTrue();
 
@@ -116,7 +116,7 @@ class UserServiceTest {
 
         List<User> result = userService.listUsers("alice");
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUsername()).isEqualTo("alice");
+        assertThat(result.getFirst().getUsername()).isEqualTo("alice");
 
         assertThat(userService.listUsers("zorro")).isEmpty();
     }
@@ -125,7 +125,7 @@ class UserServiceTest {
     @DisplayName("Update Profile")
     void updateProfile() {
         userService.register("temp", "temp@mail.com", "pass");
-        Integer userId = userService.listUsers(null).get(0).getId();
+        Long userId = userService.listUsers(null).getFirst().getId();
 
         userService.updateProfile(userId, "new_name", "new@mail.com");
 
@@ -138,7 +138,7 @@ class UserServiceTest {
     @DisplayName("Deactivate User")
     void deactivateUser() {
         userService.register("active_user", "email@test.com", "pass");
-        Integer userId = userService.listUsers(null).get(0).getId();
+        Long userId = userService.listUsers(null).getFirst().getId();
 
         boolean isDeactivated = userService.deactivateUser(userId);
 
@@ -150,8 +150,8 @@ class UserServiceTest {
     @DisplayName("Roles Logic: Assign and Remove")
     void rolesLogic() {
         userService.register("role_user", "role@test.com", "pass");
-        Integer userId = userService.listUsers(null).get(0).getId();
-        Integer roleId = 100;
+        Long userId = userService.listUsers(null).getFirst().getId();
+        Long roleId = 100;
 
         boolean assigned = userService.assignRole(userId, roleId);
         assertThat(assigned).isTrue();
