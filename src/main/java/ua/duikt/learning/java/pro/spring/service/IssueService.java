@@ -20,7 +20,8 @@ public interface IssueService {
             String title,
             String description,
             IssueType type,
-            Priority priority
+            Priority priority,
+            Long statusId
     );
 
     Issue getIssue(Long id);

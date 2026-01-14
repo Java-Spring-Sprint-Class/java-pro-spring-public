@@ -29,7 +29,7 @@ public class IssueServiceImpl implements IssueService {
     private final AtomicLong historyIdGen = new AtomicLong(1);
 
     @Override
-    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority) {
+    public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority, Long statusId) {
         Long id = issueIdGen.getAndIncrement();
         Issue issue = Issue.builder()
                 .id(id)
@@ -158,5 +158,4 @@ public class IssueServiceImpl implements IssueService {
                 .build();
         historyTable.add(history);
     }
-
 }

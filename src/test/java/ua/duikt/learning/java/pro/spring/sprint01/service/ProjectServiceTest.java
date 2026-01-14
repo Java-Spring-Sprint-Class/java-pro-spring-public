@@ -29,7 +29,8 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Project CRUD Operations")
     void projectCrud() {
-        Long pId = projectService.createProject("Alpha", "ALP", "Desc");
+        Long userId1 = 101L;
+        Long pId = projectService.createProject("Alpha", "ALP", "Desc", userId1);
 
         Project p = projectService.getProject(pId);
         assertThat(p.getName()).isEqualTo("Alpha");

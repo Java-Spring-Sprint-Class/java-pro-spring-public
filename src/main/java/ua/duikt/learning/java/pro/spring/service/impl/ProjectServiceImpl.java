@@ -25,7 +25,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final AtomicLong memberIdGen = new AtomicLong(1L);
 
     @Override
-    public Long createProject(String name, String key, String description) {
+    public Long createProject(String name, String key, String description, Long ownerId) {
         Long id = projectIdGen.getAndIncrement();
         Project project = Project.builder()
                 .id(id)

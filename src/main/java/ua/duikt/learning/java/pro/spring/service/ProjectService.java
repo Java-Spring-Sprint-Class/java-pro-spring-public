@@ -11,7 +11,7 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface ProjectService {
-    Long createProject(String name, String key, String description);
+    Long createProject(String name, String key, String description, Long ownerId);
 
     Project getProject(Long id);
 
