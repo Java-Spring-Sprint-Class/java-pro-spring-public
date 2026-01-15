@@ -25,7 +25,7 @@ public class RoleController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createRole(@RequestBody CreateRoleRequest request) {
-        Integer newRoleId = roleService.createRole(request.getName());
+        Long newRoleId = roleService.createRole(request.getName());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

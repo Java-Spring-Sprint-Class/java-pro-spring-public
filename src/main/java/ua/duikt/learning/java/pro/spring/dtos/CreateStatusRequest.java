@@ -13,7 +13,7 @@ import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 @Builder
 @AllArgsConstructor
 public class CreateStatusRequest {
-    private Integer projectId;
+    private Long projectId;
     private String name;
     private StatusCategory category;
 

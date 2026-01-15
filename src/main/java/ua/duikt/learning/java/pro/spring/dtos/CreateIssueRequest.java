@@ -14,9 +14,10 @@ import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
 @Builder
 @AllArgsConstructor
 public class CreateIssueRequest {
-    private Integer projectId;
+    private Long projectId;
     private String title;
     private String description;
     private IssueType type;
     private Priority priority;
+    private Long statusId;
 }

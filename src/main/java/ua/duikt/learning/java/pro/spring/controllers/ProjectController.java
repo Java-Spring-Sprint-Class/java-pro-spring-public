@@ -27,10 +27,11 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createProject(@RequestBody CreateProjectRequest request) {
-        Integer projectId = projectService.createProject(
+        Long projectId = projectService.createProject(
                 request.getName(),
                 request.getKey(),
-                request.getDescription()
+                request.getDescription(),
+                request.getUserId()
         );
 
         return ResponseEntity
@@ -39,7 +40,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProject(@PathVariable Integer id) {
+    public ResponseEntity<Project> getProject(@PathVariable Long id) {
         Project project = projectService.getProject(id);
         if (project != null) {
             return ResponseEntity.ok(project);
@@ -54,7 +55,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateProject(@PathVariable Integer id,
+    public ResponseEntity<String> updateProject(@PathVariable Long id,
                                                 @RequestBody UpdateProjectRequest request) {
         if (projectService.getProject(id) == null) {
             return ResponseEntity.notFound().build();
@@ -65,7 +66,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         boolean deleted = projectService.deleteProject(id);
         if (deleted) {
             return ResponseEntity.noContent().build();
@@ -75,7 +76,7 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/members")
-    public ResponseEntity<String> addMember(@PathVariable Integer projectId,
+    public ResponseEntity<String> addMember(@PathVariable Long projectId,
                                             @RequestBody AddMemberRequest request) {
         if (projectService.getProject(projectId) == null) {
             return ResponseEntity.notFound().build();
@@ -91,7 +92,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/members")
-    public ResponseEntity<List<ProjectMember>> getProjectMembers(@PathVariable Integer projectId) {
+    public ResponseEntity<List<ProjectMember>> getProjectMembers(@PathVariable Long projectId) {
         if (projectService.getProject(projectId) == null) {
             return ResponseEntity.notFound().build();
         }
@@ -99,8 +100,8 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{projectId}/members/{userId}")
-    public ResponseEntity<String> removeMember(@PathVariable Integer projectId,
-                                               @PathVariable Integer userId) {
+    public ResponseEntity<String> removeMember(@PathVariable Long projectId,
+                                               @PathVariable Long userId) {
         boolean removed = projectService.removeMember(projectId, userId);
         if (removed) {
             return ResponseEntity.ok("Member removed from project");

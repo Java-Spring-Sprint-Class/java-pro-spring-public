@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean removeRole(Integer userId, Long roleId) {
+    public boolean removeRole(Long userId, Long roleId) {
         long deletedCount = userRoleRepository.deleteByUserIdAndRoleId(userId, roleId);
         return deletedCount > 0;
     }

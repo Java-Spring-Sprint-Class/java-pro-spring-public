@@ -24,7 +24,7 @@ public class LabelController {
 
     @PostMapping("/labels")
     public ResponseEntity<Map<String, Object>> createLabel(@RequestBody CreateLabelRequest request) {
-        Integer labelId = labelService.createLabel(request.getName(), request.getColor());
+        Long labelId = labelService.createLabel(request.getName(), request.getColor());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Map.of("id", labelId, "message", "Label created"));
@@ -36,8 +36,8 @@ public class LabelController {
     }
 
     @PostMapping("/issues/{issueId}/labels/{labelId}")
-    public ResponseEntity<String> addLabelToIssue(@PathVariable Integer issueId,
-                                                  @PathVariable Integer labelId) {
+    public ResponseEntity<String> addLabelToIssue(@PathVariable Long issueId,
+                                                  @PathVariable Long labelId) {
         boolean added = labelService.addLabelToIssue(issueId, labelId);
         if (added) {
             return ResponseEntity.ok("Label added to issue");
@@ -46,13 +46,13 @@ public class LabelController {
     }
 
     @GetMapping("/issues/{issueId}/labels")
-    public ResponseEntity<List<Label>> getLabelsForIssue(@PathVariable Integer issueId) {
+    public ResponseEntity<List<Label>> getLabelsForIssue(@PathVariable Long issueId) {
         return ResponseEntity.ok(labelService.getLabelsForIssue(issueId));
     }
 
     @DeleteMapping("/issues/{issueId}/labels/{labelId}")
-    public ResponseEntity<String> removeLabelFromIssue(@PathVariable Integer issueId,
-                                                       @PathVariable Integer labelId) {
+    public ResponseEntity<String> removeLabelFromIssue(@PathVariable Long issueId,
+                                                       @PathVariable Long labelId) {
         boolean removed = labelService.removeLabelFromIssue(issueId, labelId);
         if (removed) {
             return ResponseEntity.ok("Label removed from issue");

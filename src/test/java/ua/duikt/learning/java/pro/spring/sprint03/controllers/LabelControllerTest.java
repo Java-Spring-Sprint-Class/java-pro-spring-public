@@ -37,13 +37,13 @@ class LabelControllerTest {
     @DisplayName("Create Label: Should return 201 and ID")
     void createLabel_Success() throws Exception {
         var request = new CreateLabelRequest("BUG", "#FF0000");
-        given(labelService.createLabel("BUG", "#FF0000")).willReturn(55);
+        given(labelService.createLabel("BUG", "#FF0000")).willReturn(55L);
 
         mockMvc.perform(post("/api/labels")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(55));
+                .andExpect(jsonPath("$.id").value(55L));
     }
 
     @Test
@@ -61,8 +61,8 @@ class LabelControllerTest {
     @Test
     @DisplayName("Add Label to Issue: Should return 200 OK")
     void addLabelToIssue_Success() throws Exception {
-        int issueId = 1;
-        int labelId = 5;
+        Long issueId = 1L;
+        Long labelId = 5L;
         given(labelService.addLabelToIssue(issueId, labelId)).willReturn(true);
 
         mockMvc.perform(post("/api/issues/{issueId}/labels/{labelId}", issueId, labelId))
@@ -74,9 +74,9 @@ class LabelControllerTest {
     @DisplayName("Get Labels for Issue: Should return list")
     void getLabelsForIssue_Success() throws Exception {
         Label l = new Label(); l.setColor("blue");
-        given(labelService.getLabelsForIssue(1)).willReturn(List.of(l));
+        given(detailsService.getLabelsForIssue(1L)).willReturn(List.of(l));
 
-        mockMvc.perform(get("/api/issues/{issueId}/labels", 1))
+        mockMvc.perform(get("/api/issues/{issueId}/labels", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].color").value("blue"));
     }
@@ -84,9 +84,9 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 200 if removed")
     void removeLabelFromIssue_Success() throws Exception {
-        given(labelService.removeLabelFromIssue(1, 5)).willReturn(true);
+        given(labelService.removeLabelFromIssue(1L, 5L)).willReturn(true);
 
-        mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1, 5))
+        mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1L, 5L))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Label removed from issue"));
     }
@@ -94,9 +94,9 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 404 if not found")
     void removeLabelFromIssue_NotFound() throws Exception {
-        given(labelService.removeLabelFromIssue(1, 99)).willReturn(false);
+        given(detailsService.removeLabelFromIssue(1L, 99L)).willReturn(false);
 
-        mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1, 99))
+        mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1L, 99L))
                 .andExpect(status().isNotFound());
     }
 }

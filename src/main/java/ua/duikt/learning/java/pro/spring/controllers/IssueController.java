@@ -28,12 +28,13 @@ public class IssueController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createIssue(@RequestBody CreateIssueRequest request) {
-        Integer issueId = issueService.createIssue(
+        Long issueId = issueService.createIssue(
                 request.getProjectId(),
                 request.getTitle(),
                 request.getDescription(),
                 request.getType(),
-                request.getPriority()
+                request.getPriority(),
+                request.getStatusId()
         );
 
         return ResponseEntity
@@ -42,18 +43,18 @@ public class IssueController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Issue> getIssue(@PathVariable Integer id) {
+    public ResponseEntity<Issue> getIssue(@PathVariable Long id) {
         Issue issue = issueService.getIssue(id);
         return issue != null ? ResponseEntity.ok(issue) : ResponseEntity.notFound().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Issue>> listIssues(@RequestParam Integer projectId) {
+    public ResponseEntity<List<Issue>> listIssues(@RequestParam Long projectId) {
         return ResponseEntity.ok(issueService.listIssues(projectId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateIssue(@PathVariable Integer id,
+    public ResponseEntity<String> updateIssue(@PathVariable Long id,
                                               @RequestBody UpdateIssueRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
@@ -62,14 +63,14 @@ public class IssueController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteIssue(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteIssue(@PathVariable Long id) {
         return issueService.deleteIssue(id)
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<String> updateStatus(@PathVariable Integer id,
+    public ResponseEntity<String> updateStatus(@PathVariable Long id,
                                                @RequestBody PatchStatusRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
@@ -78,7 +79,7 @@ public class IssueController {
     }
 
     @PatchMapping("/{id}/assignee")
-    public ResponseEntity<String> updateAssignee(@PathVariable Integer id,
+    public ResponseEntity<String> updateAssignee(@PathVariable Long id,
                                                  @RequestBody PatchAssigneeRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
@@ -87,7 +88,7 @@ public class IssueController {
     }
 
     @GetMapping("/{id}/history")
-    public ResponseEntity<List<IssueHistory>> getHistory(@PathVariable Integer id) {
+    public ResponseEntity<List<IssueHistory>> getHistory(@PathVariable Long id) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(issueService.getHistory(id));

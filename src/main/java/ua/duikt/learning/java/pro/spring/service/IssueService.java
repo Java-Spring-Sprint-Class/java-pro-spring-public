@@ -15,26 +15,27 @@ import java.util.List;
  */
 public interface IssueService {
     // ===== Issues =====
-    Integer createIssue(
-            Integer projectId,
+    Long createIssue(
+            Long projectId,
             String title,
             String description,
             IssueType type,
-            Priority priority
+            Priority priority,
+            Long statusId
     );
 
-    Issue getIssue(Integer id);
+    Issue getIssue(Long id);
 
-    List<Issue> listIssues(Integer projectId);
+    List<Issue> listIssues(Long projectId);
 
-    void updateIssue(Integer id, String title, String description);
+    void updateIssue(Long id, String title, String description);
 
-    boolean deleteIssue(Integer id);
+    boolean deleteIssue(Long id);
 
-    void patchStatus(Integer id, Integer newStatusId);
+    void patchStatus(Long id, Long newStatusId);
 
-    void patchAssignee(Integer id, Integer assigneeId);
+    void patchAssignee(Long id, Long assigneeId);
 
     // ===== History =====
-    List<IssueHistory> getHistory(Integer issueId);
+    List<IssueHistory> getHistory(Long issueId);
 }

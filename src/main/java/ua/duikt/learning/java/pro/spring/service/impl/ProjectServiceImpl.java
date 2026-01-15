@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
@@ -19,19 +19,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 public class ProjectServiceImpl implements ProjectService {
-    private final Map<Integer, Project> projectTable = new ConcurrentHashMap<>();
+    private final Map<Long, Project> projectTable = new ConcurrentHashMap<>();
     private final List<ProjectMember> memberTable = new ArrayList<>();
-    private final AtomicInteger projectIdGen = new AtomicInteger(1);
-    private final AtomicInteger memberIdGen = new AtomicInteger(1);
+    private final AtomicLong projectIdGen = new AtomicLong(1L);
+    private final AtomicLong memberIdGen = new AtomicLong(1L);
 
     @Override
-    public Integer createProject(String name, String key, String description) {
-        Integer id = projectIdGen.getAndIncrement();
+    public Long createProject(String name, String key, String description, Long ownerId) {
+        Long id = projectIdGen.getAndIncrement();
         Project project = Project.builder()
                 .id(id)
                 .name(name)
                 .key(key)
-                .ownerId(1)
+                .ownerId(ownerId)
                 .description(description)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -40,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProject(Integer id) {
+    public Project getProject(Long id) {
         return projectTable.get(id);
     }
 
@@ -49,7 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
         return new ArrayList<>(projectTable.values());
     }
 
-    public void updateProject(Integer id, String name, String description) {
+    public void updateProject(Long id, String name, String description) {
         Project p = projectTable.get(id);
         if (p != null) {
             p.setName(name);
@@ -58,11 +58,11 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    public boolean deleteProject(Integer id) {
+    public boolean deleteProject(Long id) {
         return projectTable.remove(id) != null;
     }
 
-    public boolean addMember(Integer projectId, Integer userId, ProjectRoleType role) {
+    public boolean addMember(Long projectId, Long userId, ProjectRoleType role) {
         ProjectMember member = ProjectMember.builder()
                 .id(memberIdGen.getAndIncrement())
                 .projectId(projectId)
@@ -73,14 +73,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectMember> getMembers(Integer projectId) {
+    public List<ProjectMember> getMembers(Long projectId) {
         return memberTable.stream()
                 .filter(m -> m.getProjectId().equals(projectId))
                 .toList();
     }
 
     @Override
-    public boolean removeMember(Integer projectId, Integer userId) {
+    public boolean removeMember(Long projectId, Long userId) {
         return memberTable.removeIf(m ->
                 m.getProjectId().equals(projectId) && m.getUserId().equals(userId));
     }

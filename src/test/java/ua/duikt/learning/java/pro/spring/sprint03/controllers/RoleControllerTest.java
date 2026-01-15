@@ -41,13 +41,13 @@ class RoleControllerTest {
     void createRole_ShouldReturnCreated_WhenSuccess() throws Exception {
         var request = new CreateRoleRequest("ADMIN");
 
-        given(roleService.createRole("ADMIN")).willReturn(100);
+        given(roleService.createRole("ADMIN")).willReturn(100L);
 
         mockMvc.perform(post("/api/roles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(100))
+                .andExpect(jsonPath("$.id").value(100L))
                 .andExpect(jsonPath("$.message").value("Role created successfully"));
     }
 
@@ -55,11 +55,11 @@ class RoleControllerTest {
     @DisplayName("Should return list of roles with status 200")
     void getRoles_ShouldReturnList() throws Exception {
         Role roleUser = new Role();
-        roleUser.setId(1);
+        roleUser.setId(1L);
         roleUser.setName("USER");
 
         Role roleAdmin = new Role();
-        roleAdmin.setId(2);
+        roleAdmin.setId(2L);
         roleAdmin.setName("ADMIN");
 
         given(roleService.getRoles()).willReturn(List.of(roleUser, roleAdmin));
