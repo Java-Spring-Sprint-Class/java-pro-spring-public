@@ -1,45 +1,54 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
+import ua.duikt.learning.java.pro.spring.repositories.AttachmentRepo;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Mykyta Sirobaba on 14.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
 @Service
+@RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
-    private final Map<Integer, Attachment> attachmentTable = new ConcurrentHashMap<>();
-    private final AtomicInteger attachmentIdGen = new AtomicInteger(1);
 
-    public boolean addAttachment(Integer issueId, String fileName, String fileUrl, Integer fileSize) {
-        Integer id = attachmentIdGen.getAndIncrement();
+    private final AttachmentRepo attachmentRepo;
+
+    @Override
+    @Transactional
+    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userId) {
         Attachment attachment = Attachment.builder()
-                .id(id)
                 .issueId(issueId)
+                .userId(userId)
                 .fileName(fileName)
                 .fileUrl(fileUrl)
                 .fileSize(fileSize)
                 .createdAt(LocalDateTime.now())
                 .build();
-        attachmentTable.put(id, attachment);
+
+        attachmentRepo.save(attachment);
         return true;
     }
 
-    public List<Attachment> getAttachments(Integer issueId) {
-        return attachmentTable.values().stream()
-                .filter(a -> a.getIssueId().equals(issueId))
-                .toList();
+    @Override
+    @Transactional(readOnly = true)
+    public List<Attachment> getAttachments(Long issueId) {
+        return attachmentRepo.findAllByIssueId(issueId);
     }
 
-    public boolean deleteAttachment(Integer id) {
-        return attachmentTable.remove(id) != null;
+    @Override
+    @Transactional
+    public boolean deleteAttachment(Long id) {
+        if (attachmentRepo.existsById(id)) {
+            attachmentRepo.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
