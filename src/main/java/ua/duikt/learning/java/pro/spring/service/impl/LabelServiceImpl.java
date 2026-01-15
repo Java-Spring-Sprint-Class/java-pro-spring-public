@@ -1,55 +1,72 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.IssueLabel;
 import ua.duikt.learning.java.pro.spring.entity.Label;
+import ua.duikt.learning.java.pro.spring.repositories.IssueLabelRepo;
+import ua.duikt.learning.java.pro.spring.repositories.LabelRepo;
 import ua.duikt.learning.java.pro.spring.service.LabelService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Mykyta Sirobaba on 14.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
 @Service
+@RequiredArgsConstructor
 public class LabelServiceImpl implements LabelService {
-    private final Map<Integer, Label> labelTable = new ConcurrentHashMap<>();
-    private final List<IssueLabel> issueLabelTable = new ArrayList<>();
-    private final AtomicInteger labelIdGen = new AtomicInteger(1);
 
-    public Integer createLabel(String name, String color) {
-        Integer id = labelIdGen.getAndIncrement();
-        Label label = Label.builder().id(id).name(name).color(color).build();
-        labelTable.put(id, label);
-        return id;
+    private final LabelRepo labelRepo;
+    private final IssueLabelRepo issueLabelRepo;
+
+    @Override
+    @Transactional
+    public Long createLabel(String name, String color) {
+        Label label = Label.builder()
+                .name(name)
+                .color(color)
+                .build();
+        return labelRepo.save(label).getId();
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public List<Label> getLabels() {
-        return new ArrayList<>(labelTable.values());
+        return labelRepo.findAll();
     }
 
-    public boolean addLabelToIssue(Integer issueId, Integer labelId) {
-        IssueLabel il = IssueLabel.builder().issueId(issueId).labelId(labelId).build();
-        return issueLabelTable.add(il);
+    @Override
+    @Transactional
+    public boolean addLabelToIssue(Long issueId, Long labelId) {
+        if (issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
+            return false;
+        }
+
+        IssueLabel issueLabel = IssueLabel.builder()
+                .issueId(issueId)
+                .labelId(labelId)
+                .build();
+
+        issueLabelRepo.save(issueLabel);
+        return true;
     }
 
-    public boolean removeLabelFromIssue(Integer issueId, Integer labelId) {
-        return issueLabelTable.removeIf(il ->
-                il.getIssueId().equals(issueId) && il.getLabelId().equals(labelId));
+    @Override
+    @Transactional
+    public boolean removeLabelFromIssue(Long issueId, Long labelId) {
+        if (issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
+            issueLabelRepo.deleteByIssueIdAndLabelId(issueId, labelId);
+            return true;
+        }
+        return false;
     }
 
-    public List<Label> getLabelsForIssue(Integer issueId) {
-        List<Integer> labelIds = issueLabelTable.stream()
-                .filter(il -> il.getIssueId().equals(issueId))
-                .map(IssueLabel::getLabelId)
-                .toList();
-
-        return labelTable.values().stream()
-                .filter(l -> labelIds.contains(l.getId()))
-                .toList();
+    @Override
+    @Transactional(readOnly = true)
+    public List<Label> getLabelsForIssue(Long issueId) {
+        return labelRepo.findAllByIssueId(issueId);
     }
 }

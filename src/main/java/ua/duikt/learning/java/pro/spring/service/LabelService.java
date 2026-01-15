@@ -9,13 +9,13 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface LabelService {
-    Integer createLabel(String name, String color);
+    Long createLabel(String name, String color);
 
     List<Label> getLabels();
 
-    boolean addLabelToIssue(Integer issueId, Integer labelId);
+    boolean addLabelToIssue(Long issueId, Long labelId);
 
-    boolean removeLabelFromIssue(Integer issueId, Integer labelId);
+    boolean removeLabelFromIssue(Long issueId, Long labelId);
 
-    List<Label> getLabelsForIssue(Integer issueId);
+    List<Label> getLabelsForIssue(Long issueId);
 }

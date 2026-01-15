@@ -1,159 +1,125 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Issue;
 import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
-import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
-import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
+import ua.duikt.learning.java.pro.spring.repositories.IssueHistoryRepo;
+import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
 import ua.duikt.learning.java.pro.spring.service.IssueService;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Mykyta Sirobaba on 13.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
 @Service
+@RequiredArgsConstructor
 public class IssueServiceImpl implements IssueService {
-    private final Map<Long, Issue> issueTable = new ConcurrentHashMap<>();
-    private final Map<Long, Status> statusTable = new ConcurrentHashMap<>();
-    private final List<IssueHistory> historyTable = new ArrayList<>();
 
-    private final AtomicLong issueIdGen = new AtomicLong(1);
-    private final AtomicLong statusIdGen = new AtomicLong(1);
-    private final AtomicLong historyIdGen = new AtomicLong(1);
+    private final IssueRepo issueRepo;
+    private final IssueHistoryRepo issueHistoryRepo;
 
     @Override
+    @Transactional
     public Long createIssue(Long projectId, String title, String description, IssueType type, Priority priority, Long statusId) {
-        Long id = issueIdGen.getAndIncrement();
         Issue issue = Issue.builder()
-                .id(id)
                 .projectId(projectId)
                 .title(title)
                 .description(description)
                 .type(type)
                 .priority(priority)
                 .statusId(statusId)
+                .key("ISSUE-" + UUID.randomUUID().toString().substring(0, 8))
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        issueTable.put(id, issue);
+        Issue savedIssue = issueRepo.save(issue);
 
-        recordHistory(id, "creation", null, "created");
+        recordHistory(savedIssue.getId(), "creation", null, "created");
 
-        return id;
+        return savedIssue.getId();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Issue getIssue(Long id) {
-        return issueTable.get(id);
+        return issueRepo.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Issue> listIssues(Long projectId) {
-        return issueTable.values().stream()
-                .filter(i -> i.getProjectId().equals(projectId))
-                .toList();
+        return issueRepo.findAllByProjectId(projectId);
     }
 
     @Override
+    @Transactional
     public void updateIssue(Long id, String title, String description) {
-        Issue issue = issueTable.get(id);
-        if (issue != null) {
+        issueRepo.findById(id).ifPresent(issue -> {
             issue.setTitle(title);
             issue.setDescription(description);
             issue.setUpdatedAt(LocalDateTime.now());
+
             recordHistory(id, "details", "old", "updated");
-        }
+        });
     }
 
     @Override
+    @Transactional
     public boolean deleteIssue(Long id) {
-        return issueTable.remove(id) != null;
+        if (issueRepo.existsById(id)) {
+            issueRepo.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     @Override
+    @Transactional
     public void patchStatus(Long id, Long newStatusId) {
-        Issue issue = issueTable.get(id);
-        if (issue != null) {
+        issueRepo.findById(id).ifPresent(issue -> {
             String oldStatus = String.valueOf(issue.getStatusId());
             issue.setStatusId(newStatusId);
+            issue.setUpdatedAt(LocalDateTime.now());
+
             recordHistory(id, "status", oldStatus, String.valueOf(newStatusId));
-        }
+        });
     }
 
     @Override
+    @Transactional
     public void patchAssignee(Long id, Long assigneeId) {
-        Issue issue = issueTable.get(id);
-        if (issue != null) {
+        issueRepo.findById(id).ifPresent(issue -> {
             String oldAssignee = String.valueOf(issue.getAssigneeId());
             issue.setAssigneeId(assigneeId);
+            issue.setUpdatedAt(LocalDateTime.now());
+
             recordHistory(id, "assignee", oldAssignee, String.valueOf(assigneeId));
-        }
+        });
     }
 
     @Override
-    public Long createStatus(Long projectId, String name, StatusCategory category) {
-        Long id = statusIdGen.getAndIncrement();
-
-        int nextPosition = statusTable.values().stream()
-                                   .filter(s -> s.getProjectId().equals(projectId))
-                                   .map(Status::getPosition)
-                                   .filter(Objects::nonNull)
-                                   .max(Integer::compareTo)
-                                   .orElse(0) + 1;
-
-        Status status = Status.builder()
-                .id(id)
-                .projectId(projectId)
-                .name(name)
-                .category(category)
-                .position(nextPosition)
-                .build();
-
-        statusTable.put(id, status);
-        return id;
-    }
-
-
-    @Override
-    public List<Status> getStatuses(Long projectId) {
-        return statusTable.values().stream()
-                .filter(s -> s.getProjectId().equals(projectId))
-                .sorted(Comparator.comparingInt(Status::getPosition))
-                .toList();
-    }
-
-    @Override
-    public void updateStatus(Long id, String name) {
-        Status s = statusTable.get(id);
-        if (s != null) s.setName(name);
-    }
-
-    @Override
-    public boolean deleteStatus(Long id) {
-        return statusTable.remove(id) != null;
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<IssueHistory> getHistory(Long issueId) {
-        return historyTable.stream()
-                .filter(h -> h.getIssueId().equals(issueId))
-                .toList();
+        return issueHistoryRepo.findAllByIssueId(issueId);
     }
-
 
     private void recordHistory(Long issueId, String field, String oldVal, String newVal) {
         IssueHistory history = IssueHistory.builder()
-                .id(historyIdGen.getAndIncrement())
                 .issueId(issueId)
                 .fieldChanged(field)
                 .oldValue(oldVal)
                 .newValue(newVal)
                 .createdAt(LocalDateTime.now())
                 .build();
-        historyTable.add(history);
+
+        issueHistoryRepo.save(history);
     }
 }

@@ -8,5 +8,5 @@ import ua.duikt.learning.java.pro.spring.entity.UserRole;
  * email mykyta.sirobaba@gmail.com
  */
 public interface UserRoleRepo extends JpaRepository<UserRole, UserRole> {
-    long deleteByUserIdAndRoleId(Integer userId, Integer roleId);
+    long deleteByUserIdAndRoleId(Long userId, Long roleId);
 }

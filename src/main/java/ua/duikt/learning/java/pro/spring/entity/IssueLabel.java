@@ -1,9 +1,6 @@
 package ua.duikt.learning.java.pro.spring.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,11 +17,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "issue_label")
 public class IssueLabel {
-    @Id
-    @Column(name = "issue_id")
-    private Long issueId;
 
     @Id
-    @Column(name = "label_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "issue_id", nullable = false)
+    private Long issueId;
+
+    @Column(name = "label_id", nullable = false)
     private Long labelId;
 }
