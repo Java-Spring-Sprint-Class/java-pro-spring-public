@@ -22,10 +22,11 @@ public class CommentController {
 
     private final DetailsService detailsService;
 
-    @PostMapping("/issues/{issueId}/comments")
+    @PostMapping("/user/{userId}/issues/{issueId}/comments")
     public ResponseEntity<String> addComment(@PathVariable Long issueId,
+                                             @PathVariable Long userId,
                                              @RequestBody AddCommentRequest request) {
-        boolean added = detailsService.addComment(issueId, request.getContent());
+        boolean added = detailsService.addComment(issueId, request.getContent(), userId);
         if (added) {
             return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
         }
