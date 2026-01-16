@@ -46,7 +46,7 @@ Ensure that all **Entities** and **DTOs** are properly validated using Bean Vali
 
 ---
 
-### Part 3: Controller Tests for Validation (Bad Flow)
+### Part 3: Controller tests for verification (Bad Flow) in GlobalValidationTest
 
 #### 1. Test Scope
 - For **each controller** that uses `@Valid`:
