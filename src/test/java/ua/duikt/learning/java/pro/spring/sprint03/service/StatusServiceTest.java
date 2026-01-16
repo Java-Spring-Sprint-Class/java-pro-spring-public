@@ -48,7 +48,7 @@ class StatusServiceTest {
         Long result = statusService.createStatus(
                 projectId,
                 "To Do",
-                StatusCategory.TODO
+                StatusCategory.TO_DO
         );
 
         
@@ -58,7 +58,7 @@ class StatusServiceTest {
         Status status = captor.getValue();
         assertThat(status.getProjectId()).isEqualTo(projectId);
         assertThat(status.getName()).isEqualTo("To Do");
-        assertThat(status.getCategory()).isEqualTo(StatusCategory.TODO);
+        assertThat(status.getCategory()).isEqualTo(StatusCategory.TO_DO);
         assertThat(status.getPosition()).isEqualTo(1);
     }
 
