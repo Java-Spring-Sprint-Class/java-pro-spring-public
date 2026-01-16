@@ -38,11 +38,12 @@ class CommentControllerTest {
     @DisplayName("Add Comment: Should return 201 Created")
     void addComment_Success() throws Exception {
         Long issueId = 1L;
+        Long userId = 2L;
         var request = new AddCommentRequest("This is a comment");
 
-        given(commentService.addComment(issueId, "This is a comment")).willReturn(true);
+        given(commentService.addComment(issueId, "This is a comment", userId)).willReturn(true);
 
-        mockMvc.perform(post("/api/issues/{issueId}/comments", issueId)
+        mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/comments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())

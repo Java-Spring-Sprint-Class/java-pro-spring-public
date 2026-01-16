@@ -37,12 +37,13 @@ class AttachmentControllerTest {
     @DisplayName("Add Attachment: Should return 201")
     void addAttachment_Success() throws Exception {
         Long issueId = 1L;
+        Long userId = 2L;
         var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
-        given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024))
+        given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024, userId))
                 .willReturn(true);
 
-        mockMvc.perform(post("/api/issues/{issueId}/attachments", issueId)
+        mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/attachments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
