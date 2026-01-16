@@ -199,19 +199,19 @@ public enum ProjectRoleType { OWNER, ADMIN, MEMBER, VIEWER }
 
 ### DetailsService (Comments, Attachments, Labels)
 
-| Method        | Parameters                      | Description                           |
-| ------------- | ------------------------------- | ------------------------------------- |
-| addComment    | Long issueId, String content | Adds a comment.                       |
-| getComments   | Long issueId                 | Returns all comments for an issue.    |
-| updateComment | Long id, String content      | Updates comment and sets `updatedAt`. |
-| deleteComment | Long id                      | Deletes a comment.                    |
+| Method        | Parameters                                | Description                           |
+| ------------- |-------------------------------------------| ------------------------------------- |
+| addComment    | Long issueId, String content, Long userId | Adds a comment.                       |
+| getComments   | Long issueId                              | Returns all comments for an issue.    |
+| updateComment | Long id, String content                   | Updates comment and sets `updatedAt`. |
+| deleteComment | Long id                                   | Deletes a comment.                    |
 
 
-| Method           | Parameters                                                         | Description          |
-| ---------------- | ------------------------------------------------------------------ | -------------------- |
-| addAttachment    | Long issueId, String fileName, String fileUrl, Integer fileSize | Adds attachment.     |
-| getAttachments   | Long issueId                                                    | Returns attachments. |
-| deleteAttachment | Long id                                                         | Deletes attachment.  |
+| Method           | Parameters                                                                   | Description          |
+| ---------------- |------------------------------------------------------------------------------| -------------------- |
+| addAttachment    | Long issueId, String fileName, String fileUrl, Integer fileSize, Long userId | Adds attachment.     |
+| getAttachments   | Long issueId                                                                 | Returns attachments. |
+| deleteAttachment | Long id                                                                      | Deletes attachment.  |
 
 
 | Method               | Parameters                       | Description                       |
