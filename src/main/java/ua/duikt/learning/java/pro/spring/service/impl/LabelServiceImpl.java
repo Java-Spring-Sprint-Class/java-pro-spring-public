@@ -11,28 +11,33 @@ import java.util.List;
  */
 // TODO: Implements all necessary methods
 public class LabelServiceImpl implements LabelService {
+    // TODO: Implements the method
     @Override
-    public Integer createLabel(String name, String color) {
-        return null;
+    public Long createLabel(String name, String color) {
+        return 0L;
     }
+
     // TODO: Implements the method
     @Override
     public List<Label> getLabels() {
-        return null;
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public boolean addLabelToIssue(Integer issueId, Integer labelId) {
+    public boolean addLabelToIssue(Long issueId, Long labelId) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public boolean removeLabelFromIssue(Integer issueId, Integer labelId) {
+    public boolean removeLabelFromIssue(Long issueId, Long labelId) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public List<Label> getLabelsForIssue(Integer issueId) {
-        return null;
+    public List<Label> getLabelsForIssue(Long issueId) {
+        return List.of();
     }
 }

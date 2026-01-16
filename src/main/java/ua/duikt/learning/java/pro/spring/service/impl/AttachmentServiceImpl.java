@@ -13,18 +13,17 @@ import java.util.List;
 public class AttachmentServiceImpl implements AttachmentService {
     // TODO: Implements the method
     @Override
-    public boolean addAttachment(Integer issueId, String fileName, String fileUrl, Integer fileSize) {
+    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Long fileSize) {
         return false;
     }
     // TODO: Implements the method
     @Override
-    public List<Attachment> getAttachments(Integer issueId) {
-        return null;
+    public List<Attachment> getAttachments(Long issueId) {
+        return List.of();
     }
     // TODO: Implements the method
     @Override
-    public boolean deleteAttachment(Integer id) {
+    public boolean deleteAttachment(Long id) {
         return false;
     }
-    // TODO: Implements the method
 }

@@ -10,11 +10,11 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface StatusService {
-    Integer createStatus(Integer projectId, String name, StatusCategory category);
+    Long createStatus(Long projectId, String name, StatusCategory category);
 
-    List<Status> getStatuses(Integer projectId);
+    List<Status> getStatuses(Long projectId);
 
-    void updateStatus(Integer id, String name);
+    void updateStatus(Long id, String name);
 
-    boolean deleteStatus(Integer id);
+    boolean deleteStatus(Long id);
 }

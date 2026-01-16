@@ -9,9 +9,9 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface AttachmentService {
-    boolean addAttachment(Integer issueId, String fileName, String fileUrl, Integer fileSize);
+    boolean addAttachment(Long issueId, String fileName, String fileUrl, Long fileSize);
 
-    List<Attachment> getAttachments(Integer issueId);
+    List<Attachment> getAttachments(Long issueId);
 
-    boolean deleteAttachment(Integer id);
+    boolean deleteAttachment(Long id);
 }

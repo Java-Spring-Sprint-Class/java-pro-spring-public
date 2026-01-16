@@ -14,22 +14,25 @@ import java.util.List;
 public class StatusServiceImpl implements StatusService {
     // TODO: Implements the method
     @Override
-    public Integer createStatus(Integer projectId, String name, StatusCategory category) {
-        return null;
+    public Long createStatus(Long projectId, String name, StatusCategory category) {
+        return 0L;
     }
+
     // TODO: Implements the method
     @Override
-    public List<Status> getStatuses(Integer projectId) {
-        return null;
+    public List<Status> getStatuses(Long projectId) {
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public void updateStatus(Integer id, String name) {
+    public void updateStatus(Long id, String name) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deleteStatus(Integer id) {
+    public boolean deleteStatus(Long id) {
         return false;
     }
 }

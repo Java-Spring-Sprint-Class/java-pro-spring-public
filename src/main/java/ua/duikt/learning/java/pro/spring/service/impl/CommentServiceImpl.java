@@ -14,22 +14,25 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     // TODO: Implements the method
     @Override
-    public boolean addComment(Integer issueId, String content)  {
+    public boolean addComment(Long issueId, String content) {
         return false;
     }
+
     // TODO: Implements the method
     @Override
-    public List<IssueComment> getComments(Integer issueId) {
-        return null;
+    public List<IssueComment> getComments(Long issueId) {
+        return List.of();
     }
+
     // TODO: Implements the method
     @Override
-    public void updateComment(Integer id, String content) {
+    public void updateComment(Long id, String content) {
 
     }
+
     // TODO: Implements the method
     @Override
-    public boolean deleteComment(Integer id) {
+    public boolean deleteComment(Long id) {
         return false;
     }
 }
