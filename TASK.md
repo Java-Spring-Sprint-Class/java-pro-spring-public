@@ -32,4 +32,17 @@ The task is to migrate from in-memory data storage to a full database-backed imp
     - API behavior remains identical to the previous implementation.
     - Controllers and services keep the same contract.
 
+## Development Approach (TDD)
+
+This task must be implemented using the **TDD (Test-Driven Development)** methodology:
+
+- Tests define the expected behavior of the system.
+- Implementation must be written to satisfy the existing tests.
+- Business logic must **not** be changed — only the persistence mechanism is allowed to be modified.
+
+### ⚠️ Important
+
+- You are **not allowed** to change test cases to match your implementation.
+- Your implementation **must match** the behavior described by the tests.
+
 The goal of this task is to learn how to integrate Spring Data JPA into an existing codebase without breaking its architecture or business logic.
