@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
+import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
 import java.util.List;
@@ -29,7 +30,7 @@ class AttachmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private DetailsService detailsService;
+    private AttachmentService attachmentService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -40,7 +41,7 @@ class AttachmentControllerTest {
         Long userId = 2L;
         var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
-        given(detailsService.addAttachment(issueId, "file.png", "http://url.com", 1024, userId))
+        given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024, userId))
                 .willReturn(true);
 
         mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/attachments", userId, issueId)
@@ -56,7 +57,7 @@ class AttachmentControllerTest {
         Attachment att = new Attachment();
         att.setFileName("doc.pdf");
 
-        given(detailsService.getAttachments(1L)).willReturn(List.of(att));
+        given(attachmentService.getAttachments(1L)).willReturn(List.of(att));
 
         mockMvc.perform(get("/api/issues/{issueId}/attachments", 1L))
                 .andExpect(status().isOk())
@@ -66,7 +67,7 @@ class AttachmentControllerTest {
     @Test
     @DisplayName("Delete Attachment: Should return 204")
     void deleteAttachment_Success() throws Exception {
-        given(detailsService.deleteAttachment(10L)).willReturn(true);
+        given(attachmentService.deleteAttachment(10L)).willReturn(true);
 
         mockMvc.perform(delete("/api/attachments/{id}", 10L))
                 .andExpect(status().isNoContent());

@@ -190,7 +190,7 @@ class ProjectServiceTest {
         boolean result = projectService.addMember(
                 projectId,
                 userId,
-                ProjectRoleType.DEVELOPER
+                ProjectRoleType.MEMBER
         );
 
         
@@ -200,7 +200,7 @@ class ProjectServiceTest {
         ProjectMember member = captor.getValue();
         assertThat(member.getProjectId()).isEqualTo(projectId);
         assertThat(member.getUserId()).isEqualTo(userId);
-        assertThat(member.getRole()).isEqualTo(ProjectRoleType.DEVELOPER);
+        assertThat(member.getRole()).isEqualTo(ProjectRoleType.MEMBER);
     }
 
     @Test
@@ -214,7 +214,7 @@ class ProjectServiceTest {
         boolean result = projectService.addMember(
                 1L,
                 10L,
-                ProjectRoleType.DEVELOPER
+                ProjectRoleType.MEMBER
         );
 
         
