@@ -21,14 +21,16 @@ public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
-    @PostMapping("/issues/{issueId}/attachments")
+    @PostMapping("/user/{userId}/issues/{issueId}/attachments")
     public ResponseEntity<String> addAttachment(@PathVariable Long issueId,
+                                                @PathVariable Long userId,
                                                 @RequestBody AddAttachmentRequest request) {
         boolean added = attachmentService.addAttachment(
                 issueId,
                 request.getFileName(),
                 request.getFileUrl(),
-                request.getFileSize()
+                request.getFileSize(),
+                userId
         );
 
         if (added) {

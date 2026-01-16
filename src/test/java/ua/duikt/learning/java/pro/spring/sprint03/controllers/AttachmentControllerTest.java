@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint03.controllers;
+package ua.duikt.learning.java.pro.spring.sprint02.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
-import ua.duikt.learning.java.pro.spring.service.AttachmentService;
+import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ class AttachmentControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private AttachmentService attachmentService;
+    private DetailsService detailsService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -37,12 +37,13 @@ class AttachmentControllerTest {
     @DisplayName("Add Attachment: Should return 201")
     void addAttachment_Success() throws Exception {
         Long issueId = 1L;
+        Long userId = 2L;
         var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
-        given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024))
+        given(detailsService.addAttachment(issueId, "file.png", "http://url.com", 1024, userId))
                 .willReturn(true);
 
-        mockMvc.perform(post("/api/issues/{issueId}/attachments", issueId)
+        mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/attachments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -55,7 +56,7 @@ class AttachmentControllerTest {
         Attachment att = new Attachment();
         att.setFileName("doc.pdf");
 
-        given(attachmentService.getAttachments(1L)).willReturn(List.of(att));
+        given(detailsService.getAttachments(1L)).willReturn(List.of(att));
 
         mockMvc.perform(get("/api/issues/{issueId}/attachments", 1L))
                 .andExpect(status().isOk())
@@ -65,7 +66,7 @@ class AttachmentControllerTest {
     @Test
     @DisplayName("Delete Attachment: Should return 204")
     void deleteAttachment_Success() throws Exception {
-        given(attachmentService.deleteAttachment(10L)).willReturn(true);
+        given(detailsService.deleteAttachment(10L)).willReturn(true);
 
         mockMvc.perform(delete("/api/attachments/{id}", 10L))
                 .andExpect(status().isNoContent());

@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint03.controllers;
+package ua.duikt.learning.java.pro.spring.sprint02.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +12,7 @@ import ua.duikt.learning.java.pro.spring.controllers.CommentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddCommentRequest;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
-import ua.duikt.learning.java.pro.spring.service.CommentService;
+import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ class CommentControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private CommentService commentService;
+    private DetailsService detailsService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -38,11 +38,12 @@ class CommentControllerTest {
     @DisplayName("Add Comment: Should return 201 Created")
     void addComment_Success() throws Exception {
         Long issueId = 1L;
+        Long userId = 2L;
         var request = new AddCommentRequest("This is a comment");
 
-        given(commentService.addComment(issueId, "This is a comment")).willReturn(true);
+        given(detailsService.addComment(issueId, "This is a comment", userId)).willReturn(true);
 
-        mockMvc.perform(post("/api/issues/{issueId}/comments", issueId)
+        mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/comments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -56,7 +57,7 @@ class CommentControllerTest {
         IssueComment comment = new IssueComment();
         comment.setContent("Test content");
 
-        given(commentService.getComments(issueId)).willReturn(List.of(comment));
+        given(detailsService.getComments(issueId)).willReturn(List.of(comment));
 
         mockMvc.perform(get("/api/issues/{issueId}/comments", issueId))
                 .andExpect(status().isOk())
@@ -80,7 +81,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Delete Comment: Should return 204 No Content")
     void deleteComment_Success() throws Exception {
-        given(commentService.deleteComment(5L)).willReturn(true);
+        given(detailsService.deleteComment(5L)).willReturn(true);
 
         mockMvc.perform(delete("/api/comments/{commentId}", 5L))
                 .andExpect(status().isNoContent());
@@ -89,7 +90,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Delete Comment: Should return 404 Not Found if missing")
     void deleteComment_NotFound() throws Exception {
-        given(commentService.deleteComment(99L)).willReturn(false);
+        given(detailsService.deleteComment(99L)).willReturn(false);
 
         mockMvc.perform(delete("/api/comments/{commentId}", 99L))
                 .andExpect(status().isNotFound());
