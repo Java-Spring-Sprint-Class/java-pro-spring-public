@@ -1,48 +1,91 @@
-## Task Description
+## Task: Validate Entities and DTOs + Controller Validation Tests
 
-The task is to migrate from in-memory data storage to a full database-backed implementation using **Spring Data**.
+### Goal
+Ensure that all **Entities** and **DTOs** are properly validated using Bean Validation annotations, and that validation is correctly enforced at the **controller level** through automated tests.
 
-### What needs to be done:
+---
 
-1. **Add Spring Data dependency**
-    - Include `spring-boot-starter-data-jpa`.
-    - Configure a database connection (H2 / PostgreSQL / MySQL — depending on project requirements).
+### Part 1: Validation of Entities and DTOs
 
-2. **Annotate entities**
-    - Mark all entity classes with appropriate JPA annotations:
-        - `@Entity`
-        - `@Table`
-        - `@Id`
-        - `@GeneratedValue`
-        - `@Column`
-        - relationships: `@OneToMany`, `@ManyToOne`, `@ManyToMany`, `@JoinColumn`, etc.
-    - Properly define relationships between entities according to the existing data model.
+#### 1. Entities Validation
+- Add appropriate **Bean Validation annotations** to all entity classes.
+- Validation must reflect business rules and database constraints.
+- Typical validations include:
+    - `@NotNull` – for mandatory fields
+    - `@NotBlank` / `@NotEmpty` – for text fields
+    - `@Size` – for length constraints
+    - `@Min` / `@Max` – for numeric ranges
+    - `@Positive` / `@PositiveOrZero`
+    - `@Email` – for email fields
+- Ensure consistency between:
+    - Entity constraints
+    - Database schema
+    - Business logic expectations
 
-3. **Repositories**
-    - Create repositories extending `JpaRepository` / `CrudRepository` for each entity.
-    - Add custom queries if needed.
+---
 
-4. **Refactor code without changing business logic**
-    - Replace in-memory collections (`Map`, `List`, `ConcurrentHashMap`, etc.) with repository-based persistence.
-    - Preserve the existing business logic and application behavior.
-    - All CRUD operations must be performed via the database.
+#### 2. DTOs Validation
+- Add validation annotations to **all request DTOs** used in controllers.
+- DTOs must validate **incoming API data** before it reaches the service layer.
+- Use:
+    - `@NotNull`, `@NotBlank`
+    - `@Size`
+    - `@Pattern` (if format validation is required)
+    - `@Email`, `@Positive`, etc.
+- DTO validation must be independent from entity validation.
 
-5. **Result**
-    - Data is persisted and retrieved from the database.
-    - API behavior remains identical to the previous implementation.
-    - Controllers and services keep the same contract.
+---
 
-## Development Approach (TDD)
+### Part 2: Controller-Level Validation
 
-This task must be implemented using the **TDD (Test-Driven Development)** methodology:
+#### 1. Enable Validation in Controllers
+- All controllers that accept request bodies must:
+    - Use `@Valid` (or `@Validated`) on DTO parameters.
+    - Handle invalid input via standard Spring validation mechanism.
+- Validation must fail **before** entering business logic.
 
-- Tests define the expected behavior of the system.
-- Implementation must be written to satisfy the existing tests.
-- Business logic must **not** be changed — only the persistence mechanism is allowed to be modified.
+---
 
-### ⚠️ Important
+### Part 3: Controller tests for verification (Bad Flow) in GlobalValidationTest
 
-- You are **not allowed** to change test cases to match your implementation.
-- Your implementation **must match** the behavior described by the tests.
+#### 1. Test Scope
+- For **each controller** that uses `@Valid`:
+    - Write **at least one test** that verifies validation failure.
+- Focus only on **bad flow scenarios**.
 
-The goal of this task is to learn how to integrate Spring Data JPA into an existing codebase without breaking its architecture or business logic.
+---
+
+#### 2. What Each Test Must Verify
+- Send an invalid request DTO (e.g. missing required fields, invalid values).
+- Expect:
+    - HTTP status `400 BAD REQUEST`
+    - Validation error response is returned
+- Confirm that:
+    - Controller validation is triggered
+    - Invalid data does not reach the service layer
+
+---
+
+#### 3. Test Requirements
+- Use:
+    - `@WebMvcTest` or `@SpringBootTest` (depending on project setup)
+    - `MockMvc`
+- Mock service layer dependencies.
+- Do **not** test business logic — only validation behavior.
+- Tests must clearly demonstrate that validation annotations are working.
+
+---
+
+### Acceptance Criteria
+- All entities and DTOs contain proper validation annotations.
+- All controllers use `@Valid` where required.
+- Each validated controller has at least one **bad flow** test.
+- Validation errors result in `400 BAD REQUEST`.
+- Tests fail if validation annotations are removed or broken.
+
+---
+
+### Notes
+- Do not change business logic.
+- Validation must be declarative (annotations only).
+- Tests should be readable and focused on validation behavior.
