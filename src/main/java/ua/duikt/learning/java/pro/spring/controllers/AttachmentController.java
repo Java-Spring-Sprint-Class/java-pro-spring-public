@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class AttachmentController {
     @PostMapping("/user/{userId}/issues/{issueId}/attachments")
     public ResponseEntity<String> addAttachment(@PathVariable Long issueId,
                                                 @PathVariable Long userId,
-                                                @RequestBody AddAttachmentRequest request) {
+                                                @RequestBody @Valid AddAttachmentRequest request) {
         boolean added = attachmentService.addAttachment(
                 issueId,
                 request.getFileName(),

@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint03;
+package ua.duikt.learning.java.pro.spring.test;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

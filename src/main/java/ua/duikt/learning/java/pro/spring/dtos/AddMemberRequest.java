@@ -1,8 +1,10 @@
 package ua.duikt.learning.java.pro.spring.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 
 /**
@@ -12,7 +14,11 @@ import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class AddMemberRequest {
+    @NotNull(message = "User ID is required")
     private Long userId;
+
+    @NotNull(message = "Role type is required")
     private ProjectRoleType role;
 }

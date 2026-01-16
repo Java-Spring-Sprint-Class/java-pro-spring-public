@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class CommentController {
     @PostMapping("/user/{userId}/issues/{issueId}/comments")
     public ResponseEntity<String> addComment(@PathVariable Long issueId,
                                              @PathVariable Long userId,
-                                             @RequestBody AddCommentRequest request) {
+                                             @RequestBody @Valid AddCommentRequest request) {
         boolean added = commentService.addComment(issueId, request.getContent(), userId);
         if (added) {
             return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
@@ -40,7 +41,7 @@ public class CommentController {
 
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<String> updateComment(@PathVariable Long commentId,
-                                                @RequestBody UpdateCommentRequest request) {
+                                                @RequestBody @Valid UpdateCommentRequest request) {
         commentService.updateComment(commentId, request.getContent());
         return ResponseEntity.ok("Comment updated");
     }

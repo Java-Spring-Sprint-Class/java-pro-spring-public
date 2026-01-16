@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
         boolean isCreated = userService.register(
                 request.getUsername(),
                 request.getEmail(),
@@ -55,7 +56,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProfile(@PathVariable Long id,
-                                                @RequestBody UpdateProfileRequest request) {
+                                                @RequestBody @Valid UpdateProfileRequest request) {
         if (userService.getUser(id) == null) {
             return ResponseEntity.notFound().build();
         }

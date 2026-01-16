@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createRole(@RequestBody CreateRoleRequest request) {
+    public ResponseEntity<Map<String, Object>> createRole(@RequestBody @Valid CreateRoleRequest request) {
         Long newRoleId = roleService.createRole(request.getName());
 
         return ResponseEntity

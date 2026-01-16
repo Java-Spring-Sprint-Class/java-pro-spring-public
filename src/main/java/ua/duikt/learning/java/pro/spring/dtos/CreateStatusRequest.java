@@ -1,8 +1,11 @@
 package ua.duikt.learning.java.pro.spring.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 
 /**
@@ -12,9 +15,14 @@ import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class CreateStatusRequest {
+    @NotNull(message = "Project ID is required")
     private Long projectId;
-    private String name;
-    private StatusCategory category;
 
+    @NotBlank(message = "Status name is required")
+    private String name;
+
+    @NotNull(message = "Status category is required")
+    private StatusCategory category;
 }

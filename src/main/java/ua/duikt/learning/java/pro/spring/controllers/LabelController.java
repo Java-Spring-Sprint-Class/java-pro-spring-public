@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class LabelController {
     private final LabelService labelService;
 
     @PostMapping("/labels")
-    public ResponseEntity<Map<String, Object>> createLabel(@RequestBody CreateLabelRequest request) {
+    public ResponseEntity<Map<String, Object>> createLabel(@RequestBody @Valid CreateLabelRequest request) {
         Long labelId = labelService.createLabel(request.getName(), request.getColor());
         return ResponseEntity
                 .status(HttpStatus.CREATED)

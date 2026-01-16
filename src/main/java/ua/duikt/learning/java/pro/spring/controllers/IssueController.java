@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class IssueController {
     private final IssueService issueService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createIssue(@RequestBody CreateIssueRequest request) {
+    public ResponseEntity<Map<String, Object>> createIssue(@RequestBody @Valid CreateIssueRequest request) {
         Long issueId = issueService.createIssue(
                 request.getProjectId(),
                 request.getTitle(),
@@ -55,7 +56,7 @@ public class IssueController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateIssue(@PathVariable Long id,
-                                              @RequestBody UpdateIssueRequest request) {
+                                              @RequestBody @Valid UpdateIssueRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
         issueService.updateIssue(id, request.getTitle(), request.getDescription());
@@ -71,7 +72,7 @@ public class IssueController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<String> updateStatus(@PathVariable Long id,
-                                               @RequestBody PatchStatusRequest request) {
+                                               @RequestBody @Valid PatchStatusRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
         issueService.patchStatus(id, request.getStatusId());
@@ -80,7 +81,7 @@ public class IssueController {
 
     @PatchMapping("/{id}/assignee")
     public ResponseEntity<String> updateAssignee(@PathVariable Long id,
-                                                 @RequestBody PatchAssigneeRequest request) {
+                                                 @RequestBody @Valid PatchAssigneeRequest request) {
         if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
 
         issueService.patchAssignee(id, request.getAssigneeId());

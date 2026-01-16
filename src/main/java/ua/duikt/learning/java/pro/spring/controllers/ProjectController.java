@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createProject(@RequestBody CreateProjectRequest request) {
+    public ResponseEntity<Map<String, Object>> createProject(@RequestBody @Valid CreateProjectRequest request) {
         Long projectId = projectService.createProject(
                 request.getName(),
                 request.getKey(),
@@ -56,7 +57,7 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProject(@PathVariable Long id,
-                                                @RequestBody UpdateProjectRequest request) {
+                                                @RequestBody @Valid UpdateProjectRequest request) {
         if (projectService.getProject(id) == null) {
             return ResponseEntity.notFound().build();
         }
@@ -77,7 +78,7 @@ public class ProjectController {
 
     @PostMapping("/{projectId}/members")
     public ResponseEntity<String> addMember(@PathVariable Long projectId,
-                                            @RequestBody AddMemberRequest request) {
+                                            @RequestBody @Valid AddMemberRequest request) {
         if (projectService.getProject(projectId) == null) {
             return ResponseEntity.notFound().build();
         }

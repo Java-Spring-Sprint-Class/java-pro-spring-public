@@ -1,5 +1,6 @@
 package ua.duikt.learning.java.pro.spring.controllers;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class StatusController {
     private final StatusService statusService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createStatus(@RequestBody CreateStatusRequest request) {
+    public ResponseEntity<Map<String, Object>> createStatus(@RequestBody @Valid CreateStatusRequest request) {
         Long statusId = statusService.createStatus(
                 request.getProjectId(),
                 request.getName(),
@@ -43,7 +44,7 @@ public class StatusController {
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable Long id,
-                                               @RequestBody UpdateStatusRequest request) {
+                                               @RequestBody @Valid UpdateStatusRequest request) {
         statusService.updateStatus(id, request.getName());
         return ResponseEntity.ok("Status updated");
     }
