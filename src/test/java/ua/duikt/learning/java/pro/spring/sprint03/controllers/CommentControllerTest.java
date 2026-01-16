@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint02.controllers;
+package ua.duikt.learning.java.pro.spring.sprint03.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +12,7 @@ import ua.duikt.learning.java.pro.spring.controllers.CommentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddCommentRequest;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.service.CommentService;
 
 import java.util.List;
 

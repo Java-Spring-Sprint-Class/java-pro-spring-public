@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint02.controllers;
+package ua.duikt.learning.java.pro.spring.sprint03.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +12,6 @@ import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
-import ua.duikt.learning.java.pro.spring.service.DetailsService;
 
 import java.util.List;
 
