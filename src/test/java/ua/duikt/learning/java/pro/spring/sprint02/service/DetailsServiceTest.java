@@ -29,8 +29,8 @@ class DetailsServiceTest {
     @Test
     @DisplayName("Comments Logic: Add, Get, Update, Delete")
     void commentsLogic() {
-        detailsService.addComment(10L, "First comment");
-        detailsService.addComment(10L, "Second comment");
+        detailsService.addComment(10L, "First comment", 1L);
+        detailsService.addComment(10L, "Second comment", 1L);
 
         List<IssueComment> comments = detailsService.getComments(10L);
         assertThat(comments).hasSize(2);
@@ -56,8 +56,8 @@ class DetailsServiceTest {
     @Test
     @DisplayName("Attachments Logic: Add, Get, Delete")
     void attachmentsLogic() {
-        detailsService.addAttachment(10L, "log.txt", "http://s3...", 1024);
-        detailsService.addAttachment(10L, "image.png", "http://s3...", 2048);
+        detailsService.addAttachment(10L, "log.txt", "http://s3...", 1024, 1L);
+        detailsService.addAttachment(10L, "image.png", "http://s3...", 2048, 1L);
 
         List<Attachment> attachments = detailsService.getAttachments(10L);
         assertThat(attachments).hasSize(2);

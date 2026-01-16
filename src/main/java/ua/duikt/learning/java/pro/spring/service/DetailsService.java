@@ -13,7 +13,7 @@ import java.util.List;
 public interface DetailsService {
     // ===== Comments =====
 
-    boolean addComment(Long issueId, String content);
+    boolean addComment(Long issueId, String content, Long userid);
 
     List<IssueComment> getComments(Long issueId);
 
@@ -23,7 +23,7 @@ public interface DetailsService {
 
     // ===== Attachments =====
 
-    boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize);
+    boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userid);
 
     List<Attachment> getAttachments(Long issueId);
 

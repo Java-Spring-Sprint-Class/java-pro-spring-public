@@ -29,11 +29,13 @@ public class DetailsServiceImpl implements DetailsService {
     private final AtomicLong attachmentIdGen = new AtomicLong(1);
     private final AtomicLong labelIdGen = new AtomicLong(1);
 
-    public boolean addComment(Long issueId, String content) {
+    @Override
+    public boolean addComment(Long issueId, String content, Long userid) {
         Long id = commentIdGen.getAndIncrement();
         IssueComment comment = IssueComment.builder()
                 .id(id)
                 .issueId(issueId)
+                .userId(userid)
                 .content(content)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -41,12 +43,14 @@ public class DetailsServiceImpl implements DetailsService {
         return true;
     }
 
+    @Override
     public List<IssueComment> getComments(Long issueId) {
         return commentTable.values().stream()
                 .filter(c -> c.getIssueId().equals(issueId))
                 .toList();
     }
 
+    @Override
     public void updateComment(Long id, String content) {
         IssueComment c = commentTable.get(id);
         if (c != null) {
@@ -55,15 +59,18 @@ public class DetailsServiceImpl implements DetailsService {
         }
     }
 
+    @Override
     public boolean deleteComment(Long id) {
         return commentTable.remove(id) != null;
     }
 
-    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize) {
+    @Override
+    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userid) {
         Long id = attachmentIdGen.getAndIncrement();
         Attachment attachment = Attachment.builder()
                 .id(id)
                 .issueId(issueId)
+                .userId(userid)
                 .fileName(fileName)
                 .fileUrl(fileUrl)
                 .fileSize(fileSize)
@@ -73,16 +80,19 @@ public class DetailsServiceImpl implements DetailsService {
         return true;
     }
 
+    @Override
     public List<Attachment> getAttachments(Long issueId) {
         return attachmentTable.values().stream()
                 .filter(a -> a.getIssueId().equals(issueId))
                 .toList();
     }
 
+    @Override
     public boolean deleteAttachment(Long id) {
         return attachmentTable.remove(id) != null;
     }
 
+    @Override
     public Long createLabel(String name, String color) {
         Long id = labelIdGen.getAndIncrement();
         Label label = Label.builder().id(id).name(name).color(color).build();
@@ -90,20 +100,24 @@ public class DetailsServiceImpl implements DetailsService {
         return id;
     }
 
+    @Override
     public List<Label> getLabels() {
         return new ArrayList<>(labelTable.values());
     }
 
+    @Override
     public boolean addLabelToIssue(Long issueId, Long labelId) {
         IssueLabel il = IssueLabel.builder().issueId(issueId).labelId(labelId).build();
         return issueLabelTable.add(il);
     }
 
+    @Override
     public boolean removeLabelFromIssue(Long issueId, Long labelId) {
         return issueLabelTable.removeIf(il ->
                 il.getIssueId().equals(issueId) && il.getLabelId().equals(labelId));
     }
 
+    @Override
     public List<Label> getLabelsForIssue(Long issueId) {
         List<Long> labelIds = issueLabelTable.stream()
                 .filter(il -> il.getIssueId().equals(issueId))
