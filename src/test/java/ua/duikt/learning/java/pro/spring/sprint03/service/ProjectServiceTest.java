@@ -1,127 +1,270 @@
 package ua.duikt.learning.java.pro.spring.sprint03.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
-import ua.duikt.learning.java.pro.spring.service.ProjectService;
+import ua.duikt.learning.java.pro.spring.repositories.ProjectMemberRepo;
+import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.ProjectServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by Mykyta Sirobaba on 13.01.2026.
+ * Created by Mykyta Sirobaba on 15.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
+@ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
 
-    private ProjectService projectService;
+    @Mock
+    private ProjectRepo projectRepo;
 
-    @BeforeEach
-    void setUp() {
-        projectService = new ProjectServiceImpl();
+    @Mock
+    private ProjectMemberRepo projectMemberRepo;
+
+    @InjectMocks
+    private ProjectServiceImpl projectService;
+
+    @Test
+    @DisplayName("createProject: should save project and return id")
+    void createProject_shouldSaveProjectAndReturnId() {
+        
+        Project savedProject = Project.builder()
+                .id(1L)
+                .build();
+
+        when(projectRepo.save(any(Project.class))).thenReturn(savedProject);
+
+        ArgumentCaptor<Project> captor = ArgumentCaptor.forClass(Project.class);
+
+        
+        Long result = projectService.createProject(
+                "Test Project",
+                "TP",
+                "Description",
+                100L
+        );
+
+        
+        assertThat(result).isEqualTo(1L);
+        verify(projectRepo).save(captor.capture());
+
+        Project project = captor.getValue();
+        assertThat(project.getName()).isEqualTo("Test Project");
+        assertThat(project.getKey()).isEqualTo("TP");
+        assertThat(project.getOwnerId()).isEqualTo(100L);
+        assertThat(project.getDescription()).isEqualTo("Description");
+        assertThat(project.getCreatedAt()).isNotNull();
     }
 
     @Test
-    @DisplayName("Project CRUD Operations")
-    void projectCrud() {
-        Long userId1 = 101L;
-        Long pId = projectService.createProject("Alpha", "ALP", "Desc", userId1);
+    @DisplayName("getProject: should return project when found")
+    void getProject_shouldReturnProject() {
+        
+        Project project = Project.builder().id(1L).build();
+        when(projectRepo.findById(1L)).thenReturn(Optional.of(project));
 
-        Project p = projectService.getProject(pId);
-        assertThat(p.getName()).isEqualTo("Alpha");
+        
+        Project result = projectService.getProject(1L);
 
-        projectService.updateProject(pId, "Omega", "New Desc");
-        assertThat(projectService.getProject(pId).getName()).isEqualTo("Omega");
-
-        projectService.deleteProject(pId);
-        assertThat(projectService.getProject(pId)).isNull();
+        
+        assertThat(result).isNotNull();
+        verify(projectRepo).findById(1L);
     }
 
     @Test
-    @DisplayName("Create and Get Project")
-    void createAndGet() {
-        Long userId1 = 101L;
-        Long pId = projectService.createProject("Alpha", "ALP", "Description for Alpha", userId1);
+    @DisplayName("getProject: should return null when not found")
+    void getProject_shouldReturnNullIfNotFound() {
+        
+        when(projectRepo.findById(99L)).thenReturn(Optional.empty());
 
-        Project p = projectService.getProject(pId);
-        assertThat(p).isNotNull();
-        assertThat(p.getName()).isEqualTo("Alpha");
-        assertThat(p.getKey()).isEqualTo("ALP");
-        assertThat(p.getId()).isEqualTo(pId);
+        
+        Project result = projectService.getProject(99L);
+
+        
+        assertThat(result).isNull();
     }
 
     @Test
-    @DisplayName("List Projects")
-    void listProjects() {
-        Long userId1 = 101L;
-        projectService.createProject("Project A", "PA", "Desc A", userId1);
-        projectService.createProject("Project B", "PB", "Desc B",  userId1);
+    @DisplayName("listProjects: should return all projects")
+    void listProjects_shouldReturnAllProjects() {
+        
+        when(projectRepo.findAll())
+                .thenReturn(List.of(new Project(), new Project()));
 
-        List<Project> allProjects = projectService.listProjects();
+        
+        List<Project> result = projectService.listProjects();
 
-        assertThat(allProjects).hasSize(2);
-        assertThat(allProjects).extracting(Project::getKey).contains("PA", "PB");
+        
+        assertThat(result).hasSize(2);
+        verify(projectRepo).findAll();
     }
 
     @Test
-    @DisplayName("Update Project")
-    void updateProject() {
-        Long userId1 = 101L;
-        Long pId = projectService.createProject("Old Name", "KEY", "Old Desc", userId1);
+    @DisplayName("updateProject: should update fields when project exists")
+    void updateProject_shouldUpdateProject() {
+        
+        Project project = Project.builder()
+                .id(1L)
+                .name("Old")
+                .description("Old desc")
+                .build();
 
-        projectService.updateProject(pId, "New Name", "New Desc");
+        when(projectRepo.findById(1L)).thenReturn(Optional.of(project));
 
-        Project updated = projectService.getProject(pId);
-        assertThat(updated.getName()).isEqualTo("New Name");
-        assertThat(updated.getDescription()).isEqualTo("New Desc");
-        assertThat(updated.getKey()).isEqualTo("KEY");
+        
+        projectService.updateProject(1L, "New", "New desc");
+
+        
+        assertThat(project.getName()).isEqualTo("New");
+        assertThat(project.getDescription()).isEqualTo("New desc");
+        assertThat(project.getUpdatedAt()).isNotNull();
     }
 
     @Test
-    @DisplayName("Delete Project")
-    void deleteProject() {
-        Long userId1 = 101L;
-        Long pId = projectService.createProject("To Delete", "DEL", "Desc", userId1);
+    @DisplayName("updateProject: should do nothing when project does not exist")
+    void updateProject_shouldDoNothingIfNotExists() {
+        
+        when(projectRepo.findById(99L)).thenReturn(Optional.empty());
 
-        boolean isDeleted = projectService.deleteProject(pId);
-        assertThat(isDeleted).isTrue();
-        assertThat(projectService.getProject(pId)).isNull();
+        
+        projectService.updateProject(99L, "x", "y");
 
-        boolean deleteAgain = projectService.deleteProject(pId);
-        assertThat(deleteAgain).isFalse();
+        
+        verify(projectRepo).findById(99L);
     }
 
     @Test
-    @DisplayName("Manage Project Members: Add, Get, Remove")
-    void memberManagement() {
-        Long userId = 100L;
-        Long userId1 = 101L;
-        Long userId2 = 102L;
-        Long pId = projectService.createProject("Team Project", "TEAM", "Desc", userId);
+    @DisplayName("deleteProject: should delete project and return true if exists")
+    void deleteProject_shouldDeleteAndReturnTrue() {
+        
+        when(projectRepo.existsById(1L)).thenReturn(true);
 
-        boolean added1 = projectService.addMember(pId, userId1, ProjectRoleType.OWNER);
-        boolean added2 = projectService.addMember(pId, userId2, ProjectRoleType.MEMBER);
+        
+        boolean result = projectService.deleteProject(1L);
 
-        assertThat(added1).isTrue();
-        assertThat(added2).isTrue();
+        
+        assertThat(result).isTrue();
+        verify(projectRepo).deleteById(1L);
+    }
 
-        List<ProjectMember> members = projectService.getMembers(pId);
-        assertThat(members).hasSize(2);
+    @Test
+    @DisplayName("deleteProject: should return false if project does not exist")
+    void deleteProject_shouldReturnFalseIfNotExists() {
+        
+        when(projectRepo.existsById(1L)).thenReturn(false);
 
-        assertThat(members).anyMatch(m -> m.getUserId().equals(userId1) && m.getRole() == ProjectRoleType.OWNER);
-        assertThat(members).anyMatch(m -> m.getUserId().equals(userId2) && m.getRole() == ProjectRoleType.MEMBER);
+        
+        boolean result = projectService.deleteProject(1L);
 
-        boolean removed = projectService.removeMember(pId, userId1);
-        assertThat(removed).isTrue();
+        
+        assertThat(result).isFalse();
+        verify(projectRepo, never()).deleteById(anyLong());
+    }
 
-        assertThat(projectService.getMembers(pId)).hasSize(1);
+    @Test
+    @DisplayName("addMember: should add member when not exists")
+    void addMember_shouldSaveMember_ifNotExists() {
+        
+        Long projectId = 1L;
+        Long userId = 10L;
 
-        boolean removeFail = projectService.removeMember(pId, 999L);
-        assertThat(removeFail).isFalse();
+        when(projectMemberRepo.existsByProjectIdAndUserId(projectId, userId))
+                .thenReturn(false);
+
+        ArgumentCaptor<ProjectMember> captor =
+                ArgumentCaptor.forClass(ProjectMember.class);
+
+        
+        boolean result = projectService.addMember(
+                projectId,
+                userId,
+                ProjectRoleType.DEVELOPER
+        );
+
+        
+        assertThat(result).isTrue();
+        verify(projectMemberRepo).save(captor.capture());
+
+        ProjectMember member = captor.getValue();
+        assertThat(member.getProjectId()).isEqualTo(projectId);
+        assertThat(member.getUserId()).isEqualTo(userId);
+        assertThat(member.getRole()).isEqualTo(ProjectRoleType.DEVELOPER);
+    }
+
+    @Test
+    @DisplayName("addMember: should return false when member already exists")
+    void addMember_shouldReturnFalse_ifExists() {
+        
+        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+                .thenReturn(true);
+
+        
+        boolean result = projectService.addMember(
+                1L,
+                10L,
+                ProjectRoleType.DEVELOPER
+        );
+
+        
+        assertThat(result).isFalse();
+        verify(projectMemberRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("getMembers: should return project members")
+    void getMembers_shouldReturnMembers() {
+        
+        when(projectMemberRepo.findAllByProjectId(1L))
+                .thenReturn(List.of(new ProjectMember(), new ProjectMember()));
+
+        
+        List<ProjectMember> result = projectService.getMembers(1L);
+
+        
+        assertThat(result).hasSize(2);
+        verify(projectMemberRepo).findAllByProjectId(1L);
+    }
+
+    @Test
+    @DisplayName("removeMember: should delete member and return true if exists")
+    void removeMember_shouldDeleteAndReturnTrue() {
+        
+        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+                .thenReturn(true);
+
+        
+        boolean result = projectService.removeMember(1L, 10L);
+
+        
+        assertThat(result).isTrue();
+        verify(projectMemberRepo).deleteByProjectIdAndUserId(1L, 10L);
+    }
+
+    @Test
+    @DisplayName("removeMember: should return false if member does not exist")
+    void removeMember_shouldReturnFalseIfNotExists() {
+        
+        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+                .thenReturn(false);
+
+        
+        boolean result = projectService.removeMember(1L, 10L);
+
+        
+        assertThat(result).isFalse();
+        verify(projectMemberRepo, never())
+                .deleteByProjectIdAndUserId(anyLong(), anyLong());
     }
 }

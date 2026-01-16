@@ -1,128 +1,235 @@
 package ua.duikt.learning.java.pro.spring.sprint03.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Issue;
 import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
 import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
-import ua.duikt.learning.java.pro.spring.service.IssueService;
+import ua.duikt.learning.java.pro.spring.repositories.IssueHistoryRepo;
+import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.IssueServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by Mykyta Sirobaba on 13.01.2026.
+ * Created by Mykyta Sirobaba on 15.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
+@ExtendWith(MockitoExtension.class)
 class IssueServiceTest {
 
-    private IssueService issueService;
+    @Mock
+    private IssueRepo issueRepo;
 
-    @BeforeEach
-    void setUp() {
-        issueService = new IssueServiceImpl();
+    @Mock
+    private IssueHistoryRepo issueHistoryRepo;
+
+    @InjectMocks
+    private IssueServiceImpl issueService;
+
+    @Test
+    @DisplayName("createIssue: should save issue, record history and return id")
+    void createIssue_shouldSaveIssueAndRecordHistory() {
+        
+        Issue savedIssue = Issue.builder()
+                .id(1L)
+                .build();
+
+        when(issueRepo.save(any(Issue.class))).thenReturn(savedIssue);
+
+        ArgumentCaptor<Issue> issueCaptor = ArgumentCaptor.forClass(Issue.class);
+        ArgumentCaptor<IssueHistory> historyCaptor = ArgumentCaptor.forClass(IssueHistory.class);
+
+        
+        Long result = issueService.createIssue(
+                10L,
+                "Test title",
+                "Test description",
+                IssueType.BUG,
+                Priority.HIGH,
+                1L
+        );
+
+        
+        assertThat(result).isEqualTo(1L);
+
+        verify(issueRepo).save(issueCaptor.capture());
+        verify(issueHistoryRepo).save(historyCaptor.capture());
+
+        Issue issue = issueCaptor.getValue();
+        assertThat(issue.getProjectId()).isEqualTo(10L);
+        assertThat(issue.getTitle()).isEqualTo("Test title");
+        assertThat(issue.getType()).isEqualTo(IssueType.BUG);
+        assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
+        assertThat(issue.getKey()).startsWith("ISSUE-");
+        assertThat(issue.getCreatedAt()).isNotNull();
+
+        IssueHistory history = historyCaptor.getValue();
+        assertThat(history.getIssueId()).isEqualTo(1L);
+        assertThat(history.getFieldChanged()).isEqualTo("creation");
+        assertThat(history.getNewValue()).isEqualTo("created");
+        assertThat(history.getCreatedAt()).isNotNull();
     }
 
     @Test
-    @DisplayName("Status Management")
-    void statusManagement() {
-        issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
-        issueService.createStatus(1L, "In Progress", StatusCategory.IN_PROGRESS);
+    @DisplayName("getIssue: should return issue when found")
+    void getIssue_shouldReturnIssue() {
+        
+        Issue issue = Issue.builder().id(1L).build();
+        when(issueRepo.findById(1L)).thenReturn(Optional.of(issue));
 
-        List<Status> statuses = issueService.getStatuses(1L);
-        assertThat(statuses).hasSize(2);
-        assertThat(statuses.getFirst().getName()).isEqualTo("To Do");
+        
+        Issue result = issueService.getIssue(1L);
+
+        
+        assertThat(result).isNotNull();
+        verify(issueRepo).findById(1L);
     }
 
     @Test
-    @DisplayName("Status Lifecycle: Create, Update, Delete")
-    void statusLifecycle() {
-        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
+    @DisplayName("getIssue: should return null when not found")
+    void getIssue_shouldReturnNullIfNotFound() {
+        
+        when(issueRepo.findById(99L)).thenReturn(Optional.empty());
 
-        List<Status> statuses = issueService.getStatuses(1L);
-        assertThat(statuses).hasSize(1);
-        assertThat(statuses.getFirst().getName()).isEqualTo("To Do");
+        
+        Issue result = issueService.getIssue(99L);
 
-        issueService.updateStatus(sId, "To Do Updated");
-
-        Status updatedStatus = issueService.getStatuses(1L).getFirst();
-        assertThat(updatedStatus.getName()).isEqualTo("To Do Updated");
-
-        boolean deleted = issueService.deleteStatus(sId);
-        assertThat(deleted).isTrue();
-        assertThat(issueService.getStatuses(1L)).isEmpty();
+        
+        assertThat(result).isNull();
     }
 
     @Test
-    @DisplayName("Issue CRUD: Create, Get, Update, Delete")
-    void issueCrud() {
-        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
-        Long issueId = issueService.createIssue(1L, "Login Bug", "Fix it", IssueType.BUG, Priority.HIGH, sId);
+    @DisplayName("listIssues: should return issues by projectId")
+    void listIssues_shouldReturnIssuesByProjectId() {
+        
+        when(issueRepo.findAllByProjectId(5L))
+                .thenReturn(List.of(new Issue(), new Issue()));
 
-        Issue issue = issueService.getIssue(issueId);
-        assertThat(issue).isNotNull();
-        assertThat(issue.getTitle()).isEqualTo("Login Bug");
+        
+        List<Issue> result = issueService.listIssues(5L);
 
-        issueService.updateIssue(issueId, "Login Bug Fixed", "It is done");
-
-        Issue updatedIssue = issueService.getIssue(issueId);
-        assertThat(updatedIssue.getTitle()).isEqualTo("Login Bug Fixed");
-        assertThat(updatedIssue.getDescription()).isEqualTo("It is done");
-
-        boolean isDeleted = issueService.deleteIssue(issueId);
-        assertThat(isDeleted).isTrue();
-        assertThat(issueService.getIssue(issueId)).isNull();
+        
+        assertThat(result).hasSize(2);
+        verify(issueRepo).findAllByProjectId(5L);
     }
 
     @Test
-    @DisplayName("List Issues by Project")
-    void listIssues() {
-        Long sId = issueService.createStatus(1L, "To Do", StatusCategory.TO_DO);
-        issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.LOW, sId);
-        issueService.createIssue(1L, "Task 2", "Desc", IssueType.STORY, Priority.MEDIUM, sId);
+    @DisplayName("updateIssue: should update fields and record history if issue exists")
+    void updateIssue_shouldUpdateAndRecordHistory() {
+        
+        Issue issue = Issue.builder()
+                .id(1L)
+                .title("Old")
+                .description("Old desc")
+                .build();
 
-        issueService.createIssue(2L, "Other Project Task", "Desc", IssueType.TASK, Priority.LOW, sId);
+        when(issueRepo.findById(1L)).thenReturn(Optional.of(issue));
 
-        List<Issue> project1Issues = issueService.listIssues(1L);
-        assertThat(project1Issues).hasSize(2);
+        
+        issueService.updateIssue(1L, "New title", "New desc");
 
-        List<Issue> project2Issues = issueService.listIssues(2L);
-        assertThat(project2Issues).hasSize(1);
+        
+        assertThat(issue.getTitle()).isEqualTo("New title");
+        assertThat(issue.getDescription()).isEqualTo("New desc");
+        assertThat(issue.getUpdatedAt()).isNotNull();
+
+        verify(issueHistoryRepo).save(any(IssueHistory.class));
     }
 
     @Test
-    @DisplayName("Patch Status and History Tracking")
-    void patchStatusAndHistory() {
-        Long statusId = 100L;
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
+    @DisplayName("updateIssue: should do nothing when issue does not exist")
+    void updateIssue_shouldDoNothingIfNotExists() {
+        
+        when(issueRepo.findById(99L)).thenReturn(Optional.empty());
 
-        issueService.patchStatus(issueId, statusId);
+        
+        issueService.updateIssue(99L, "x", "y");
 
-        Issue updatedIssue = issueService.getIssue(issueId);
-        assertThat(updatedIssue.getStatusId()).isEqualTo(statusId);
-
-        List<IssueHistory> history = issueService.getHistory(issueId);
-
-        assertThat(history).hasSizeGreaterThanOrEqualTo(1);
-
-        IssueHistory lastChange = history.getLast();
-        assertThat(lastChange.getFieldChanged()).isEqualTo("status");
-        assertThat(lastChange.getNewValue()).isEqualTo(String.valueOf(statusId));
+        
+        verify(issueHistoryRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("Patch Assignee and History")
-    void patchAssignee() {
-        Long statusId = 100L;
-        Long issueId = issueService.createIssue(1L, "Task 1", "Desc", IssueType.TASK, Priority.MEDIUM, statusId);
-        Long assigneeId = 55L;
+    @DisplayName("deleteIssue: should delete issue and return true if exists")
+    void deleteIssue_shouldDeleteAndReturnTrue() {
+        
+        when(issueRepo.existsById(1L)).thenReturn(true);
 
-        issueService.patchAssignee(issueId, assigneeId);
+        
+        boolean result = issueService.deleteIssue(1L);
 
-        assertThat(issueService.getIssue(issueId).getAssigneeId()).isEqualTo(assigneeId);
+        
+        assertThat(result).isTrue();
+        verify(issueRepo).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("deleteIssue: should return false if issue does not exist")
+    void deleteIssue_shouldReturnFalseIfNotExists() {
+        
+        when(issueRepo.existsById(1L)).thenReturn(false);
+
+        
+        boolean result = issueService.deleteIssue(1L);
+
+        
+        assertThat(result).isFalse();
+        verify(issueRepo, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("patchStatus: should update status and record history")
+    void patchStatus_shouldUpdateAndRecordHistory() {
+        
+        Issue issue = Issue.builder().id(1L).statusId(1L).build();
+        when(issueRepo.findById(1L)).thenReturn(Optional.of(issue));
+
+        
+        issueService.patchStatus(1L, 2L);
+
+        
+        assertThat(issue.getStatusId()).isEqualTo(2L);
+        verify(issueHistoryRepo).save(any(IssueHistory.class));
+    }
+
+    @Test
+    @DisplayName("patchAssignee: should update assignee and record history")
+    void patchAssignee_shouldUpdateAndRecordHistory() {
+        
+        Issue issue = Issue.builder().id(1L).assigneeId(10L).build();
+        when(issueRepo.findById(1L)).thenReturn(Optional.of(issue));
+
+        
+        issueService.patchAssignee(1L, 20L);
+
+        
+        assertThat(issue.getAssigneeId()).isEqualTo(20L);
+        verify(issueHistoryRepo).save(any(IssueHistory.class));
+    }
+
+    @Test
+    @DisplayName("getHistory: should return issue history")
+    void getHistory_shouldReturnHistory() {
+        
+        when(issueHistoryRepo.findAllByIssueId(1L))
+                .thenReturn(List.of(new IssueHistory(), new IssueHistory()));
+
+        
+        List<IssueHistory> result = issueService.getHistory(1L);
+
+        
+        assertThat(result).hasSize(2);
+        verify(issueHistoryRepo).findAllByIssueId(1L);
     }
 }

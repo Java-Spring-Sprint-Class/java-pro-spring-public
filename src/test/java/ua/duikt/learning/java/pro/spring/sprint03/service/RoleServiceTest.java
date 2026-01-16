@@ -1,35 +1,73 @@
 package ua.duikt.learning.java.pro.spring.sprint03.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Role;
-import ua.duikt.learning.java.pro.spring.service.RoleService;
+import ua.duikt.learning.java.pro.spring.repositories.RoleRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.RoleServiceImpl;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by Mykyta Sirobaba on 13.01.2026.
+ * Created by Mykyta Sirobaba on 15.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
+@ExtendWith(MockitoExtension.class)
 class RoleServiceTest {
 
-    private RoleService roleService;
+    @Mock
+    private RoleRepo roleRepo;
 
-    @BeforeEach
-    void setUp() {
-        roleService = new RoleServiceImpl();
+    @InjectMocks
+    private RoleServiceImpl roleService;
+
+    @Test
+    @DisplayName("createRole: should save role and return id")
+    void createRole_shouldSaveRoleAndReturnId() {
+        
+        Role savedRole = Role.builder()
+                .id(1L)
+                .name("ADMIN")
+                .build();
+
+        when(roleRepo.save(any(Role.class))).thenReturn(savedRole);
+
+        ArgumentCaptor<Role> captor = ArgumentCaptor.forClass(Role.class);
+
+        
+        Long result = roleService.createRole("ADMIN");
+
+        
+        assertThat(result).isEqualTo(1L);
+        verify(roleRepo).save(captor.capture());
+
+        Role role = captor.getValue();
+        assertThat(role.getName()).isEqualTo("ADMIN");
     }
 
     @Test
-    void createAndListRoles() {
-        Long id1 = roleService.createRole("ADMIN");
-        Long id2 = roleService.createRole("USER");
+    @DisplayName("getRoles: should return all roles")
+    void getRoles_shouldReturnAllRoles() {
+        
+        when(roleRepo.findAll())
+                .thenReturn(List.of(
+                        Role.builder().id(1L).build(),
+                        Role.builder().id(2L).build()
+                ));
 
-        List<Role> roles = roleService.getRoles();
-        assertThat(roles).hasSize(2);
-        assertThat(roles).extracting(Role::getName).contains("ADMIN", "USER");
+        
+        List<Role> result = roleService.getRoles();
+
+        
+        assertThat(result).hasSize(2);
+        verify(roleRepo).findAll();
     }
 }
