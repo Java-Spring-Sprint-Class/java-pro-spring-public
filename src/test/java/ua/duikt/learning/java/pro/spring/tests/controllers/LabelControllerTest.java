@@ -1,4 +1,4 @@
-package ua.duikt.learning.java.pro.spring.sprint03.controllers;
+package ua.duikt.learning.java.pro.spring.tests.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
