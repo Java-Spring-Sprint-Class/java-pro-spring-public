@@ -41,13 +41,13 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Long | `id` |
-| name | String | `name` |
-| key | String | `key` |
-| ownerId | Long | `ownerId` |
+| id | Long | `id`          |
+| name | String | `name`        |
+| key | String | `projectKey`  |
+| ownerId | Long | `ownerId`     |
 | description | String | `description` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
+| createdAt | LocalDateTime | `createdAt`   |
+| updatedAt | LocalDateTime | `updatedAt`   |
 
 ### 5. ProjectMember
 
@@ -62,18 +62,18 @@ Your mission: transform this prototype into a full-fledged, working **REST API a
 
 | Field | Type | Variable Name |
 |-------|------|---------------|
-| id | Long | `id` |
-| projectId | Long | `projectId` |
-| key | String | `key` |
-| title | String | `title` |
+| id | Long | `id`          |
+| projectId | Long | `projectId`   |
+| key | String | `issueKey`    |
+| title | String | `title`       |
 | description | String | `description` |
-| type | IssueType | `type` |
-| priority | Priority | `priority` |
-| statusId | Long | `statusId` |
-| assigneeId | Long | `assigneeId` |
-| reporterId | Long | `reporterId` |
-| createdAt | LocalDateTime | `createdAt` |
-| updatedAt | LocalDateTime | `updatedAt` |
+| type | IssueType | `type`        |
+| priority | Priority | `priority`    |
+| statusId | Long | `statusId`    |
+| assigneeId | Long | `assigneeId`  |
+| reporterId | Long | `reporterId`  |
+| createdAt | LocalDateTime | `createdAt`   |
+| updatedAt | LocalDateTime | `updatedAt`   |
 
 ### 7. Status
 
