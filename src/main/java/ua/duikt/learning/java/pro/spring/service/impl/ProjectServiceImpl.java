@@ -29,7 +29,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Long createProject(String name, String key, String description, Long ownerId) {
         Project project = Project.builder()
                 .name(name)
-                .key(key)
+                .projectKey(key)
                 .ownerId(ownerId)
                 .description(description)
                 .createdAt(LocalDateTime.now())

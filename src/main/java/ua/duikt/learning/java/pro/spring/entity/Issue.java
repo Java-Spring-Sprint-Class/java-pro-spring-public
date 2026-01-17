@@ -29,7 +29,7 @@ public class Issue {
     private Long projectId;
 
     @Column(nullable = false)
-    private String key;
+    private String issueKey;
 
     @Column(nullable = false)
     private String title;
