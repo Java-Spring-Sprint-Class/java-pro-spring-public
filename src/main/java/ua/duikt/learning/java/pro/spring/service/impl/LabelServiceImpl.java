@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.IssueLabel;
 import ua.duikt.learning.java.pro.spring.entity.Label;
-import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.IssueLabelRepo;
 import ua.duikt.learning.java.pro.spring.repositories.LabelRepo;
@@ -44,7 +44,7 @@ public class LabelServiceImpl implements LabelService {
     @Transactional
     public void addLabelToIssue(Long issueId, Long labelId) {
         if (issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
-            throw new BadRequestException("Label already exists");
+            throw new ConflictException("Label already exists");
         }
 
         IssueLabel issueLabel = IssueLabel.builder()

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
 import ua.duikt.learning.java.pro.spring.entity.Issue;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.AttachmentRepo;
 import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
@@ -27,6 +28,9 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     @Transactional
     public void addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userId) {
+        if (fileName == null || fileName.isEmpty() || fileUrl == null) {
+            throw new BadRequestException("Invalid attachment data");
+        }
 
         Issue issue = issueRepo.findById(issueId)
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found id=" + issueId));

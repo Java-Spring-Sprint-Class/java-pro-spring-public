@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.CommentRepo;
 import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
@@ -30,8 +31,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void addComment(Long issueId, String content, Long userId) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new BadRequestException("Comment content cannot be empty");
+        }
         if (!issueRepo.existsById(issueId)) {
-            throw new ResourceNotFoundException("Issue with id " + id + " not found");
+            throw new ResourceNotFoundException("Issue with id " + issueId + " not found");
         }
         if (!userRepo.existsById(userId)) {
             throw new ResourceNotFoundException("User with id " + userId + " not found");

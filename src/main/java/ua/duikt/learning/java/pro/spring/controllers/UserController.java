@@ -43,10 +43,6 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProfile(@PathVariable Long id,
                                                 @RequestBody @Valid UpdateProfileRequest request) {
-        if (userService.getUser(id) == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         userService.updateProfile(id, request.getUsername(), request.getEmail());
         return ResponseEntity.ok("Profile updated");
     }
