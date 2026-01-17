@@ -55,7 +55,8 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 409 Conflict when user already exists")
     void register_ShouldReturnConflict_WhenUserExists() throws Exception {
-        var request = new RegisterRequest("exist", "exist@mail.com", "pass");
+        var request = new RegisterRequest("exist", "exist@mail.com", "password");
+
         given(userService.register(anyString(), anyString(), anyString())).willReturn(false);
 
         mockMvc.perform(post("/api/users/register")
@@ -64,7 +65,6 @@ class UserControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string("User with this username or email already exists"));
     }
-
     @Test
     @DisplayName("Should return User JSON when user exists")
     void getUser_ShouldReturnUser_WhenFound() throws Exception {
@@ -127,7 +127,7 @@ class UserControllerTest {
     void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
         given(userService.getUser(999L)).willReturn(null);
 
-        var request = new UpdateProfileRequest("new", "new");
+        var request = new UpdateProfileRequest("new", "new@example.com");
 
         mockMvc.perform(put("/api/users/{id}", 999L)
                         .contentType(MediaType.APPLICATION_JSON)
