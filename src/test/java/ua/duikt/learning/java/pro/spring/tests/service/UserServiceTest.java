@@ -12,6 +12,7 @@ import ua.duikt.learning.java.pro.spring.entity.UserRole;
 import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
+import ua.duikt.learning.java.pro.spring.repositories.RoleRepo;
 import ua.duikt.learning.java.pro.spring.repositories.UserRepo;
 import ua.duikt.learning.java.pro.spring.repositories.UserRoleRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.UserServiceImpl;
@@ -29,6 +30,9 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+
+    @Mock
+    private RoleRepo roleRepository;
 
     @Mock
     private UserRepo userRepository;
@@ -190,7 +194,7 @@ class UserServiceTest {
         Long roleId = 2L;
 
         when(userRepository.existsById(userId)).thenReturn(true);
-        when(userRoleRepository.existsByUserRoleId(roleId)).thenReturn(true);
+        when(roleRepository.existsById(roleId)).thenReturn(true);
         when(userRoleRepository.existsByUserIdAndRoleId(userId, roleId)).thenReturn(false);
 
         userService.assignRole(userId, roleId);
@@ -199,15 +203,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("assignRole: should throw BadRequestException on database error")
-    void assignRole_shouldThrowBadRequestException_onException() {
+    @DisplayName("assignRole: should throw RuntimeException on database error")
+    void assignRole_shouldThrowException_onDatabaseError() {
         Long userId = 1L;
         Long roleId = 2L;
 
         when(userRepository.existsById(userId)).thenReturn(true);
-        when(userRoleRepository.existsByUserRoleId(roleId)).thenReturn(true);
+        when(roleRepository.existsById(roleId)).thenReturn(true);
         when(userRoleRepository.existsByUserIdAndRoleId(userId, roleId)).thenReturn(false);
-
         when(userRoleRepository.save(any(UserRole.class))).thenThrow(new RuntimeException("DB error"));
 
         assertThrows(RuntimeException.class, () -> userService.assignRole(userId, roleId));
