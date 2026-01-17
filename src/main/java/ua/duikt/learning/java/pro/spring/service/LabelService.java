@@ -13,9 +13,9 @@ public interface LabelService {
 
     List<Label> getLabels();
 
-    boolean addLabelToIssue(Long issueId, Long labelId);
+    void addLabelToIssue(Long issueId, Long labelId);
 
-    boolean removeLabelFromIssue(Long issueId, Long labelId);
+    void removeLabelFromIssue(Long issueId, Long labelId);
 
     List<Label> getLabelsForIssue(Long issueId);
 }

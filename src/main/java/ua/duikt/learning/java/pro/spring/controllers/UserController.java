@@ -25,27 +25,13 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid RegisterRequest request) {
-        boolean isCreated = userService.register(
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword()
-        );
-
-        if (isCreated) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this username or email already exists");
-        }
+        userService.register(request.getUsername(), request.getEmail(), request.getPassword());
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userService.getUser(id);
-        if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(userService.getUser(id));
     }
 
     @GetMapping
@@ -67,32 +53,21 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deactivateUser(@PathVariable Long id) {
-        boolean isDeactivated = userService.deactivateUser(id);
-        if (isDeactivated) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        userService.deactivateUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{userId}/roles/{roleId}")
     public ResponseEntity<String> assignRole(@PathVariable Long userId,
                                              @PathVariable Long roleId) {
-        boolean assigned = userService.assignRole(userId, roleId);
-        if (assigned) {
-            return ResponseEntity.ok("Role assigned");
-        }
-        return ResponseEntity.badRequest().body("Failed to assign role");
+        userService.assignRole(userId, roleId);
+        return ResponseEntity.ok("Role assigned");
     }
 
     @DeleteMapping("/{userId}/roles/{roleId}")
     public ResponseEntity<String> removeRole(@PathVariable Long userId,
                                              @PathVariable Long roleId) {
-        boolean removed = userService.removeRole(userId, roleId);
-        if (removed) {
-            return ResponseEntity.ok("Role removed");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Role assignment not found");
-        }
+        userService.removeRole(userId, roleId);
+        return ResponseEntity.ok("Role removed");
     }
 }

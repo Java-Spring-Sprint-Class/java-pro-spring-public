@@ -27,11 +27,8 @@ public class CommentController {
     public ResponseEntity<String> addComment(@PathVariable Long issueId,
                                              @PathVariable Long userId,
                                              @RequestBody @Valid AddCommentRequest request) {
-        boolean added = commentService.addComment(issueId, request.getContent(), userId);
-        if (added) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
-        }
-        return ResponseEntity.badRequest().body("Failed to add comment");
+        commentService.addComment(issueId, request.getContent(), userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
     }
 
     @GetMapping("/issues/{issueId}/comments")
@@ -40,15 +37,18 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<String> updateComment(@PathVariable Long commentId,
-                                                @RequestBody @Valid UpdateCommentRequest request) {
+    public ResponseEntity<String> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody @Valid UpdateCommentRequest request) {
+
         commentService.updateComment(commentId, request.getContent());
         return ResponseEntity.ok("Comment updated");
     }
 
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
-        boolean deleted = commentService.deleteComment(commentId);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        commentService.deleteComment(commentId);
+        return ResponseEntity.noContent().build();
     }
+
 }

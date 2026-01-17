@@ -19,11 +19,11 @@ public interface ProjectService {
 
     void updateProject(Long id, String name, String description);
 
-    boolean deleteProject(Long id);
+    void deleteProject(Long id);
 
-    boolean addMember(Long projectId, Long userId, ProjectRoleType role);
+    void addMember(Long projectId, Long userId, ProjectRoleType role);
 
     List<ProjectMember> getMembers(Long projectId);
 
-    boolean removeMember(Long projectId, Long userId);
+    void removeMember(Long projectId, Long userId);
 }

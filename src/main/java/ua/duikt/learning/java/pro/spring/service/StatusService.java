@@ -16,5 +16,5 @@ public interface StatusService {
 
     void updateStatus(Long id, String name);
 
-    boolean deleteStatus(Long id);
+    void deleteStatus(Long id);
 }

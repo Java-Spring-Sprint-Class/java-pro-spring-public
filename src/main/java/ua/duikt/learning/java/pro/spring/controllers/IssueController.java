@@ -45,8 +45,7 @@ public class IssueController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Issue> getIssue(@PathVariable Long id) {
-        Issue issue = issueService.getIssue(id);
-        return issue != null ? ResponseEntity.ok(issue) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(issueService.getIssue(id));
     }
 
     @GetMapping
@@ -55,34 +54,34 @@ public class IssueController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateIssue(@PathVariable Long id,
-                                              @RequestBody @Valid UpdateIssueRequest request) {
-        if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<String> updateIssue(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateIssueRequest request) {
 
         issueService.updateIssue(id, request.getTitle(), request.getDescription());
         return ResponseEntity.ok("Issue details updated");
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIssue(@PathVariable Long id) {
-        return issueService.deleteIssue(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        issueService.deleteIssue(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<String> updateStatus(@PathVariable Long id,
-                                               @RequestBody @Valid PatchStatusRequest request) {
-        if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<String> updateStatus(
+            @PathVariable Long id,
+            @RequestBody @Valid PatchStatusRequest request) {
 
         issueService.patchStatus(id, request.getStatusId());
         return ResponseEntity.ok("Status updated");
     }
 
     @PatchMapping("/{id}/assignee")
-    public ResponseEntity<String> updateAssignee(@PathVariable Long id,
-                                                 @RequestBody @Valid PatchAssigneeRequest request) {
-        if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<String> updateAssignee(
+            @PathVariable Long id,
+            @RequestBody @Valid PatchAssigneeRequest request) {
 
         issueService.patchAssignee(id, request.getAssigneeId());
         return ResponseEntity.ok("Assignee updated");
@@ -90,8 +89,8 @@ public class IssueController {
 
     @GetMapping("/{id}/history")
     public ResponseEntity<List<IssueHistory>> getHistory(@PathVariable Long id) {
-        if (issueService.getIssue(id) == null) return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(issueService.getHistory(id));
+        List<IssueHistory> history = issueService.getHistory(id);
+        return ResponseEntity.ok(history);
     }
+
 }

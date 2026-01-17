@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
 import ua.duikt.learning.java.pro.spring.repositories.StatusRepo;
 import ua.duikt.learning.java.pro.spring.service.StatusService;
 
@@ -19,10 +21,15 @@ import java.util.List;
 public class StatusServiceImpl implements StatusService {
 
     private final StatusRepo statusRepository;
+    private final ProjectRepo projectRepo;
 
     @Override
     @Transactional
     public Long createStatus(Long projectId, String name, StatusCategory category) {
+        if (!projectRepo.existsById(projectId)) {
+            throw new ResourceNotFoundException("Project not found");
+        }
+
         Integer maxPosition = statusRepository.findMaxPositionByProjectId(projectId);
 
         int nextPosition = (maxPosition == null ? 0 : maxPosition) + 1;
@@ -51,11 +58,10 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     @Transactional
-    public boolean deleteStatus(Long id) {
-        if (statusRepository.existsById(id)) {
-            statusRepository.deleteById(id);
-            return true;
+    public void deleteStatus(Long id) {
+        if (!statusRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Status not found");
         }
-        return false;
+        statusRepository.deleteById(id);
     }
 }

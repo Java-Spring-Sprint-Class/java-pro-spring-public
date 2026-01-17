@@ -51,11 +51,7 @@ public class StatusController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStatus(@PathVariable Long id) {
-        boolean deleted = statusService.deleteStatus(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        statusService.deleteStatus(id);
+        return ResponseEntity.noContent().build();
     }
 }

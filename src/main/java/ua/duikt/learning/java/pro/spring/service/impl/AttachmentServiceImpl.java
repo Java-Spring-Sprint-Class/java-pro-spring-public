@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
+import ua.duikt.learning.java.pro.spring.entity.Issue;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.AttachmentRepo;
+import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.time.LocalDateTime;
@@ -19,10 +22,15 @@ import java.util.List;
 public class AttachmentServiceImpl implements AttachmentService {
 
     private final AttachmentRepo attachmentRepo;
+    private final IssueRepo issueRepo;
 
     @Override
     @Transactional
-    public boolean addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userId) {
+    public void addAttachment(Long issueId, String fileName, String fileUrl, Integer fileSize, Long userId) {
+
+        Issue issue = issueRepo.findById(issueId)
+                .orElseThrow(() -> new ResourceNotFoundException("Issue not found id=" + issueId));
+
         Attachment attachment = Attachment.builder()
                 .issueId(issueId)
                 .userId(userId)
@@ -33,7 +41,6 @@ public class AttachmentServiceImpl implements AttachmentService {
                 .build();
 
         attachmentRepo.save(attachment);
-        return true;
     }
 
     @Override
@@ -44,11 +51,10 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     @Transactional
-    public boolean deleteAttachment(Long id) {
-        if (attachmentRepo.existsById(id)) {
-            attachmentRepo.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteAttachment(Long id) {
+        Attachment attachment = attachmentRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Attachment not found id=" + id));
+        attachmentRepo.delete(attachment);
     }
+
 }

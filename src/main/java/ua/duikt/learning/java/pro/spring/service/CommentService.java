@@ -9,11 +9,11 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface CommentService {
-    boolean addComment(Long issueId, String content, Long userId);
+    void addComment(Long issueId, String content, Long userId);
 
     List<IssueComment> getComments(Long issueId);
 
     void updateComment(Long id, String content);
 
-    boolean deleteComment(Long id);
+    void deleteComment(Long id);
 }

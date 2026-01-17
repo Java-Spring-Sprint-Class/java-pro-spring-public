@@ -39,11 +39,8 @@ public class LabelController {
     @PostMapping("/issues/{issueId}/labels/{labelId}")
     public ResponseEntity<String> addLabelToIssue(@PathVariable Long issueId,
                                                   @PathVariable Long labelId) {
-        boolean added = labelService.addLabelToIssue(issueId, labelId);
-        if (added) {
-            return ResponseEntity.ok("Label added to issue");
-        }
-        return ResponseEntity.badRequest().body("Failed to add label");
+        labelService.addLabelToIssue(issueId, labelId);
+        return ResponseEntity.ok("Label added to issue");
     }
 
     @GetMapping("/issues/{issueId}/labels")
@@ -54,10 +51,7 @@ public class LabelController {
     @DeleteMapping("/issues/{issueId}/labels/{labelId}")
     public ResponseEntity<String> removeLabelFromIssue(@PathVariable Long issueId,
                                                        @PathVariable Long labelId) {
-        boolean removed = labelService.removeLabelFromIssue(issueId, labelId);
-        if (removed) {
-            return ResponseEntity.ok("Label removed from issue");
-        }
-        return ResponseEntity.notFound().build();
+        labelService.removeLabelFromIssue(issueId, labelId);
+        return ResponseEntity.ok("Label removed from issue");
     }
 }

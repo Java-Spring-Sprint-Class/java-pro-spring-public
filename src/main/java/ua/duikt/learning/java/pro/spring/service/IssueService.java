@@ -30,7 +30,7 @@ public interface IssueService {
 
     void updateIssue(Long id, String title, String description);
 
-    boolean deleteIssue(Long id);
+    void deleteIssue(Long id);
 
     void patchStatus(Long id, Long newStatusId);
 

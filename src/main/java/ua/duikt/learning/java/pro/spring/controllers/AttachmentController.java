@@ -23,21 +23,18 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PostMapping("/user/{userId}/issues/{issueId}/attachments")
-    public ResponseEntity<String> addAttachment(@PathVariable Long issueId,
-                                                @PathVariable Long userId,
-                                                @RequestBody @Valid AddAttachmentRequest request) {
-        boolean added = attachmentService.addAttachment(
-                issueId,
+    public ResponseEntity<String> addAttachment(
+            @PathVariable Long issueId,
+            @PathVariable Long userId,
+            @RequestBody @Valid AddAttachmentRequest request) {
+
+        attachmentService.addAttachment(issueId,
                 request.getFileName(),
                 request.getFileUrl(),
                 request.getFileSize(),
-                userId
-        );
+                userId);
 
-        if (added) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Attachment added");
-        }
-        return ResponseEntity.badRequest().body("Failed to add attachment");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Attachment added");
     }
 
     @GetMapping("/issues/{issueId}/attachments")
@@ -47,7 +44,8 @@ public class AttachmentController {
 
     @DeleteMapping("/attachments/{attachmentId}")
     public ResponseEntity<Void> deleteAttachment(@PathVariable Long attachmentId) {
-        boolean deleted = attachmentService.deleteAttachment(attachmentId);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        attachmentService.deleteAttachment(attachmentId);
+        return ResponseEntity.noContent().build();
     }
+
 }

@@ -1,9 +1,11 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Role;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
 import ua.duikt.learning.java.pro.spring.repositories.RoleRepo;
 import ua.duikt.learning.java.pro.spring.service.RoleService;
 
@@ -22,11 +24,17 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public Long createRole(String name) {
-        Role role = Role.builder()
-                .name(name)
-                .build();
+        try {
+            Role role = Role.builder()
+                    .name(name)
+                    .build();
 
-        return roleRepo.save(role).getId();
+            return roleRepo.save(role).getId();
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("Role with name '" + name + "' already exists");
+        }
+
     }
 
     @Override

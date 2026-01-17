@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.IssueLabel;
 import ua.duikt.learning.java.pro.spring.entity.Label;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.IssueLabelRepo;
 import ua.duikt.learning.java.pro.spring.repositories.LabelRepo;
 import ua.duikt.learning.java.pro.spring.service.LabelService;
@@ -40,9 +42,9 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     @Transactional
-    public boolean addLabelToIssue(Long issueId, Long labelId) {
+    public void addLabelToIssue(Long issueId, Long labelId) {
         if (issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
-            return false;
+            throw new BadRequestException("Label already exists");
         }
 
         IssueLabel issueLabel = IssueLabel.builder()
@@ -51,17 +53,15 @@ public class LabelServiceImpl implements LabelService {
                 .build();
 
         issueLabelRepo.save(issueLabel);
-        return true;
     }
 
     @Override
     @Transactional
-    public boolean removeLabelFromIssue(Long issueId, Long labelId) {
-        if (issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
-            issueLabelRepo.deleteByIssueIdAndLabelId(issueId, labelId);
-            return true;
+    public void removeLabelFromIssue(Long issueId, Long labelId) {
+        if (!issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId)) {
+            throw new ResourceNotFoundException("Label does not exists");
         }
-        return false;
+        issueLabelRepo.deleteByIssueIdAndLabelId(issueId, labelId);
     }
 
     @Override

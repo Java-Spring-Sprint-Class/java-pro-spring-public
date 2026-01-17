@@ -1,11 +1,14 @@
 package ua.duikt.learning.java.pro.spring.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.ProjectMemberRepo;
 import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
 import ua.duikt.learning.java.pro.spring.service.ProjectService;
@@ -27,6 +30,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public Long createProject(String name, String key, String description, Long ownerId) {
+
         Project project = Project.builder()
                 .name(name)
                 .key(key)
@@ -35,13 +39,21 @@ public class ProjectServiceImpl implements ProjectService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return projectRepo.save(project).getId();
+        try {
+            return projectRepo.save(project).getId();
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException(
+                    "Project with key '" + key + "' already exists"
+            );
+        }
     }
+
 
     @Override
     @Transactional(readOnly = true)
     public Project getProject(Long id) {
-        return projectRepo.findById(id).orElse(null);
+        return projectRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found id" + id));
     }
 
     @Override
@@ -53,28 +65,39 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void updateProject(Long id, String name, String description) {
-        projectRepo.findById(id).ifPresent(p -> {
-            p.setName(name);
-            p.setDescription(description);
-            p.setUpdatedAt(LocalDateTime.now());
-        });
+
+        Project project = projectRepo.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Project not found id=" + id)
+                );
+
+        project.setName(name);
+        project.setDescription(description);
+        project.setUpdatedAt(LocalDateTime.now());
     }
+
+
 
     @Override
     @Transactional
-    public boolean deleteProject(Long id) {
-        if (projectRepo.existsById(id)) {
-            projectRepo.deleteById(id);
-            return true;
+    public void deleteProject(Long id) {
+        if (!projectRepo.existsById(id)) {
+            throw new ResourceNotFoundException("Project not found id" + id);
         }
-        return false;
+        projectRepo.deleteById(id);
     }
 
     @Override
     @Transactional
-    public boolean addMember(Long projectId, Long userId, ProjectRoleType role) {
+    public void addMember(Long projectId, Long userId, ProjectRoleType role) {
+
+        projectRepo.findById(projectId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Project with id " + projectId + " not found")
+                );
+
         if (projectMemberRepo.existsByProjectIdAndUserId(projectId, userId)) {
-            return false;
+            throw new ConflictException("User already a member of this project");
         }
 
         ProjectMember member = ProjectMember.builder()
@@ -84,8 +107,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
         projectMemberRepo.save(member);
-        return true;
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -95,11 +118,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public boolean removeMember(Long projectId, Long userId) {
-        if (projectMemberRepo.existsByProjectIdAndUserId(projectId, userId)) {
-            projectMemberRepo.deleteByProjectIdAndUserId(projectId, userId);
-            return true;
+    public void removeMember(Long projectId, Long userId) {
+        if (!projectMemberRepo.existsByProjectIdAndUserId(projectId, userId)) {
+            throw new ResourceNotFoundException("Project with id " + projectId + " not found");
         }
-        return false;
+        projectMemberRepo.deleteByProjectIdAndUserId(projectId, userId);
     }
 }

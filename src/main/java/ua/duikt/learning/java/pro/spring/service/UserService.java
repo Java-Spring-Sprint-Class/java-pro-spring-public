@@ -9,11 +9,11 @@ import java.util.List;
  * email mykyta.sirobaba@gmail.com
  */
 public interface UserService {
-    boolean assignRole(Long userId, Long roleId);
+    void assignRole(Long userId, Long roleId);
 
-    boolean removeRole(Long userId, Long roleId);
+    void removeRole(Long userId, Long roleId);
 
-    boolean deactivateUser(Long id);
+    void deactivateUser(Long id);
 
     void updateProfile(Long id, String username, String email);
 
@@ -21,5 +21,5 @@ public interface UserService {
 
     User getUser(Long id);
 
-    boolean register(String username, String email, String password);
+    void register(String username, String email, String password);
 }
