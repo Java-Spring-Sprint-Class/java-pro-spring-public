@@ -61,7 +61,7 @@ class AllEntitiesTest {
         assertFieldExists(Project.class, "ownerId", Long.class);
 
         Project project = Project.builder().projectKey("PRJ").ownerId(10L).build();
-        assertThat(project.getKey()).isEqualTo("PRJ");
+        assertThat(project.getProjectKey()).isEqualTo("PRJ");
     }
 
     @Test
