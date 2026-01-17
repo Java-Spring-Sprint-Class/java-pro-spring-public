@@ -51,7 +51,7 @@ class ProjectServiceTest {
         Project p = projectService.getProject(pId);
         assertThat(p).isNotNull();
         assertThat(p.getName()).isEqualTo("Alpha");
-        assertThat(p.getKey()).isEqualTo("ALP");
+        assertThat(p.getProjectKey()).isEqualTo("ALP");
         assertThat(p.getId()).isEqualTo(pId);
     }
 
@@ -65,7 +65,7 @@ class ProjectServiceTest {
         List<Project> allProjects = projectService.listProjects();
 
         assertThat(allProjects).hasSize(2);
-        assertThat(allProjects).extracting(Project::getKey).contains("PA", "PB");
+        assertThat(allProjects).extracting(Project::getProjectKey).contains("PA", "PB");
     }
 
     @Test
@@ -79,7 +79,7 @@ class ProjectServiceTest {
         Project updated = projectService.getProject(pId);
         assertThat(updated.getName()).isEqualTo("New Name");
         assertThat(updated.getDescription()).isEqualTo("New Desc");
-        assertThat(updated.getKey()).isEqualTo("KEY");
+        assertThat(updated.getProjectKey()).isEqualTo("KEY");
     }
 
     @Test

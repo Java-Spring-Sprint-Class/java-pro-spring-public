@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Issue {
     private Long id;
     private Long projectId;
-    private String key;
+    private String issueKey;
     private String title;
     private String description;
     private IssueType type;
