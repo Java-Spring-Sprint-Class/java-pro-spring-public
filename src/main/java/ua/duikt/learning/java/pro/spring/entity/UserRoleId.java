@@ -1,28 +1,19 @@
 package ua.duikt.learning.java.pro.spring.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
- * Created by Mykyta Sirobaba on 13.01.2026.
+ * Created by Mykyta Sirobaba on 17.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "user_role")
-@IdClass(UserRoleId.class)
-public class UserRole {
-    @Id
-    @Column(name = "user_id")
+public class UserRoleId implements Serializable {
     private Long userId;
-
-    @Id
-    @Column(name = "role_id")
     private Long roleId;
 }

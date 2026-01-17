@@ -27,7 +27,7 @@ public class Project {
     private String name;
 
     @Column(nullable = false, unique = true)
-    private String key;
+    private String projectKey;
 
     @Column(name = "owner_id")
     private Long ownerId;
