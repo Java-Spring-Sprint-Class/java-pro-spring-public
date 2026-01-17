@@ -2,6 +2,7 @@ package ua.duikt.learning.java.pro.spring.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
  * Created by Mykyta Sirobaba on 14.01.2026.
  * email mykyta.sirobaba@gmail.com
  */
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -27,12 +29,15 @@ public class CommentController {
     public ResponseEntity<String> addComment(@PathVariable Long issueId,
                                              @PathVariable Long userId,
                                              @RequestBody @Valid AddCommentRequest request) {
+        log.info("Request to add comment to issue id: {} by user id: {}", issueId, userId);
         commentService.addComment(issueId, request.getContent(), userId);
+        log.info("Comment added successfully");
         return ResponseEntity.status(HttpStatus.CREATED).body("Comment added");
     }
 
     @GetMapping("/issues/{issueId}/comments")
     public ResponseEntity<List<IssueComment>> getComments(@PathVariable Long issueId) {
+        log.info("Request to get comments for issue id: {}", issueId);
         return ResponseEntity.ok(commentService.getComments(issueId));
     }
 
@@ -41,14 +46,17 @@ public class CommentController {
             @PathVariable Long commentId,
             @RequestBody @Valid UpdateCommentRequest request) {
 
+        log.info("Request to update comment id: {}", commentId);
         commentService.updateComment(commentId, request.getContent());
+        log.info("Comment updated successfully");
         return ResponseEntity.ok("Comment updated");
     }
 
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
+        log.info("Request to delete comment id: {}", commentId);
         commentService.deleteComment(commentId);
+        log.info("Comment deleted successfully");
         return ResponseEntity.noContent().build();
     }
-
 }
