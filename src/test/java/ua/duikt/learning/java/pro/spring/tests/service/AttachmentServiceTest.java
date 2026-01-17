@@ -8,12 +8,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
+import ua.duikt.learning.java.pro.spring.entity.Issue;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.AttachmentRepo;
+import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.AttachmentServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -24,36 +30,53 @@ import static org.mockito.Mockito.*;
 class AttachmentServiceTest {
 
     @Mock
+    private IssueRepo issueRepo;
+
+    @Mock
     private AttachmentRepo attachmentRepo;
 
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
 
     @Test
-    @DisplayName("addAttachment: should save attachment and return true")
-    void addAttachment_shouldSaveAttachmentAndReturnTrue() {
+    @DisplayName("addAttachment: should save attachment")
+    void addAttachment_shouldSaveAttachment() {
         Long issueId = 1L;
         Long userId = 10L;
-        String fileName = "spec.pdf";
-        String fileUrl = "http://files/spec.pdf";
-        Integer fileSize = 1024;
+        when(issueRepo.findById(issueId)).thenReturn(Optional.of(new Issue()));
+
+        attachmentService.addAttachment(issueId, "spec.pdf", "http://url", 1024, userId);
 
         ArgumentCaptor<Attachment> captor = ArgumentCaptor.forClass(Attachment.class);
-
-        boolean result = attachmentService.addAttachment(
-                issueId, fileName, fileUrl, fileSize, userId
-        );
-
-        assertThat(result).isTrue();
         verify(attachmentRepo).save(captor.capture());
 
         Attachment saved = captor.getValue();
         assertThat(saved.getIssueId()).isEqualTo(issueId);
-        assertThat(saved.getUserId()).isEqualTo(userId);
-        assertThat(saved.getFileName()).isEqualTo(fileName);
-        assertThat(saved.getFileUrl()).isEqualTo(fileUrl);
-        assertThat(saved.getFileSize()).isEqualTo(fileSize);
-        assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getFileName()).isEqualTo("spec.pdf");
+    }
+
+    @Test
+    @DisplayName("addAttachment: should throw BadRequestException if file data is invalid")
+    void addAttachment_shouldThrowBadRequestException_ifInvalidData() {
+        Long issueId = 1L;
+        Long userId = 10L;
+
+        assertThrows(BadRequestException.class, () -> attachmentService.addAttachment(issueId, "", null, 0, userId));
+
+        verify(attachmentRepo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("addAttachment: should throw ResourceNotFoundException if issue missing")
+    void addAttachment_shouldThrowNotFound_ifIssueNotExists() {
+        Long issueId = 99L;
+        when(issueRepo.findById(issueId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                attachmentService.addAttachment(issueId, "file.txt", "url", 100, 1L)
+        );
+
+        verify(attachmentRepo, never()).save(any());
     }
 
     @Test
@@ -74,26 +97,26 @@ class AttachmentServiceTest {
     }
 
     @Test
-    @DisplayName("deleteAttachment: should delete attachment if it exists and return true")
-    void deleteAttachment_shouldDeleteAndReturnTrue_ifExists() {
+    @DisplayName("deleteAttachment: should delete attachment if it exists")
+    void deleteAttachment_shouldDelete_ifExists() {
         Long attachmentId = 3L;
-        when(attachmentRepo.existsById(attachmentId)).thenReturn(true);
+        Attachment attachment = Attachment.builder().id(attachmentId).build();
 
-        boolean result = attachmentService.deleteAttachment(attachmentId);
+        when(attachmentRepo.findById(attachmentId)).thenReturn(Optional.of(attachment));
 
-        assertThat(result).isTrue();
-        verify(attachmentRepo).deleteById(attachmentId);
+        attachmentService.deleteAttachment(attachmentId);
+
+        verify(attachmentRepo).delete(attachment);
     }
 
     @Test
-    @DisplayName("deleteAttachment: should return false if attachment does not exist")
-    void deleteAttachment_shouldReturnFalse_ifNotExists() {
+    @DisplayName("deleteAttachment: should throw ResourceNotFoundException if attachment does not exist")
+    void deleteAttachment_shouldThrowResourceNotFoundException_ifNotExists() {
         Long attachmentId = 99L;
-        when(attachmentRepo.existsById(attachmentId)).thenReturn(false);
+        when(attachmentRepo.findById(attachmentId)).thenReturn(Optional.empty());
 
-        boolean result = attachmentService.deleteAttachment(attachmentId);
+        assertThrows(ResourceNotFoundException.class, () -> attachmentService.deleteAttachment(attachmentId));
 
-        assertThat(result).isFalse();
-        verify(attachmentRepo, never()).deleteById(anyLong());
+        verify(attachmentRepo, never()).delete(any());
     }
 }

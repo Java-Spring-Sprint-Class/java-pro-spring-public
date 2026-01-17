@@ -11,11 +11,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,14 +43,34 @@ class AttachmentControllerTest {
         Long userId = 2L;
         var request = new AddAttachmentRequest("file.png", "http://url.com", 1024);
 
-        given(attachmentService.addAttachment(issueId, "file.png", "http://url.com", 1024, userId))
-                .willReturn(true);
+        doNothing().when(attachmentService).addAttachment(issueId, "file.png", "http://url.com", 1024, userId);
 
         mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/attachments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Attachment added"));
+    }
+
+    @Test
+    @DisplayName("Delete Attachment: Should return 204")
+    void deleteAttachment_Success() throws Exception {
+        doNothing().when(attachmentService).deleteAttachment(10L);
+
+        mockMvc.perform(delete("/api/attachments/{id}", 10L))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Delete Attachment: Should return 404 if not found")
+    void deleteAttachment_NotFound() throws Exception {
+        doThrow(new ResourceNotFoundException("Attachment not found"))
+                .when(attachmentService).deleteAttachment(99L);
+
+        mockMvc.perform(delete("/api/attachments/{id}", 99L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Attachment not found"));
     }
 
     @Test
@@ -63,12 +86,4 @@ class AttachmentControllerTest {
                 .andExpect(jsonPath("$[0].fileName").value("doc.pdf"));
     }
 
-    @Test
-    @DisplayName("Delete Attachment: Should return 204")
-    void deleteAttachment_Success() throws Exception {
-        given(attachmentService.deleteAttachment(10L)).willReturn(true);
-
-        mockMvc.perform(delete("/api/attachments/{id}", 10L))
-                .andExpect(status().isNoContent());
-    }
 }

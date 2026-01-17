@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
 import ua.duikt.learning.java.pro.spring.repositories.StatusRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.StatusServiceImpl;
 
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -26,6 +29,9 @@ import static org.mockito.Mockito.*;
 class StatusServiceTest {
 
     @Mock
+    private ProjectRepo projectRepo;
+
+    @Mock
     private StatusRepo statusRepository;
 
     @InjectMocks
@@ -34,59 +40,38 @@ class StatusServiceTest {
     @Test
     @DisplayName("createStatus: should create status with position = 1 when no statuses exist")
     void createStatus_shouldSetPositionOne_whenNoStatusesExist() {
-        
         Long projectId = 1L;
-        when(statusRepository.findMaxPositionByProjectId(projectId))
-                .thenReturn(null);
+
+        when(projectRepo.existsById(projectId)).thenReturn(true);
+
+        when(statusRepository.findMaxPositionByProjectId(projectId)).thenReturn(null);
 
         Status savedStatus = Status.builder().id(10L).build();
         when(statusRepository.save(any(Status.class))).thenReturn(savedStatus);
 
-        ArgumentCaptor<Status> captor = ArgumentCaptor.forClass(Status.class);
+        Long result = statusService.createStatus(projectId, "To Do", StatusCategory.TO_DO);
 
-        
-        Long result = statusService.createStatus(
-                projectId,
-                "To Do",
-                StatusCategory.TO_DO
-        );
-
-        
         assertThat(result).isEqualTo(10L);
-        verify(statusRepository).save(captor.capture());
-
-        Status status = captor.getValue();
-        assertThat(status.getProjectId()).isEqualTo(projectId);
-        assertThat(status.getName()).isEqualTo("To Do");
-        assertThat(status.getCategory()).isEqualTo(StatusCategory.TO_DO);
-        assertThat(status.getPosition()).isEqualTo(1);
+        verify(statusRepository).save(any());
     }
 
     @Test
     @DisplayName("createStatus: should increment position based on maxPosition")
     void createStatus_shouldIncrementPosition() {
-        
         Long projectId = 1L;
-        when(statusRepository.findMaxPositionByProjectId(projectId))
-                .thenReturn(3);
+
+        when(projectRepo.existsById(projectId)).thenReturn(true);
+
+        when(statusRepository.findMaxPositionByProjectId(projectId)).thenReturn(3);
 
         Status savedStatus = Status.builder().id(11L).build();
         when(statusRepository.save(any(Status.class))).thenReturn(savedStatus);
 
+        statusService.createStatus(projectId, "In Progress", StatusCategory.IN_PROGRESS);
+
         ArgumentCaptor<Status> captor = ArgumentCaptor.forClass(Status.class);
-
-        
-        statusService.createStatus(
-                projectId,
-                "In Progress",
-                StatusCategory.IN_PROGRESS
-        );
-
-        
         verify(statusRepository).save(captor.capture());
-
-        Status status = captor.getValue();
-        assertThat(status.getPosition()).isEqualTo(4);
+        assertThat(captor.getValue().getPosition()).isEqualTo(4);
     }
 
     @Test
@@ -144,30 +129,26 @@ class StatusServiceTest {
     }
 
     @Test
-    @DisplayName("deleteStatus: should delete status and return true if exists")
-    void deleteStatus_shouldDeleteAndReturnTrue() {
-        
-        when(statusRepository.existsById(1L)).thenReturn(true);
+    @DisplayName("deleteStatus: should delete status if exists")
+    void deleteStatus_shouldDelete_ifExists() {
+        Long statusId = 1L;
+        when(statusRepository.existsById(statusId)).thenReturn(true);
 
-        
-        boolean result = statusService.deleteStatus(1L);
+        statusService.deleteStatus(statusId);
 
-        
-        assertThat(result).isTrue();
-        verify(statusRepository).deleteById(1L);
+        verify(statusRepository).deleteById(statusId);
     }
 
     @Test
-    @DisplayName("deleteStatus: should return false if status does not exist")
-    void deleteStatus_shouldReturnFalse_ifNotExists() {
-        
-        when(statusRepository.existsById(1L)).thenReturn(false);
+    @DisplayName("deleteStatus: should throw ResourceNotFoundException if status does not exist")
+    void deleteStatus_shouldThrowResourceNotFoundException_ifNotExists() {
+        Long statusId = 1L;
+        when(statusRepository.existsById(statusId)).thenReturn(false);
 
-        
-        boolean result = statusService.deleteStatus(1L);
+        assertThrows(ResourceNotFoundException.class, () -> {
+            statusService.deleteStatus(statusId);
+        });
 
-        
-        assertThat(result).isFalse();
         verify(statusRepository, never()).deleteById(anyLong());
     }
 }

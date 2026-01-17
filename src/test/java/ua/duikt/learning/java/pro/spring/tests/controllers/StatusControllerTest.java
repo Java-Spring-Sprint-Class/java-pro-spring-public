@@ -12,11 +12,14 @@ import ua.duikt.learning.java.pro.spring.controllers.StatusController;
 import ua.duikt.learning.java.pro.spring.dtos.CreateStatusRequest;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.StatusService;
 
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -66,18 +69,21 @@ class StatusControllerTest {
     @Test
     @DisplayName("Delete Status: returns 204 if success")
     void deleteStatus_Success() throws Exception {
-        given(statusService.deleteStatus(1L)).willReturn(true);
+        doNothing().when(statusService).deleteStatus(1L);
 
         mockMvc.perform(delete("/api/statuses/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("Delete Status: returns 404 if failed")
+    @DisplayName("Delete Status: returns 404 if status does not exist")
     void deleteStatus_NotFound() throws Exception {
-        given(statusService.deleteStatus(99L)).willReturn(false);
+        doThrow(new ResourceNotFoundException("Status not found"))
+                .when(statusService).deleteStatus(99L);
 
         mockMvc.perform(delete("/api/statuses/{id}", 99L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Status not found"));
     }
 }
