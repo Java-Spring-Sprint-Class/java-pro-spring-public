@@ -48,7 +48,7 @@ public class IssueServiceImpl implements IssueService {
                 .type(type)
                 .priority(priority)
                 .statusId(statusId)
-                .key("ISSUE-" + UUID.randomUUID().toString().substring(0, 8))
+                .issueKey("ISSUE-" + UUID.randomUUID().toString().substring(0, 8))
                 .createdAt(LocalDateTime.now())
                 .build();
 

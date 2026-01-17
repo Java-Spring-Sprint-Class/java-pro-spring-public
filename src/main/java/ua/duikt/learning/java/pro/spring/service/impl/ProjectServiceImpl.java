@@ -33,7 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = Project.builder()
                 .name(name)
-                .key(key)
+                .projectKey(key)
                 .ownerId(ownerId)
                 .description(description)
                 .createdAt(LocalDateTime.now())
