@@ -71,7 +71,7 @@ class IssueServiceTest {
         assertThat(issue.getTitle()).isEqualTo("Test title");
         assertThat(issue.getType()).isEqualTo(IssueType.BUG);
         assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
-        assertThat(issue.getKey()).startsWith("ISSUE-");
+        assertThat(issue.getIssueKey()).startsWith("ISSUE-");
         assertThat(issue.getCreatedAt()).isNotNull();
 
         IssueHistory history = historyCaptor.getValue();

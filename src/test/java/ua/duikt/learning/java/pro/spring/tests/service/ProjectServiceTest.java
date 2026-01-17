@@ -62,7 +62,7 @@ class ProjectServiceTest {
 
         Project project = captor.getValue();
         assertThat(project.getName()).isEqualTo("Test Project");
-        assertThat(project.getKey()).isEqualTo("TP");
+        assertThat(project.getProjectKey()).isEqualTo("TP");
         assertThat(project.getOwnerId()).isEqualTo(100L);
         assertThat(project.getDescription()).isEqualTo("Description");
         assertThat(project.getCreatedAt()).isNotNull();
