@@ -9,6 +9,5 @@ import ua.duikt.learning.java.pro.spring.entity.UserRole;
  */
 public interface UserRoleRepo extends JpaRepository<UserRole, UserRole> {
     long deleteByUserIdAndRoleId(Long userId, Long roleId);
-    boolean existsByUserRoleId(Long roleId);
     boolean existsByUserIdAndRoleId(Long userId, Long roleId);
 }

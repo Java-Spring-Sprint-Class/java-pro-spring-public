@@ -57,11 +57,11 @@ class AllEntitiesTest {
     @DisplayName("Project Entity: Check fields")
     void projectEntityTest() {
         assertFieldExists(Project.class, "name", String.class);
-        assertFieldExists(Project.class, "key", String.class);
+        assertFieldExists(Project.class, "projectKey", String.class);
         assertFieldExists(Project.class, "ownerId", Long.class);
 
-        Project project = Project.builder().key("PRJ").ownerId(10L).build();
-        assertThat(project.getKey()).isEqualTo("PRJ");
+        Project project = Project.builder().projectKey("PRJ").ownerId(10L).build();
+        assertThat(project.getProjectKey()).isEqualTo("PRJ");
     }
 
     @Test
@@ -95,7 +95,7 @@ class AllEntitiesTest {
         assertFieldExists(Issue.class, "projectId", Long.class);
         assertFieldExists(Issue.class, "assigneeId", Long.class);
         assertFieldExists(Issue.class, "reporterId", Long.class);
-        assertFieldExists(Issue.class, "key", String.class);
+        assertFieldExists(Issue.class, "issueKey", String.class);
 
         Issue issue = Issue.builder()
                 .type(IssueType.STORY)
