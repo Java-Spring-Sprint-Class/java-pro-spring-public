@@ -8,6 +8,7 @@ import ua.duikt.learning.java.pro.spring.entity.UserRole;
 import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
+import ua.duikt.learning.java.pro.spring.repositories.RoleRepo;
 import ua.duikt.learning.java.pro.spring.repositories.UserRepo;
 import ua.duikt.learning.java.pro.spring.repositories.UserRoleRepo;
 import ua.duikt.learning.java.pro.spring.service.UserService;
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepository;
     private final UserRoleRepo userRoleRepository;
+    private final RoleRepo roleRepository;
 
     @Override
     @Transactional
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("User with id " + userId + " does not exist");
         }
 
-        if (!userRoleRepository.existsByUserRoleId(roleId)) {
+        if (!roleRepository.existsById(roleId)) {
             throw new BadRequestException("Role with id " + roleId + " does not exist");
         }
 
