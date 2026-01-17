@@ -12,11 +12,16 @@ import ua.duikt.learning.java.pro.spring.controllers.CommentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddCommentRequest;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.CommentService;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,13 +46,32 @@ class CommentControllerTest {
         Long userId = 2L;
         var request = new AddCommentRequest("This is a comment");
 
-        given(commentService.addComment(issueId, "This is a comment", userId)).willReturn(true);
+        doNothing().when(commentService).addComment(issueId, "This is a comment", userId);
 
         mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/comments", userId, issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Comment added"));
+    }
+
+    @Test
+    @DisplayName("Add Comment: Should return 400 Bad Request if content is empty")
+    void addComment_BadRequest() throws Exception {
+        Long issueId = 1L;
+        Long userId = 2L;
+        String emptyContent = "";
+        var request = new AddCommentRequest(emptyContent);
+
+        doThrow(new BadRequestException("Comment content cannot be empty"))
+                .when(commentService).addComment(eq(issueId), eq(emptyContent), eq(userId));
+
+        mockMvc.perform(post("/api/user/{userId}/issues/{issueId}/comments", userId, issueId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Comment content cannot be empty"));
     }
 
     @Test
@@ -81,7 +105,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("Delete Comment: Should return 204 No Content")
     void deleteComment_Success() throws Exception {
-        given(commentService.deleteComment(5L)).willReturn(true);
+        doNothing().when(commentService).deleteComment(5L);
 
         mockMvc.perform(delete("/api/comments/{commentId}", 5L))
                 .andExpect(status().isNoContent());
@@ -90,9 +114,12 @@ class CommentControllerTest {
     @Test
     @DisplayName("Delete Comment: Should return 404 Not Found if missing")
     void deleteComment_NotFound() throws Exception {
-        given(commentService.deleteComment(99L)).willReturn(false);
+        doThrow(new ResourceNotFoundException("Comment not found"))
+                .when(commentService).deleteComment(99L);
 
         mockMvc.perform(delete("/api/comments/{commentId}", 99L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Comment not found"));
     }
 }

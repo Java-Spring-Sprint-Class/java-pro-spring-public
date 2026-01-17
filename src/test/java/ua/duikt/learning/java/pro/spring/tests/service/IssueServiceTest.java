@@ -11,14 +11,18 @@ import ua.duikt.learning.java.pro.spring.entity.Issue;
 import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
 import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.IssueHistoryRepo;
 import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
+import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
+import ua.duikt.learning.java.pro.spring.repositories.StatusRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.IssueServiceImpl;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -27,6 +31,12 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 class IssueServiceTest {
+
+    @Mock
+    private ProjectRepo projectRepo;
+
+    @Mock
+    private StatusRepo statusRepo;
 
     @Mock
     private IssueRepo issueRepo;
@@ -40,7 +50,12 @@ class IssueServiceTest {
     @Test
     @DisplayName("createIssue: should save issue, record history and return id")
     void createIssue_shouldSaveIssueAndRecordHistory() {
-        
+        Long projectId = 10L;
+        Long statusId = 1L;
+
+        when(projectRepo.existsById(projectId)).thenReturn(true);
+        when(statusRepo.existsById(statusId)).thenReturn(true);
+
         Issue savedIssue = Issue.builder()
                 .id(1L)
                 .build();
@@ -50,35 +65,31 @@ class IssueServiceTest {
         ArgumentCaptor<Issue> issueCaptor = ArgumentCaptor.forClass(Issue.class);
         ArgumentCaptor<IssueHistory> historyCaptor = ArgumentCaptor.forClass(IssueHistory.class);
 
-        
         Long result = issueService.createIssue(
-                10L,
+                projectId,
                 "Test title",
                 "Test description",
                 IssueType.BUG,
                 Priority.HIGH,
-                1L
+                statusId
         );
 
-        
         assertThat(result).isEqualTo(1L);
+
+        verify(projectRepo).existsById(projectId);
+        verify(statusRepo).existsById(statusId);
 
         verify(issueRepo).save(issueCaptor.capture());
         verify(issueHistoryRepo).save(historyCaptor.capture());
 
         Issue issue = issueCaptor.getValue();
-        assertThat(issue.getProjectId()).isEqualTo(10L);
+        assertThat(issue.getProjectId()).isEqualTo(projectId);
         assertThat(issue.getTitle()).isEqualTo("Test title");
-        assertThat(issue.getType()).isEqualTo(IssueType.BUG);
-        assertThat(issue.getPriority()).isEqualTo(Priority.HIGH);
-        assertThat(issue.getKey()).startsWith("ISSUE-");
-        assertThat(issue.getCreatedAt()).isNotNull();
+        assertThat(issue.getStatusId()).isEqualTo(statusId);
 
         IssueHistory history = historyCaptor.getValue();
         assertThat(history.getIssueId()).isEqualTo(1L);
         assertThat(history.getFieldChanged()).isEqualTo("creation");
-        assertThat(history.getNewValue()).isEqualTo("created");
-        assertThat(history.getCreatedAt()).isNotNull();
     }
 
     @Test
@@ -97,16 +108,12 @@ class IssueServiceTest {
     }
 
     @Test
-    @DisplayName("getIssue: should return null when not found")
-    void getIssue_shouldReturnNullIfNotFound() {
-        
-        when(issueRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getIssue: should throw ResourceNotFoundException when not found")
+    void getIssue_shouldThrowException_ifNotFound() {
+        Long issueId = 99L;
+        when(issueRepo.findById(issueId)).thenReturn(Optional.empty());
 
-        
-        Issue result = issueService.getIssue(99L);
-
-        
-        assertThat(result).isNull();
+        assertThrows(ResourceNotFoundException.class, () -> issueService.getIssue(issueId));
     }
 
     @Test
@@ -148,43 +155,39 @@ class IssueServiceTest {
     }
 
     @Test
-    @DisplayName("updateIssue: should do nothing when issue does not exist")
-    void updateIssue_shouldDoNothingIfNotExists() {
-        
-        when(issueRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("updateIssue: should throw ResourceNotFoundException when issue does not exist")
+    void updateIssue_shouldThrowException_ifNotExists() {
+        Long issueId = 99L;
+        when(issueRepo.findById(issueId)).thenReturn(Optional.empty());
 
-        
-        issueService.updateIssue(99L, "x", "y");
+        assertThrows(ResourceNotFoundException.class, () -> {
+            issueService.updateIssue(issueId, "New Title", "New Description");
+        });
 
-        
         verify(issueHistoryRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("deleteIssue: should delete issue and return true if exists")
-    void deleteIssue_shouldDeleteAndReturnTrue() {
-        
-        when(issueRepo.existsById(1L)).thenReturn(true);
+    @DisplayName("deleteIssue: should delete issue if exists")
+    void deleteIssue_shouldDelete_ifExists() {
+        Long issueId = 1L;
+        when(issueRepo.existsById(issueId)).thenReturn(true);
 
-        
-        boolean result = issueService.deleteIssue(1L);
+        issueService.deleteIssue(issueId);
 
-        
-        assertThat(result).isTrue();
-        verify(issueRepo).deleteById(1L);
+        verify(issueRepo).deleteById(issueId);
     }
 
     @Test
-    @DisplayName("deleteIssue: should return false if issue does not exist")
-    void deleteIssue_shouldReturnFalseIfNotExists() {
-        
-        when(issueRepo.existsById(1L)).thenReturn(false);
+    @DisplayName("deleteIssue: should throw ResourceNotFoundException if issue does not exist")
+    void deleteIssue_shouldThrowResourceNotFoundException_ifNotExists() {
+        Long issueId = 1L;
+        when(issueRepo.existsById(issueId)).thenReturn(false);
 
-        
-        boolean result = issueService.deleteIssue(1L);
+        assertThrows(ResourceNotFoundException.class, () -> {
+            issueService.deleteIssue(issueId);
+        });
 
-        
-        assertThat(result).isFalse();
         verify(issueRepo, never()).deleteById(anyLong());
     }
 

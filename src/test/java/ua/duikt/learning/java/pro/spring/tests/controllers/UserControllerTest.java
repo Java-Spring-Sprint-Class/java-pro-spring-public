@@ -12,13 +12,15 @@ import ua.duikt.learning.java.pro.spring.controllers.UserController;
 import ua.duikt.learning.java.pro.spring.dtos.RegisterRequest;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateProfileRequest;
 import ua.duikt.learning.java.pro.spring.entity.User;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
 import ua.duikt.learning.java.pro.spring.service.UserService;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -43,7 +45,7 @@ class UserControllerTest {
     void register_ShouldReturnCreated_WhenSuccess() throws Exception {
         var request = new RegisterRequest("john", "john@mail.com", "pass123");
 
-        given(userService.register(anyString(), anyString(), anyString())).willReturn(true);
+        doNothing().when(userService).register(anyString(), anyString(), anyString());
 
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -55,14 +57,17 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 409 Conflict when user already exists")
     void register_ShouldReturnConflict_WhenUserExists() throws Exception {
-        var request = new RegisterRequest("exist", "exist@mail.com", "pass");
-        given(userService.register(anyString(), anyString(), anyString())).willReturn(false);
+        var request = new RegisterRequest("exist", "exist@mail.com", "password123");
+
+        doThrow(new UserAlreadyExistException("User with this username or email already exists"))
+                .when(userService).register(anyString(), anyString(), anyString());
 
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("User with this username or email already exists"));
+                .andExpect(status().isConflict()) // Тепер ми дійдемо сюди і отримаємо 409
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("User with this username or email already exists"));
     }
 
     @Test
@@ -83,10 +88,15 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 404 Not Found when user does not exist")
     void getUser_ShouldReturnNotFound_WhenMissing() throws Exception {
-        given(userService.getUser(999L)).willReturn(null);
+        Long userId = 999L;
 
-        mockMvc.perform(get("/api/users/{id}", 999L))
-                .andExpect(status().isNotFound());
+        given(userService.getUser(userId))
+                .willThrow(new ResourceNotFoundException("User not found with id: " + userId));
+
+        mockMvc.perform(get("/api/users/{id}", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
     }
 
     @Test
@@ -125,20 +135,24 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 404 when updating non-existent user")
     void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
-        given(userService.getUser(999L)).willReturn(null);
+        Long userId = 999L;
+        var request = new UpdateProfileRequest("new_username", "new_email@mail.com");
 
-        var request = new UpdateProfileRequest("new", "new");
+        doThrow(new ResourceNotFoundException("User not found with id: " + userId))
+                .when(userService).updateProfile(eq(userId), any(), any());
 
-        mockMvc.perform(put("/api/users/{id}", 999L)
+        mockMvc.perform(put("/api/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("User not found with id: " + userId));
     }
 
     @Test
     @DisplayName("Should return 204 No Content on successful deactivation")
     void deactivateUser_ShouldReturnNoContent() throws Exception {
-        given(userService.deactivateUser(1L)).willReturn(true);
+        doNothing().when(userService).deactivateUser(1L);
 
         mockMvc.perform(delete("/api/users/{id}", 1L))
                 .andExpect(status().isNoContent());
@@ -147,9 +161,12 @@ class UserControllerTest {
     @Test
     @DisplayName("Should return 404 if deactivation fails")
     void deactivateUser_ShouldReturnNotFound() throws Exception {
-        given(userService.deactivateUser(999L)).willReturn(false);
+        doThrow(new ResourceNotFoundException("User not found"))
+                .when(userService).deactivateUser(999L);
 
         mockMvc.perform(delete("/api/users/{id}", 999L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("User not found"));
     }
 }

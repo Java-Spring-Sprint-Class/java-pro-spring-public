@@ -11,11 +11,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.LabelController;
 import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
 import ua.duikt.learning.java.pro.spring.entity.Label;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.LabelService;
 
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -63,11 +67,27 @@ class LabelControllerTest {
     void addLabelToIssue_Success() throws Exception {
         Long issueId = 1L;
         Long labelId = 5L;
-        given(labelService.addLabelToIssue(issueId, labelId)).willReturn(true);
+
+        doNothing().when(labelService).addLabelToIssue(issueId, labelId);
 
         mockMvc.perform(post("/api/issues/{issueId}/labels/{labelId}", issueId, labelId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Label added to issue"));
+    }
+
+    @Test
+    @DisplayName("Add Label to Issue: Should return 409 Conflict if already exists")
+    void addLabelToIssue_Conflict() throws Exception {
+        Long issueId = 1L;
+        Long labelId = 5L;
+
+        doThrow(new ConflictException("Label is already assigned to this issue"))
+                .when(labelService).addLabelToIssue(issueId, labelId);
+
+        mockMvc.perform(post("/api/issues/{issueId}/labels/{labelId}", issueId, labelId))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("Label is already assigned to this issue"));
     }
 
     @Test
@@ -84,7 +104,7 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 200 if removed")
     void removeLabelFromIssue_Success() throws Exception {
-        given(labelService.removeLabelFromIssue(1L, 5L)).willReturn(true);
+        doNothing().when(labelService).removeLabelFromIssue(1L, 5L);
 
         mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1L, 5L))
                 .andExpect(status().isOk())
@@ -94,9 +114,12 @@ class LabelControllerTest {
     @Test
     @DisplayName("Remove Label from Issue: Should return 404 if not found")
     void removeLabelFromIssue_NotFound() throws Exception {
-        given(labelService.removeLabelFromIssue(1L, 99L)).willReturn(false);
+        doThrow(new ResourceNotFoundException("Label relation not found"))
+                .when(labelService).removeLabelFromIssue(1L, 99L);
 
         mockMvc.perform(delete("/api/issues/{issueId}/labels/{labelId}", 1L, 99L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Label relation not found"));
     }
 }

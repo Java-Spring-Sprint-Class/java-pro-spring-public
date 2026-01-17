@@ -10,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.ProjectMemberRepo;
 import ua.duikt.learning.java.pro.spring.repositories.ProjectRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.ProjectServiceImpl;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -84,16 +87,14 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("getProject: should return null when not found")
-    void getProject_shouldReturnNullIfNotFound() {
-        
-        when(projectRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getProject: should throw ResourceNotFoundException when not found")
+    void getProject_shouldThrowException_ifNotFound() {
+        Long projectId = 99L;
+        when(projectRepo.findById(projectId)).thenReturn(Optional.empty());
 
-        
-        Project result = projectService.getProject(99L);
-
-        
-        assertThat(result).isNull();
+        assertThrows(ResourceNotFoundException.class, () -> {
+            projectService.getProject(projectId);
+        });
     }
 
     @Test
@@ -133,68 +134,41 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("updateProject: should do nothing when project does not exist")
-    void updateProject_shouldDoNothingIfNotExists() {
-        
-        when(projectRepo.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("deleteProject: should delete project if exists")
+    void deleteProject_shouldDelete_ifExists() {
+        Long projectId = 1L;
+        when(projectRepo.existsById(projectId)).thenReturn(true);
 
-        
-        projectService.updateProject(99L, "x", "y");
+        projectService.deleteProject(projectId);
 
-        
-        verify(projectRepo).findById(99L);
+        verify(projectRepo).deleteById(projectId);
     }
 
     @Test
-    @DisplayName("deleteProject: should delete project and return true if exists")
-    void deleteProject_shouldDeleteAndReturnTrue() {
-        
-        when(projectRepo.existsById(1L)).thenReturn(true);
+    @DisplayName("deleteProject: should throw ResourceNotFoundException if project does not exist")
+    void deleteProject_shouldThrowResourceNotFoundException_ifNotExists() {
+        Long projectId = 1L;
+        when(projectRepo.existsById(projectId)).thenReturn(false);
 
-        
-        boolean result = projectService.deleteProject(1L);
+        assertThrows(ResourceNotFoundException.class, () -> projectService.deleteProject(projectId));
 
-        
-        assertThat(result).isTrue();
-        verify(projectRepo).deleteById(1L);
-    }
-
-    @Test
-    @DisplayName("deleteProject: should return false if project does not exist")
-    void deleteProject_shouldReturnFalseIfNotExists() {
-        
-        when(projectRepo.existsById(1L)).thenReturn(false);
-
-        
-        boolean result = projectService.deleteProject(1L);
-
-        
-        assertThat(result).isFalse();
         verify(projectRepo, never()).deleteById(anyLong());
     }
 
     @Test
     @DisplayName("addMember: should add member when not exists")
     void addMember_shouldSaveMember_ifNotExists() {
-        
         Long projectId = 1L;
         Long userId = 10L;
 
+        when(projectRepo.findById(projectId))
+                .thenReturn(Optional.of(new Project()));
         when(projectMemberRepo.existsByProjectIdAndUserId(projectId, userId))
                 .thenReturn(false);
 
-        ArgumentCaptor<ProjectMember> captor =
-                ArgumentCaptor.forClass(ProjectMember.class);
+        projectService.addMember(projectId, userId, ProjectRoleType.MEMBER);
 
-        
-        boolean result = projectService.addMember(
-                projectId,
-                userId,
-                ProjectRoleType.MEMBER
-        );
-
-        
-        assertThat(result).isTrue();
+        ArgumentCaptor<ProjectMember> captor = ArgumentCaptor.forClass(ProjectMember.class);
         verify(projectMemberRepo).save(captor.capture());
 
         ProjectMember member = captor.getValue();
@@ -204,21 +178,21 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("addMember: should return false when member already exists")
-    void addMember_shouldReturnFalse_ifExists() {
-        
-        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+    @DisplayName("addMember: should throw ConflictException when member already exists")
+    void addMember_shouldThrowConflictException_ifExists() {
+        Long projectId = 1L;
+        Long userId = 10L;
+
+        when(projectRepo.findById(projectId))
+                .thenReturn(Optional.of(new Project()));
+
+        when(projectMemberRepo.existsByProjectIdAndUserId(projectId, userId))
                 .thenReturn(true);
 
-        
-        boolean result = projectService.addMember(
-                1L,
-                10L,
-                ProjectRoleType.MEMBER
+        assertThrows(ConflictException.class, () ->
+                projectService.addMember(projectId, userId, ProjectRoleType.MEMBER)
         );
 
-        
-        assertThat(result).isFalse();
         verify(projectMemberRepo, never()).save(any());
     }
 
@@ -238,32 +212,30 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("removeMember: should delete member and return true if exists")
-    void removeMember_shouldDeleteAndReturnTrue() {
-        
-        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+    @DisplayName("removeMember: should delete member if exists")
+    void removeMember_shouldDelete_ifExists() {
+        Long projectId = 1L;
+        Long userId = 10L;
+
+        when(projectMemberRepo.existsByProjectIdAndUserId(projectId, userId))
                 .thenReturn(true);
 
-        
-        boolean result = projectService.removeMember(1L, 10L);
+        projectService.removeMember(projectId, userId);
 
-        
-        assertThat(result).isTrue();
-        verify(projectMemberRepo).deleteByProjectIdAndUserId(1L, 10L);
+        verify(projectMemberRepo).deleteByProjectIdAndUserId(projectId, userId);
     }
 
     @Test
-    @DisplayName("removeMember: should return false if member does not exist")
-    void removeMember_shouldReturnFalseIfNotExists() {
-        
-        when(projectMemberRepo.existsByProjectIdAndUserId(1L, 10L))
+    @DisplayName("removeMember: should throw ResourceNotFoundException if member does not exist")
+    void removeMember_shouldThrowResourceNotFoundException_ifNotExists() {
+        Long projectId = 1L;
+        Long userId = 10L;
+
+        when(projectMemberRepo.existsByProjectIdAndUserId(projectId, userId))
                 .thenReturn(false);
 
-        
-        boolean result = projectService.removeMember(1L, 10L);
+        assertThrows(ResourceNotFoundException.class, () -> projectService.removeMember(projectId, userId));
 
-        
-        assertThat(result).isFalse();
         verify(projectMemberRepo, never())
                 .deleteByProjectIdAndUserId(anyLong(), anyLong());
     }

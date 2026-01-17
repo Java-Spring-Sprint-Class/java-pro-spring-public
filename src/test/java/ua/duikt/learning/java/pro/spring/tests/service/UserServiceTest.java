@@ -9,6 +9,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.User;
 import ua.duikt.learning.java.pro.spring.entity.UserRole;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
 import ua.duikt.learning.java.pro.spring.repositories.UserRepo;
 import ua.duikt.learning.java.pro.spring.repositories.UserRoleRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.UserServiceImpl;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -36,55 +40,47 @@ class UserServiceTest {
     private UserServiceImpl userService;
 
     @Test
-    @DisplayName("register: should return false if username already exists")
-    void register_shouldReturnFalse_ifUsernameExists() {
-        
-        when(userRepository.existsByUsername("user1")).thenReturn(true);
+    @DisplayName("register: should throw UserAlreadyExistException if username already exists")
+    void register_shouldThrowUserAlreadyExistException_ifUsernameExists() {
+        String username = "user1";
+        when(userRepository.existsByUsername(username)).thenReturn(true);
 
-        
-        boolean result = userService.register("user1", "email@test.com", "pass");
+        assertThrows(UserAlreadyExistException.class, () -> userService.register(username, "email@test.com", "pass"));
 
-        
-        assertThat(result).isFalse();
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("register: should return false if email already exists")
-    void register_shouldReturnFalse_ifEmailExists() {
-        
+    @DisplayName("register: should throw UserAlreadyExistException if email already exists")
+    void register_shouldThrowUserAlreadyExistException_ifEmailExists() {
+        String email = "email@test.com";
         when(userRepository.existsByUsername("user1")).thenReturn(false);
-        when(userRepository.existsByEmail("email@test.com")).thenReturn(true);
+        when(userRepository.existsByEmail(email)).thenReturn(true);
 
-        
-        boolean result = userService.register("user1", "email@test.com", "pass");
+        assertThrows(UserAlreadyExistException.class, () -> userService.register("user1", email, "pass"));
 
-        
-        assertThat(result).isFalse();
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("register: should save user and return true")
-    void register_shouldSaveUserAndReturnTrue() {
-        
-        when(userRepository.existsByUsername("user1")).thenReturn(false);
-        when(userRepository.existsByEmail("email@test.com")).thenReturn(false);
+    @DisplayName("register: should save user")
+    void register_shouldSaveUser() {
+        String username = "user1";
+        String email = "email@test.com";
+        String pass = "pass";
+
+        when(userRepository.existsByUsername(username)).thenReturn(false);
+        when(userRepository.existsByEmail(email)).thenReturn(false);
+
+        userService.register(username, email, pass);
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        
-        boolean result = userService.register("user1", "email@test.com", "pass");
-
-        
-        assertThat(result).isTrue();
         verify(userRepository).save(captor.capture());
 
         User saved = captor.getValue();
-        assertThat(saved.getUsername()).isEqualTo("user1");
-        assertThat(saved.getEmail()).isEqualTo("email@test.com");
-        assertThat(saved.getPasswordHash()).isEqualTo("pass");
+        assertThat(saved.getUsername()).isEqualTo(username);
+        assertThat(saved.getEmail()).isEqualTo(email);
+        assertThat(saved.getPasswordHash()).isEqualTo(pass);
         assertThat(saved.getIsActive()).isTrue();
         assertThat(saved.getCreatedAt()).isNotNull();
     }
@@ -102,13 +98,14 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("getUser: should return null if not exists")
-    void getUser_shouldReturnNullIfNotExists() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("getUser: should throw ResourceNotFoundException if not exists")
+    void getUser_shouldThrowException_ifNotFound() {
+        Long userId = 99L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        User result = userService.getUser(99L);
-
-        assertThat(result).isNull();
+        assertThrows(ResourceNotFoundException.class, () -> {
+            userService.getUser(userId);
+        });
     }
 
     @Test
@@ -151,79 +148,86 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("updateProfile: should do nothing if user not exists")
-    void updateProfile_shouldDoNothingIfUserNotExists() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+    @DisplayName("updateProfile: should throw ResourceNotFoundException if user not exists")
+    void updateProfile_shouldThrowException_ifUserNotExists() {
+        Long userId = 99L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        userService.updateProfile(99L, "x", "y");
+        assertThrows(ResourceNotFoundException.class, () -> {
+            userService.updateProfile(userId, "new_name", "new_email@mail.com");
+        });
 
-        verify(userRepository).findById(99L);
-        verify(userRepository, never()).save(any());
+        verify(userRepository).findById(userId);
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
-    @DisplayName("deactivateUser: should deactivate and return true if exists")
-    void deactivateUser_shouldDeactivateAndReturnTrue() {
+    @DisplayName("deactivateUser: should deactivate if exists")
+    void deactivateUser_shouldDeactivate_ifExists() {
         User user = User.builder().id(1L).isActive(true).build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        boolean result = userService.deactivateUser(1L);
+        userService.deactivateUser(1L);
 
-        assertThat(result).isTrue();
         assertThat(user.getIsActive()).isFalse();
         verify(userRepository).save(user);
     }
 
     @Test
-    @DisplayName("deactivateUser: should return false if user not exists")
-    void deactivateUser_shouldReturnFalseIfNotExists() {
+    @DisplayName("deactivateUser: should throw ResourceNotFoundException if user not exists")
+    void deactivateUser_shouldThrowResourceNotFoundException_ifNotExists() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        boolean result = userService.deactivateUser(99L);
+        assertThrows(ResourceNotFoundException.class, () -> userService.deactivateUser(99L));
 
-        assertThat(result).isFalse();
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("assignRole: should save user role and return true")
-    void assignRole_shouldSaveUserRoleAndReturnTrue() {
-        when(userRoleRepository.save(any(UserRole.class))).thenReturn(UserRole.builder().build());
+    @DisplayName("assignRole: should save user role")
+    void assignRole_shouldSaveUserRole() {
+        Long userId = 1L;
+        Long roleId = 2L;
 
-        boolean result = userService.assignRole(1L, 2L);
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userRoleRepository.existsByUserRoleId(roleId)).thenReturn(true);
+        when(userRoleRepository.existsByUserIdAndRoleId(userId, roleId)).thenReturn(false);
 
-        assertThat(result).isTrue();
+        userService.assignRole(userId, roleId);
+
         verify(userRoleRepository).save(any(UserRole.class));
     }
 
     @Test
-    @DisplayName("assignRole: should return false on exception")
-    void assignRole_shouldReturnFalseOnException() {
-        when(userRoleRepository.save(any(UserRole.class))).thenThrow(new RuntimeException());
+    @DisplayName("assignRole: should throw BadRequestException on database error")
+    void assignRole_shouldThrowBadRequestException_onException() {
+        Long userId = 1L;
+        Long roleId = 2L;
 
-        boolean result = userService.assignRole(1L, 2L);
+        when(userRepository.existsById(userId)).thenReturn(true);
+        when(userRoleRepository.existsByUserRoleId(roleId)).thenReturn(true);
+        when(userRoleRepository.existsByUserIdAndRoleId(userId, roleId)).thenReturn(false);
 
-        assertThat(result).isFalse();
-        verify(userRoleRepository).save(any(UserRole.class));
+        when(userRoleRepository.save(any(UserRole.class))).thenThrow(new RuntimeException("DB error"));
+
+        assertThrows(RuntimeException.class, () -> userService.assignRole(userId, roleId));
     }
 
     @Test
-    @DisplayName("removeRole: should return true if deletion count > 0")
-    void removeRole_shouldReturnTrueIfDeleted() {
+    @DisplayName("removeRole: should complete if deletion count > 0")
+    void removeRole_shouldComplete_ifDeleted() {
         when(userRoleRepository.deleteByUserIdAndRoleId(1L, 2L)).thenReturn(1L);
 
-        boolean result = userService.removeRole(1L, 2L);
+        userService.removeRole(1L, 2L);
 
-        assertThat(result).isTrue();
+        verify(userRoleRepository).deleteByUserIdAndRoleId(1L, 2L);
     }
 
     @Test
-    @DisplayName("removeRole: should return false if deletion count = 0")
-    void removeRole_shouldReturnFalseIfNotDeleted() {
+    @DisplayName("removeRole: should throw ResourceNotFoundException if deletion count = 0")
+    void removeRole_shouldThrowResourceNotFoundException_ifNotDeleted() {
         when(userRoleRepository.deleteByUserIdAndRoleId(1L, 2L)).thenReturn(0L);
 
-        boolean result = userService.removeRole(1L, 2L);
-
-        assertThat(result).isFalse();
+        assertThrows(ResourceNotFoundException.class, () -> userService.removeRole(1L, 2L));
     }
 }

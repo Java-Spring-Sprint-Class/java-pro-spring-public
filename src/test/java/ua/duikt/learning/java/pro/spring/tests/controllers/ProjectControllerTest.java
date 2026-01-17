@@ -15,11 +15,14 @@ import ua.duikt.learning.java.pro.spring.dtos.UpdateProjectRequest;
 import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.ProjectService;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -73,10 +76,13 @@ class ProjectControllerTest {
     @Test
     @DisplayName("2. Get Project: Should return 404 if not found")
     void getProject_NotFound() throws Exception {
-        given(projectService.getProject(99L)).willReturn(null);
+        given(projectService.getProject(99L))
+                .willThrow(new ResourceNotFoundException("Project not found id 99"));
 
         mockMvc.perform(get("/api/projects/{id}", 99L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Project not found id 99"));
     }
 
     @Test
@@ -99,20 +105,21 @@ class ProjectControllerTest {
     @Test
     @DisplayName("4. Update Project: Should return 404 if project missing")
     void updateProject_NotFound() throws Exception {
-        given(projectService.getProject(99L)).willReturn(null);
+        Long projectId = 99L;
         var request = new UpdateProjectRequest("Val", "Desc");
 
-        mockMvc.perform(put("/api/projects/{id}", 99)
+        doThrow(new ResourceNotFoundException("Project not found id " + projectId))
+                .when(projectService).updateProject(eq(projectId), eq("Val"), eq("Desc"));
+
+        mockMvc.perform(put("/api/projects/{id}", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Project not found id " + projectId));
     }
-
     @Test
     @DisplayName("5. Delete Project: Should return 204 No Content")
     void deleteProject_Success() throws Exception {
-        given(projectService.deleteProject(1L)).willReturn(true);
-
         mockMvc.perform(delete("/api/projects/{id}", 1))
                 .andExpect(status().isNoContent());
     }
@@ -126,8 +133,6 @@ class ProjectControllerTest {
 
         given(projectService.getProject(projectId)).willReturn(new Project());
 
-        given(projectService.addMember(projectId, userId, ProjectRoleType.ADMIN)).willReturn(true);
-
         mockMvc.perform(post("/api/projects/{projectId}/members", projectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -138,13 +143,16 @@ class ProjectControllerTest {
     @Test
     @DisplayName("6. Add Member: Should return 404 if project missing")
     void addMember_ProjectNotFound() throws Exception {
-        given(projectService.getProject(99L)).willReturn(null);
         var request = new AddMemberRequest(10L, ProjectRoleType.ADMIN);
+
+        doThrow(new ResourceNotFoundException("Project not found id 99"))
+                .when(projectService).addMember(eq(99L), anyLong(), any());
 
         mockMvc.perform(post("/api/projects/{projectId}/members", 99L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Project not found id 99"));
     }
 
     @Test
@@ -164,8 +172,6 @@ class ProjectControllerTest {
     @Test
     @DisplayName("8. Remove Member: Should return 200")
     void removeMember_Success() throws Exception {
-        given(projectService.removeMember(1L, 10L)).willReturn(true);
-
         mockMvc.perform(delete("/api/projects/{projectId}/members/{userId}", 1L, 10L))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Member removed from project"));

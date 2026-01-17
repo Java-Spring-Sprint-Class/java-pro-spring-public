@@ -16,11 +16,15 @@ import ua.duikt.learning.java.pro.spring.entity.Issue;
 import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
 import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.service.IssueService;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -99,13 +103,18 @@ class IssueControllerTest {
     @Test
     @DisplayName("Update Issue: returns 404 if missing")
     void updateIssue_NotFound() throws Exception {
-        given(issueService.getIssue(99L)).willReturn(null);
+        Long issueId = 99L;
         var request = new UpdateIssueRequest("T", "D");
 
-        mockMvc.perform(put("/api/issues/{id}", 99L)
+        doThrow(new ResourceNotFoundException("Issue with id " + issueId + " not found"))
+                .when(issueService).updateIssue(eq(issueId), anyString(), anyString());
+
+        mockMvc.perform(put("/api/issues/{id}", issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Issue with id " + issueId + " not found"));
     }
 
     @Test

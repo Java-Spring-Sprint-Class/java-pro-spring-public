@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.IssueLabel;
 import ua.duikt.learning.java.pro.spring.entity.Label;
+import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.IssueLabelRepo;
 import ua.duikt.learning.java.pro.spring.repositories.LabelRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.LabelServiceImpl;
@@ -16,6 +18,7 @@ import ua.duikt.learning.java.pro.spring.service.impl.LabelServiceImpl;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -89,9 +92,8 @@ class LabelServiceTest {
 
         ArgumentCaptor<IssueLabel> captor = ArgumentCaptor.forClass(IssueLabel.class);
 
-        boolean result = labelService.addLabelToIssue(issueId, labelId);
+        labelService.addLabelToIssue(issueId, labelId);
 
-        assertThat(result).isTrue();
         verify(issueLabelRepo).save(captor.capture());
 
         IssueLabel saved = captor.getValue();
@@ -100,52 +102,45 @@ class LabelServiceTest {
     }
 
     @Test
-    @DisplayName("addLabelToIssue: should return false when relation already exists")
-    void addLabelToIssue_shouldReturnFalse_ifExists() {
-         
+    @DisplayName("addLabelToIssue: should throw ConflictException when relation already exists")
+    void addLabelToIssue_shouldThrowConflictException_ifExists() {
         Long issueId = 10L;
         Long labelId = 5L;
 
         when(issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId))
                 .thenReturn(true);
 
-        boolean result = labelService.addLabelToIssue(issueId, labelId);
+        assertThrows(ConflictException.class, () -> labelService.addLabelToIssue(issueId, labelId));
 
-        assertThat(result).isFalse();
         verify(issueLabelRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("removeLabelFromIssue: should delete relation and return true if exists")
-    void removeLabelFromIssue_shouldDeleteAndReturnTrue_ifExists() {
-         
+    @DisplayName("removeLabelFromIssue: should delete relation if exists")
+    void removeLabelFromIssue_shouldDelete_ifExists() {
         Long issueId = 7L;
         Long labelId = 3L;
 
         when(issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId))
                 .thenReturn(true);
 
-        boolean result = labelService.removeLabelFromIssue(issueId, labelId);
+        labelService.removeLabelFromIssue(issueId, labelId);
 
-        assertThat(result).isTrue();
         verify(issueLabelRepo).deleteByIssueIdAndLabelId(issueId, labelId);
     }
 
     @Test
-    @DisplayName("removeLabelFromIssue: should return false if relation does not exist")
-    void removeLabelFromIssue_shouldReturnFalse_ifNotExists() {
-         
+    @DisplayName("removeLabelFromIssue: should throw ResourceNotFoundException if relation does not exist")
+    void removeLabelFromIssue_shouldThrowResourceNotFoundException_ifNotExists() {
         Long issueId = 7L;
         Long labelId = 3L;
 
         when(issueLabelRepo.existsByIssueIdAndLabelId(issueId, labelId))
                 .thenReturn(false);
 
-        boolean result = labelService.removeLabelFromIssue(issueId, labelId);
+        assertThrows(ResourceNotFoundException.class, () -> labelService.removeLabelFromIssue(issueId, labelId));
 
-        assertThat(result).isFalse();
-        verify(issueLabelRepo, never())
-                .deleteByIssueIdAndLabelId(anyLong(), anyLong());
+        verify(issueLabelRepo, never()).deleteByIssueIdAndLabelId(anyLong(), anyLong());
     }
 
     @Test

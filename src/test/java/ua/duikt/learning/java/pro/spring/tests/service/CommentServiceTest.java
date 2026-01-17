@@ -8,7 +8,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
+import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
+import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.repositories.CommentRepo;
+import ua.duikt.learning.java.pro.spring.repositories.IssueRepo;
+import ua.duikt.learning.java.pro.spring.repositories.UserRepo;
 import ua.duikt.learning.java.pro.spring.service.impl.CommentServiceImpl;
 
 import java.time.LocalDateTime;
@@ -16,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 /**
@@ -26,23 +31,28 @@ import static org.mockito.Mockito.*;
 class CommentServiceTest {
 
     @Mock
+    private IssueRepo issueRepo;
+    @Mock
+    private UserRepo userRepo;
+    @Mock
     private CommentRepo commentRepo;
 
     @InjectMocks
     private CommentServiceImpl commentService;
 
     @Test
-    @DisplayName("addComment: should save comment and return true")
-    void addComment_shouldSaveCommentAndReturnTrue() {
+    @DisplayName("addComment: should save comment")
+    void addComment_shouldSaveComment() {
         Long issueId = 1L;
         Long userId = 5L;
         String content = "Test comment";
 
+        when(issueRepo.existsById(issueId)).thenReturn(true);
+        when(userRepo.existsById(userId)).thenReturn(true);
+
+        commentService.addComment(issueId, content, userId);
+
         ArgumentCaptor<IssueComment> captor = ArgumentCaptor.forClass(IssueComment.class);
-
-        boolean result = commentService.addComment(issueId, content, userId);
-
-        assertThat(result).isTrue();
         verify(commentRepo).save(captor.capture());
 
         IssueComment saved = captor.getValue();
@@ -50,6 +60,17 @@ class CommentServiceTest {
         assertThat(saved.getUserId()).isEqualTo(userId);
         assertThat(saved.getContent()).isEqualTo(content);
         assertThat(saved.getCreatedAt()).isNotNull();
+    }
+    @Test
+    @DisplayName("addComment: should throw BadRequestException if content is empty")
+    void addComment_shouldThrowBadRequestException_ifContentIsEmpty() {
+        Long issueId = 1L;
+        Long userId = 5L;
+        String content = "";
+
+        assertThrows(BadRequestException.class, () -> commentService.addComment(issueId, content, userId));
+
+        verify(commentRepo, never()).save(any());
     }
 
     @Test
@@ -89,38 +110,39 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("updateComment: should do nothing when comment does not exist")
-    void updateComment_shouldDoNothing_ifNotExists() {
+    @DisplayName("updateComment: should throw ResourceNotFoundException when comment does not exist")
+    void updateComment_shouldThrowException_ifNotExists() {
         Long commentId = 99L;
         when(commentRepo.findById(commentId)).thenReturn(Optional.empty());
 
-        commentService.updateComment(commentId, "New content");
+        assertThrows(ResourceNotFoundException.class, () ->
+                commentService.updateComment(commentId, "New content")
+        );
 
         verify(commentRepo).findById(commentId);
         verify(commentRepo, never()).save(any());
     }
 
     @Test
-    @DisplayName("deleteComment: should delete comment and return true if exists")
-    void deleteComment_shouldDeleteAndReturnTrue_ifExists() {
+    @DisplayName("deleteComment: should delete comment if exists")
+    void deleteComment_shouldDelete_ifExists() {
         Long commentId = 3L;
-        when(commentRepo.existsById(commentId)).thenReturn(true);
+        IssueComment comment = IssueComment.builder().id(commentId).build();
+        when(commentRepo.findById(commentId)).thenReturn(Optional.of(comment));
 
-        boolean result = commentService.deleteComment(commentId);
+        commentService.deleteComment(commentId);
 
-        assertThat(result).isTrue();
-        verify(commentRepo).deleteById(commentId);
+        verify(commentRepo).delete(comment);
     }
 
     @Test
-    @DisplayName("deleteComment: should return false if comment does not exist")
-    void deleteComment_shouldReturnFalse_ifNotExists() {
+    @DisplayName("deleteComment: should throw ResourceNotFoundException if comment does not exist")
+    void deleteComment_shouldThrowResourceNotFoundException_ifNotExists() {
         Long commentId = 100L;
-        when(commentRepo.existsById(commentId)).thenReturn(false);
+        when(commentRepo.findById(commentId)).thenReturn(Optional.empty());
 
-        boolean result = commentService.deleteComment(commentId);
+        assertThrows(ResourceNotFoundException.class, () -> commentService.deleteComment(commentId));
 
-        assertThat(result).isFalse();
-        verify(commentRepo, never()).deleteById(anyLong());
+        verify(commentRepo, never()).delete(any());
     }
 }
