@@ -58,7 +58,7 @@ public class IssueServiceImpl implements IssueService {
                 .build();
 
         Issue savedIssue = issueRepo.save(issue);
-        log.info("Issue created successfully with ID: {} and Key: {}", savedIssue.getId(), savedIssue.getKey());
+        log.info("Issue created successfully with ID: {} and Key: {}", savedIssue.getId(), savedIssue.getIssueKey());
 
         recordHistory(savedIssue.getId(), "creation", null, "created");
 
