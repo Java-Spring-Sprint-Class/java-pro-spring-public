@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.LabelController;
@@ -13,6 +15,7 @@ import ua.duikt.learning.java.pro.spring.dtos.CreateLabelRequest;
 import ua.duikt.learning.java.pro.spring.entity.Label;
 import ua.duikt.learning.java.pro.spring.exceptions.ConflictException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.LabelService;
 
 import java.util.List;
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(LabelController.class)
+@Import(SecurityConfig.class)
 class LabelControllerTest {
 
     @Autowired
@@ -39,6 +43,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Create Label: Should return 201 and ID")
+    @WithMockUser(username = "user", roles = "USER")
     void createLabel_Success() throws Exception {
         var request = new CreateLabelRequest("BUG", "#FF0000");
         given(labelService.createLabel("BUG", "#FF0000")).willReturn(55L);
@@ -52,6 +57,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Get All Labels: Should return list")
+    @WithMockUser(username = "user", roles = "USER")
     void getAllLabels_Success() throws Exception {
         Label label = new Label();
         label.setName("Feature");
@@ -64,6 +70,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Add Label to Issue: Should return 200 OK")
+    @WithMockUser(username = "user", roles = "USER")
     void addLabelToIssue_Success() throws Exception {
         Long issueId = 1L;
         Long labelId = 5L;
@@ -77,6 +84,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Add Label to Issue: Should return 409 Conflict if already exists")
+    @WithMockUser(username = "user", roles = "USER")
     void addLabelToIssue_Conflict() throws Exception {
         Long issueId = 1L;
         Long labelId = 5L;
@@ -92,6 +100,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Get Labels for Issue: Should return list")
+    @WithMockUser(username = "user", roles = "USER")
     void getLabelsForIssue_Success() throws Exception {
         Label l = new Label(); l.setColor("blue");
         given(labelService.getLabelsForIssue(1L)).willReturn(List.of(l));
@@ -103,6 +112,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Remove Label from Issue: Should return 200 if removed")
+    @WithMockUser(username = "user", roles = "USER")
     void removeLabelFromIssue_Success() throws Exception {
         doNothing().when(labelService).removeLabelFromIssue(1L, 5L);
 
@@ -113,6 +123,7 @@ class LabelControllerTest {
 
     @Test
     @DisplayName("Remove Label from Issue: Should return 404 if not found")
+    @WithMockUser(username = "user", roles = "USER")
     void removeLabelFromIssue_NotFound() throws Exception {
         doThrow(new ResourceNotFoundException("Label relation not found"))
                 .when(labelService).removeLabelFromIssue(1L, 99L);

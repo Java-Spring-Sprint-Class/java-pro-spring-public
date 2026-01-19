@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.ProjectController;
@@ -16,6 +18,7 @@ import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.ProjectService;
 
 import java.util.List;
@@ -32,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(ProjectController.class)
+@Import(SecurityConfig.class)
 class ProjectControllerTest {
 
     @Autowired
@@ -45,6 +49,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("1. Create Project: Should return 201 and new ID")
+    @WithMockUser(username = "user", roles = "USER")
     void createProject_Success() throws Exception {
         Long userId = 1L;
         var request = new CreateProjectRequest("New Project", "NP", "Desc", userId);
@@ -61,6 +66,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("2. Get Project: Should return Project JSON if found")
+    @WithMockUser(username = "user", roles = "USER")
     void getProject_Success() throws Exception {
         Project project = new Project();
         project.setId(1L);
@@ -75,6 +81,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("2. Get Project: Should return 404 if not found")
+    @WithMockUser(username = "user", roles = "USER")
     void getProject_NotFound() throws Exception {
         given(projectService.getProject(99L))
                 .willThrow(new ResourceNotFoundException("Project not found id 99"));
@@ -87,6 +94,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("4. Update Project: Should check existence, update and return 200")
+    @WithMockUser(username = "user", roles = "USER")
     void updateProject_Success() throws Exception {
         Long projectId = 1L;
         var request = new UpdateProjectRequest("Updated Name", "Updated Desc");
@@ -104,6 +112,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("4. Update Project: Should return 404 if project missing")
+    @WithMockUser(username = "user", roles = "USER")
     void updateProject_NotFound() throws Exception {
         Long projectId = 99L;
         var request = new UpdateProjectRequest("Val", "Desc");
@@ -117,8 +126,10 @@ class ProjectControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Project not found id " + projectId));
     }
+
     @Test
     @DisplayName("5. Delete Project: Should return 204 No Content")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteProject_Success() throws Exception {
         mockMvc.perform(delete("/api/projects/{id}", 1))
                 .andExpect(status().isNoContent());
@@ -126,6 +137,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("6. Add Member: Should return 200 when project exists")
+    @WithMockUser(username = "user", roles = "USER")
     void addMember_Success() throws Exception {
         Long projectId = 1L;
         Long userId = 10L;
@@ -142,6 +154,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("6. Add Member: Should return 404 if project missing")
+    @WithMockUser(username = "user", roles = "USER")
     void addMember_ProjectNotFound() throws Exception {
         var request = new AddMemberRequest(10L, ProjectRoleType.ADMIN);
 
@@ -157,6 +170,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("7. Get Members: Should return list")
+    @WithMockUser(username = "user", roles = "USER")
     void getProjectMembers_Success() throws Exception {
         Long projectId = 1L;
         ProjectMember member = new ProjectMember();
@@ -171,6 +185,7 @@ class ProjectControllerTest {
 
     @Test
     @DisplayName("8. Remove Member: Should return 200")
+    @WithMockUser(username = "user", roles = "USER")
     void removeMember_Success() throws Exception {
         mockMvc.perform(delete("/api/projects/{projectId}/members/{userId}", 1L, 10L))
                 .andExpect(status().isOk())

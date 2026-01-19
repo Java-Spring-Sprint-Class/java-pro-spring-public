@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.UserController;
@@ -14,6 +16,7 @@ import ua.duikt.learning.java.pro.spring.dtos.UpdateProfileRequest;
 import ua.duikt.learning.java.pro.spring.entity.User;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.UserService;
 
 import java.util.List;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(UserController.class)
+@Import(SecurityConfig.class)
 class UserControllerTest {
 
     @Autowired
@@ -56,6 +60,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return 409 Conflict when user already exists")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void register_ShouldReturnConflict_WhenUserExists() throws Exception {
         var request = new RegisterRequest("exist", "exist@mail.com", "password123");
 
@@ -72,6 +77,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return User JSON when user exists")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getUser_ShouldReturnUser_WhenFound() throws Exception {
         User mockUser = new User();
         mockUser.setId(1L);
@@ -87,6 +93,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return 404 Not Found when user does not exist")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getUser_ShouldReturnNotFound_WhenMissing() throws Exception {
         Long userId = 999L;
 
@@ -101,6 +108,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return list of users")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void listUsers_ShouldReturnList() throws Exception {
         User u1 = new User();
         u1.setUsername("A");
@@ -117,6 +125,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should update user and return 200 OK")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void updateProfile_ShouldUpdate_WhenUserExists() throws Exception {
         Long userId = 1L;
         var request = new UpdateProfileRequest("newNick", "new@mail.com");
@@ -134,6 +143,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return 404 when updating non-existent user")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void updateProfile_ShouldReturn404_WhenUserMissing() throws Exception {
         Long userId = 999L;
         var request = new UpdateProfileRequest("new_username", "new_email@mail.com");
@@ -151,6 +161,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return 204 No Content on successful deactivation")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void deactivateUser_ShouldReturnNoContent() throws Exception {
         doNothing().when(userService).deactivateUser(1L);
 
@@ -160,6 +171,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Should return 404 if deactivation fails")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void deactivateUser_ShouldReturnNotFound() throws Exception {
         doThrow(new ResourceNotFoundException("User not found"))
                 .when(userService).deactivateUser(999L);

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.StatusController;
@@ -13,6 +15,7 @@ import ua.duikt.learning.java.pro.spring.dtos.CreateStatusRequest;
 import ua.duikt.learning.java.pro.spring.entity.Status;
 import ua.duikt.learning.java.pro.spring.entity.enums.StatusCategory;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.StatusService;
 
 import java.util.List;
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(StatusController.class)
+@Import(SecurityConfig.class)
 class StatusControllerTest {
 
     @Autowired
@@ -39,6 +43,7 @@ class StatusControllerTest {
 
     @Test
     @DisplayName("Create Status: should return 201")
+    @WithMockUser(username = "user", roles = "USER")
     void createStatus_Success() throws Exception {
         var request = new CreateStatusRequest(
                 1L, "To Do", StatusCategory.TO_DO
@@ -56,6 +61,7 @@ class StatusControllerTest {
 
     @Test
     @DisplayName("Get Statuses: filters by projectId")
+    @WithMockUser(username = "user", roles = "USER")
     void getStatuses_Success() throws Exception {
         Status s1 = new Status(); s1.setName("Done");
         given(statusService.getStatuses(10L)).willReturn(List.of(s1));
@@ -68,6 +74,7 @@ class StatusControllerTest {
 
     @Test
     @DisplayName("Delete Status: returns 204 if success")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteStatus_Success() throws Exception {
         doNothing().when(statusService).deleteStatus(1L);
 
@@ -77,6 +84,7 @@ class StatusControllerTest {
 
     @Test
     @DisplayName("Delete Status: returns 404 if status does not exist")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteStatus_NotFound() throws Exception {
         doThrow(new ResourceNotFoundException("Status not found"))
                 .when(statusService).deleteStatus(99L);

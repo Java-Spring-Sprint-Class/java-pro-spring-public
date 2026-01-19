@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ua.duikt.learning.java.pro.spring.entity.User;
 import ua.duikt.learning.java.pro.spring.entity.UserRole;
 import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
@@ -39,6 +40,9 @@ class UserServiceTest {
 
     @Mock
     private UserRoleRepo userRoleRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -75,6 +79,7 @@ class UserServiceTest {
 
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
+        when(passwordEncoder.encode(pass)).thenReturn("pass");
 
         userService.register(username, email, pass);
 

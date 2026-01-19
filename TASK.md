@@ -1,35 +1,47 @@
-# Task: Implementing Logging and Writing Custom Tests
+# Task: Implement Security in Spring Boot Application
 
-Your objective is to improve application observability and reliability by adding a structured logging mechanism and creating custom unit and integration tests. This will help track application behavior and ensure correctness of service logic.
+## Objective
+The goal of this task is to implement **Spring Security** in the application with proper access control, custom `UserDetails` and `UserDetailsService`, and update existing tests to work with security.
+
+---
 
 ## Requirements
 
-### 1. Implement Logging
-- Integrate a logging framework (e.g., `SLF4J` + `Logback`) into the project.
-- Add logging statements to all service and controller classes at appropriate levels:
-    - `INFO` for key actions (e.g., creating, updating, or deleting resources)
-    - `DEBUG` for detailed internal state and flow
-    - `ERROR` for exceptions and unexpected behavior
+### 1. Security Configuration
+- Configure **Spring Security** to allow **everyone** to access only the `/register` endpoint in the `UserController`.
+- Restrict access to the `RoleController` endpoints to **ADMIN** users only.
+- All other endpoints should be secured according to the application's requirements.
 
-- Ensure that log messages are informative and include relevant identifiers (e.g., userId, issueId) when available.
+### 2. Custom UserDetails
+- Implement a **custom `UserDetails`** class that wraps the `User` entity.
+- Map roles and permissions from your entities to Spring Security authorities.
 
-### 2. Write Custom Unit Tests
-- Create unit tests for service classes using `JUnit` and `Mockito`.
-- Cover both **happy path** and **edge/bad flows** to ensure correctness.
-- Include assertions for:
-    - Returned values
-    - Expected exceptions
-    - Correct logging calls (optional, using tools like `LogCaptor` if desired)
+### 3. UserDetailsService
+- Implement a **custom `UserDetailsService`** that loads user information from the database.
+- Ensure proper exception handling when users are not found.
 
-### 3. Write Custom Integration Tests
-- Create integration tests for controllers using `@SpringBootTest` and `TestRestTemplate` or `MockMvc`.
-- Test that endpoints:
-    - Return correct HTTP status codes
-    - Handle input validation properly
-    - Log relevant actions for traceability
+### 4. Update Tests
+- Refactor existing tests to include **security context**.
+- Write tests to verify:
+    - Public endpoints (e.g., `/register`) are accessible without authentication.
+    - Admin endpoints (e.g., `/roles`) are restricted to users with the `ADMIN` role.
+    - Unauthorized access returns appropriate HTTP status codes (e.g., `403 Forbidden`).
 
-## Expected Outcome
+### 5. Bonus
+- Use **TDD approach**: implement tests first and then secure the application to pass those tests.
+- Ensure code is modular and easy to extend for future roles and permissions.
 
-- All custom tests must pass (green status).
-- Logs should clearly reflect application flow and errors.
-- This confirms that the logging is correctly implemented and the system behaves as expected under both normal and edge conditions.
+---
+
+## Deliverables
+1. `SecurityConfig.java` or equivalent configuration.
+2. `CustomUserDetails.java` and `CustomUserDetailsService.java`.
+3. Updated and fully working tests with security enabled.
+4. Documentation or comments explaining security rules applied to controllers.
+
+---
+
+## Notes
+- Make sure to use **Spring Boot 3+** and **Spring Security 6+** conventions.
+- Use annotations like `@PreAuthorize` or `@Secured` where needed for method-level security.
+- Keep password encoding and authentication best practices in mind.

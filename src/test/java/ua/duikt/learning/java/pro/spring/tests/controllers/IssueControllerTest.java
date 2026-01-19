@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.IssueController;
@@ -17,6 +19,7 @@ import ua.duikt.learning.java.pro.spring.entity.IssueHistory;
 import ua.duikt.learning.java.pro.spring.entity.enums.IssueType;
 import ua.duikt.learning.java.pro.spring.entity.enums.Priority;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.IssueService;
 
 import java.util.List;
@@ -33,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(IssueController.class)
+@Import(SecurityConfig.class)
 class IssueControllerTest {
 
     @Autowired
@@ -44,6 +48,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Create Issue: returns 201 and ID")
+    @WithMockUser(username = "user", roles = "USER")
     void createIssue_Success() throws Exception {
         Long statusId = 1L;
         var request = new CreateIssueRequest(
@@ -62,6 +67,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Get Issue: returns Issue if found")
+    @WithMockUser(username = "user", roles = "USER")
     void getIssue_Success() throws Exception {
         Issue issue = new Issue();
         issue.setId(10L);
@@ -76,6 +82,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("List Issues: filters by projectId")
+    @WithMockUser(username = "user", roles = "USER")
     void listIssues_Success() throws Exception {
         Issue issue = new Issue();
         given(issueService.listIssues(5L)).willReturn(List.of(issue));
@@ -87,6 +94,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Update Issue: checks existence then updates")
+    @WithMockUser(username = "user", roles = "USER")
     void updateIssue_Success() throws Exception {
         Long id = 1L;
         var request = new UpdateIssueRequest("New Title", "New Desc");
@@ -102,6 +110,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Update Issue: returns 404 if missing")
+    @WithMockUser(username = "user", roles = "USER")
     void updateIssue_NotFound() throws Exception {
         Long issueId = 99L;
         var request = new UpdateIssueRequest("T", "D");
@@ -119,6 +128,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Patch Status: should update status")
+    @WithMockUser(username = "user", roles = "USER")
     void updateStatus_Success() throws Exception {
         Long issueId = 1L;
         Long newStatusId = 5L;
@@ -135,6 +145,7 @@ class IssueControllerTest {
 
     @Test
     @DisplayName("Get History: returns list of changes")
+    @WithMockUser(username = "user", roles = "USER")
     void getHistory_Success() throws Exception {
         Long issueId = 1L;
         given(issueService.getIssue(issueId)).willReturn(new Issue());

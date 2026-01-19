@@ -5,12 +5,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.RoleController;
 import ua.duikt.learning.java.pro.spring.dtos.CreateRoleRequest;
 import ua.duikt.learning.java.pro.spring.entity.Role;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.RoleService;
 
 import java.util.List;
@@ -25,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(RoleController.class)
+@Import(SecurityConfig.class)
 class RoleControllerTest {
 
     @Autowired
@@ -38,6 +42,7 @@ class RoleControllerTest {
 
     @Test
     @DisplayName("Should create role and return 201 Created with new ID")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void createRole_ShouldReturnCreated_WhenSuccess() throws Exception {
         var request = new CreateRoleRequest("ADMIN");
 
@@ -53,6 +58,7 @@ class RoleControllerTest {
 
     @Test
     @DisplayName("Should return list of roles with status 200")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getRoles_ShouldReturnList() throws Exception {
         Role roleUser = new Role();
         roleUser.setId(1L);
@@ -74,6 +80,7 @@ class RoleControllerTest {
 
     @Test
     @DisplayName("Should return empty list when no roles exist")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getRoles_ShouldReturnEmptyList() throws Exception {
         given(roleService.getRoles()).willReturn(List.of());
 

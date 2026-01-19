@@ -5,13 +5,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
 import ua.duikt.learning.java.pro.spring.entity.Attachment;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.CustomUserDetails;
+import ua.duikt.learning.java.pro.spring.security.CustomUserDetailsService;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.util.List;
@@ -27,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(AttachmentController.class)
+@Import(SecurityConfig.class)
 class AttachmentControllerTest {
 
     @Autowired
@@ -38,6 +45,7 @@ class AttachmentControllerTest {
 
     @Test
     @DisplayName("Add Attachment: Should return 201")
+    @WithMockUser(username = "user", roles = "USER")
     void addAttachment_Success() throws Exception {
         Long issueId = 1L;
         Long userId = 2L;
@@ -54,6 +62,7 @@ class AttachmentControllerTest {
 
     @Test
     @DisplayName("Delete Attachment: Should return 204")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteAttachment_Success() throws Exception {
         doNothing().when(attachmentService).deleteAttachment(10L);
 
@@ -63,6 +72,7 @@ class AttachmentControllerTest {
 
     @Test
     @DisplayName("Delete Attachment: Should return 404 if not found")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteAttachment_NotFound() throws Exception {
         doThrow(new ResourceNotFoundException("Attachment not found"))
                 .when(attachmentService).deleteAttachment(99L);
@@ -75,6 +85,7 @@ class AttachmentControllerTest {
 
     @Test
     @DisplayName("Get Attachments: Should return list")
+    @WithMockUser(username = "user", roles = "USER")
     void getAttachments_Success() throws Exception {
         Attachment att = new Attachment();
         att.setFileName("doc.pdf");

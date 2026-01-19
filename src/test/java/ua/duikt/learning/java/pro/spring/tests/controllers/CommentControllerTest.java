@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.CommentController;
@@ -14,6 +16,7 @@ import ua.duikt.learning.java.pro.spring.dtos.UpdateCommentRequest;
 import ua.duikt.learning.java.pro.spring.entity.IssueComment;
 import ua.duikt.learning.java.pro.spring.exceptions.BadRequestException;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
 import ua.duikt.learning.java.pro.spring.service.CommentService;
 
 import java.util.List;
@@ -30,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * email mykyta.sirobaba@gmail.com
  */
 @WebMvcTest(CommentController.class)
+@Import(SecurityConfig.class)
 class CommentControllerTest {
 
     @Autowired
@@ -41,6 +45,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Add Comment: Should return 201 Created")
+    @WithMockUser(username = "user", roles = "USER")
     void addComment_Success() throws Exception {
         Long issueId = 1L;
         Long userId = 2L;
@@ -57,6 +62,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Add Comment: Should return 400 Bad Request if content is empty")
+    @WithMockUser(username = "user", roles = "USER")
     void addComment_BadRequest() throws Exception {
         Long issueId = 1L;
         Long userId = 2L;
@@ -76,6 +82,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Get Comments: Should return list")
+    @WithMockUser(username = "user", roles = "USER")
     void getComments_Success() throws Exception {
         Long issueId = 1L;
         IssueComment comment = new IssueComment();
@@ -91,6 +98,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Update Comment: Should return 200 OK")
+    @WithMockUser(username = "user", roles = "USER")
     void updateComment_Success() throws Exception {
         Long commentId = 5L;
         var request = new UpdateCommentRequest("Updated text");
@@ -104,6 +112,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Delete Comment: Should return 204 No Content")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteComment_Success() throws Exception {
         doNothing().when(commentService).deleteComment(5L);
 
@@ -113,6 +122,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("Delete Comment: Should return 404 Not Found if missing")
+    @WithMockUser(username = "user", roles = "USER")
     void deleteComment_NotFound() throws Exception {
         doThrow(new ResourceNotFoundException("Comment not found"))
                 .when(commentService).deleteComment(99L);
