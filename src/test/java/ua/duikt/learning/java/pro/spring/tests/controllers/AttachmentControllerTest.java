@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.AttachmentController;
 import ua.duikt.learning.java.pro.spring.dtos.AddAttachmentRequest;
@@ -18,6 +19,8 @@ import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.security.CustomUserDetails;
 import ua.duikt.learning.java.pro.spring.security.CustomUserDetailsService;
 import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
+import ua.duikt.learning.java.pro.spring.security.filters.AccessTokenAuthenticationFilter;
+import ua.duikt.learning.java.pro.spring.security.jwt.JwtTool;
 import ua.duikt.learning.java.pro.spring.service.AttachmentService;
 
 import java.util.List;
@@ -40,6 +43,12 @@ class AttachmentControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private AttachmentService attachmentService;
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+    @MockitoBean
+    private JwtTool jwtTool;
+    @MockitoSpyBean
+    private AccessTokenAuthenticationFilter accessTokenFilter;
     @Autowired
     private ObjectMapper objectMapper;
 

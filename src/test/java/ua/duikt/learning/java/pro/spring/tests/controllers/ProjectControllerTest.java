@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.ProjectController;
 import ua.duikt.learning.java.pro.spring.dtos.AddMemberRequest;
@@ -18,7 +19,10 @@ import ua.duikt.learning.java.pro.spring.entity.Project;
 import ua.duikt.learning.java.pro.spring.entity.ProjectMember;
 import ua.duikt.learning.java.pro.spring.entity.enums.ProjectRoleType;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
+import ua.duikt.learning.java.pro.spring.security.CustomUserDetailsService;
 import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
+import ua.duikt.learning.java.pro.spring.security.filters.AccessTokenAuthenticationFilter;
+import ua.duikt.learning.java.pro.spring.security.jwt.JwtTool;
 import ua.duikt.learning.java.pro.spring.service.ProjectService;
 
 import java.util.List;
@@ -43,6 +47,12 @@ class ProjectControllerTest {
 
     @MockitoBean
     private ProjectService projectService;
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+    @MockitoBean
+    private JwtTool jwtTool;
+    @MockitoSpyBean
+    private AccessTokenAuthenticationFilter accessTokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;

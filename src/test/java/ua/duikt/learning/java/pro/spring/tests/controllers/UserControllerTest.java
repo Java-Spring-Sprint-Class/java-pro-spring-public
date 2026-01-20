@@ -9,14 +9,19 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.duikt.learning.java.pro.spring.controllers.UserController;
 import ua.duikt.learning.java.pro.spring.dtos.RegisterRequest;
+import ua.duikt.learning.java.pro.spring.dtos.TokenResponseDto;
 import ua.duikt.learning.java.pro.spring.dtos.UpdateProfileRequest;
 import ua.duikt.learning.java.pro.spring.entity.User;
 import ua.duikt.learning.java.pro.spring.exceptions.ResourceNotFoundException;
 import ua.duikt.learning.java.pro.spring.exceptions.UserAlreadyExistException;
+import ua.duikt.learning.java.pro.spring.security.CustomUserDetailsService;
 import ua.duikt.learning.java.pro.spring.security.SecurityConfig;
+import ua.duikt.learning.java.pro.spring.security.filters.AccessTokenAuthenticationFilter;
+import ua.duikt.learning.java.pro.spring.security.jwt.JwtTool;
 import ua.duikt.learning.java.pro.spring.service.UserService;
 
 import java.util.List;
@@ -40,6 +45,12 @@ class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+    @MockitoBean
+    private JwtTool jwtTool;
+    @MockitoSpyBean
+    private AccessTokenAuthenticationFilter accessTokenFilter;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,13 +60,13 @@ class UserControllerTest {
     void register_ShouldReturnCreated_WhenSuccess() throws Exception {
         var request = new RegisterRequest("john", "john@mail.com", "pass123");
 
-        doNothing().when(userService).register(anyString(), anyString(), anyString());
+        when(userService.register(anyString(), anyString(), anyString())).thenReturn(new TokenResponseDto());
 
         mockMvc.perform(post("/api/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("User registered successfully"));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
