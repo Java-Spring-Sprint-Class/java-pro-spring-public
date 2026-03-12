@@ -15,7 +15,6 @@ The task is to migrate from in-memory data storage to a full database-backed imp
         - `@Id`
         - `@GeneratedValue`
         - `@Column`
-        - relationships: `@OneToMany`, `@ManyToOne`, `@ManyToMany`, `@JoinColumn`, etc.
     - Properly define relationships between entities according to the existing data model.
 
 3. **Repositories**
